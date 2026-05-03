@@ -1,0 +1,40 @@
+{
+  "custom": {
+    "cover": null,
+    "photos": []
+  },
+  "production": {
+    "cover": null,
+    "photos": []
+  },
+  "details": {
+    "cover": null,
+    "photos": []
+  },
+  "multifamily/orchard-grove": {
+    "cover": "assets/multifamily/orchard-grove/cover.jpg",
+    "photos": [
+      "assets/multifamily/orchard-grove/OrchardGrove-1.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-10.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-11.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-12.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-13.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-14.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-2.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-3.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-5.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-6.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-7.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-8.jpg",
+      "assets/multifamily/orchard-grove/OrchardGrove-9.jpg"
+    ]
+  },
+  "multifamily/parkway": {
+    "cover": null,
+    "photos": []
+  },
+  "multifamily/4th-main": {
+    "cover": null,
+    "photos": []
+  }
+}

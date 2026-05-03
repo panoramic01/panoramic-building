@@ -160,8 +160,9 @@
     .project-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
     .project-card-cover {
       aspect-ratio: 16/9;
-      background: #e8e7e3;
+      background: #1F3971;
       overflow: hidden;
+      position: relative;
     }
     .project-card-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
     .project-card:hover .project-card-cover img { transform: scale(1.04); }
@@ -169,9 +170,49 @@
       width: 100%;
       height: 100%;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #A2A092;
+      gap: 12px;
+      background: linear-gradient(135deg, #1F3971 0%, #152847 100%);
+    }
+    .project-card-cover-placeholder .ph-name {
+      color: rgba(255,255,255,0.9);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .project-card-cover-placeholder .ph-location {
+      color: rgba(255,255,255,0.4);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .project-card-cover-placeholder .ph-line {
+      width: 32px;
+      height: 2px;
+      background: rgba(255,255,255,0.25);
+    }
+    .project-card-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+      gap: 4px;
+    }
+    .project-card-cover-overlay .ph-name {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .project-card-cover-overlay .ph-location {
+      color: rgba(255,255,255,0.65);
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
@@ -257,11 +298,19 @@
       position: relative;
       max-width: 90vw;
       max-height: 90vh;
+      overflow: hidden;
+      cursor: zoom-in;
     }
+    .lightbox-inner.zoomed { cursor: grab; }
+    .lightbox-inner.zoomed:active { cursor: grabbing; }
     .lightbox-inner img {
       max-width: 90vw;
       max-height: 90vh;
       object-fit: contain;
+      transform-origin: center center;
+      transition: transform 0.2s ease;
+      user-select: none;
+      pointer-events: none;
     }
     .lightbox-close {
       position: fixed;
@@ -398,8 +447,16 @@
     <div id="mf-projects" class="project-grid">
 
       <div class="project-card" onclick="openProject('orchard-grove')">
-        <div class="project-card-cover">
-          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        <div class="project-card-cover" id="cover-orchard-grove">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">Orchard Grove</div>
+            <div class="ph-location">Idaho Falls, ID</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">Orchard Grove</div>
+            <div class="ph-location">Idaho Falls, ID</div>
+          </div>
         </div>
         <div class="project-card-info">
           <h3>Orchard Grove</h3>
@@ -411,8 +468,16 @@
       </div>
 
       <div class="project-card" onclick="openProject('parkway')">
-        <div class="project-card-cover">
-          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        <div class="project-card-cover" id="cover-parkway">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">Parkway</div>
+            <div class="ph-location">Idaho Falls, ID</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">Parkway</div>
+            <div class="ph-location">Idaho Falls, ID</div>
+          </div>
         </div>
         <div class="project-card-info">
           <h3>Parkway</h3>
@@ -423,9 +488,59 @@
         </div>
       </div>
 
+      <div class="project-card" onclick="openProject('altura')">
+        <div class="project-card-cover" id="cover-altura">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">Altura</div>
+            <div class="ph-location">Logan, UT</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">Altura</div>
+            <div class="ph-location">Logan, UT</div>
+          </div>
+        </div>
+        <div class="project-card-info">
+          <h3>Altura</h3>
+          <p>Logan, UT</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+
+      <div class="project-card" onclick="openProject('the-crossing')">
+        <div class="project-card-cover" id="cover-the-crossing">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">The Crossing</div>
+            <div class="ph-location">Woods Cross, UT</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">The Crossing</div>
+            <div class="ph-location">Woods Cross, UT</div>
+          </div>
+        </div>
+        <div class="project-card-info">
+          <h3>The Crossing</h3>
+          <p>Woods Cross, UT</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+
       <div class="project-card" onclick="openProject('4th-main')">
-        <div class="project-card-cover">
-          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        <div class="project-card-cover" id="cover-4th-main">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">4th + Main</div>
+            <div class="ph-location">Bountiful, UT</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">4th + Main</div>
+            <div class="ph-location">Bountiful, UT</div>
+          </div>
         </div>
         <div class="project-card-info">
           <h3>4th + Main</h3>
@@ -449,7 +564,6 @@
         <p>Idaho Falls, ID</p>
       </div>
       <div class="photo-grid" id="grid-orchard-grove">
-        <!-- Add images here: <div class="photo-item" onclick="openLightbox(this, 'grid-orchard-grove')"><img src="assets/multifamily/orchard-grove/01.jpeg" alt="Orchard Grove"></div> -->
         <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
       </div>
     </div>
@@ -464,6 +578,34 @@
         <p>Idaho Falls, ID</p>
       </div>
       <div class="photo-grid" id="grid-parkway">
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+    <div id="sub-altura" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>Altura</h2>
+        <p>Logan, UT</p>
+      </div>
+      <div class="photo-grid" id="grid-altura">
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+    <div id="sub-the-crossing" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>The Crossing</h2>
+        <p>Woods Cross, UT</p>
+      </div>
+      <div class="photo-grid" id="grid-the-crossing">
         <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
       </div>
     </div>
@@ -487,7 +629,6 @@
   <!-- ── Custom Homes Tab ── -->
   <div id="tab-custom" class="tab-panel">
     <div class="photo-grid" id="grid-custom">
-      <!-- Add images here: <div class="photo-item" onclick="openLightbox(this, 'grid-custom')"><img src="assets/custom/01.jpeg" alt="Custom Home"></div> -->
       <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
     </div>
   </div>
@@ -576,9 +717,18 @@
       document.getElementById('tab-' + name).classList.add('active');
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
-      // Reset multifamily to project list when switching back
       if (name === 'multifamily') closeProject();
     }
+
+    // Open tab from URL param e.g. gallery.html?tab=custom
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab) {
+        const btn = document.querySelector('.tab-btn[onclick*="' + tab + '"]');
+        if (btn) switchTab(tab, btn);
+      }
+    })();
 
     // ── Multifamily sub-galleries ──
     function openProject(id) {
@@ -592,6 +742,72 @@
       document.getElementById('mf-projects').style.display = 'grid';
     }
 
+    // ── Load photos from manifest ──
+    const gridMap = {
+      'custom':                    'grid-custom',
+      'production':                'grid-production',
+      'details':                   'grid-details',
+      'multifamily/orchard-grove': 'grid-orchard-grove',
+      'multifamily/parkway':       'grid-parkway',
+      'multifamily/4th-main':      'grid-4th-main',
+      'multifamily/the-crossing':  'grid-the-crossing',
+      'multifamily/altura':        'grid-altura'
+    };
+
+    const coverMap = {
+      'multifamily/orchard-grove': 'cover-orchard-grove',
+      'multifamily/parkway':       'cover-parkway',
+      'multifamily/4th-main':      'cover-4th-main',
+      'multifamily/the-crossing':  'cover-the-crossing',
+      'multifamily/altura':        'cover-altura'
+    };
+
+    function populateGrid(gridId, photos) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      if (!photos || photos.length === 0) return;
+      grid.innerHTML = '';
+      photos.forEach(function(src) {
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        div.onclick = function() { openLightbox(div, gridId); };
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        div.appendChild(img);
+        grid.appendChild(div);
+      });
+    }
+
+    function setCoverImage(coverId, src) {
+      const cover = document.getElementById(coverId);
+      if (!cover || !src) return;
+      cover.style.backgroundImage = "url('" + src + "')";
+      cover.style.backgroundSize = 'cover';
+      cover.style.backgroundPosition = 'center';
+      // hide the placeholder, show overlay
+      const placeholder = cover.querySelector('.project-card-cover-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      const overlay = cover.querySelector('.project-card-cover-overlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
+
+    fetch('gallery-manifest.json')
+      .then(function(r) { return r.json(); })
+      .then(function(manifest) {
+        Object.keys(gridMap).forEach(function(key) {
+          var entry = manifest[key];
+          if (!entry) return;
+          // Support both old format (array) and new format ({cover, photos})
+          var photos = Array.isArray(entry) ? entry : entry.photos;
+          var cover = Array.isArray(entry) ? null : entry.cover;
+          populateGrid(gridMap[key], photos);
+          if (coverMap[key]) setCoverImage(coverMap[key], cover);
+        });
+      })
+      .catch(function(e) { console.warn('Could not load gallery manifest', e); });
+
     // ── Lightbox ──
     let lightboxImages = [];
     let lightboxIndex = 0;
@@ -599,9 +815,9 @@
     function openLightbox(el, gridId) {
       const grid = document.getElementById(gridId);
       const items = grid.querySelectorAll('.photo-item img');
-      lightboxImages = Array.from(items).map(img => ({ src: img.src, alt: img.alt }));
+      lightboxImages = Array.from(items).map(function(img) { return { src: img.src, alt: img.alt }; });
       const clickedSrc = el.querySelector('img').src;
-      lightboxIndex = lightboxImages.findIndex(i => i.src === clickedSrc);
+      lightboxIndex = lightboxImages.findIndex(function(i) { return i.src === clickedSrc; });
       showLightboxImage();
       document.getElementById('lightbox').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -610,14 +826,153 @@
       const img = document.getElementById('lightbox-img');
       img.src = lightboxImages[lightboxIndex].src;
       img.alt = lightboxImages[lightboxIndex].alt;
+      resetZoom();
     }
     function lightboxNav(dir) {
       lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
       showLightboxImage();
     }
+
+    // ── Zoom & Pan ──
+    var isZoomed = false;
+    var panX = 0, panY = 0;
+    var startX = 0, startY = 0;
+    var isPanning = false;
+
+    function resetZoom() {
+      isZoomed = false;
+      panX = 0; panY = 0;
+      var inner = document.querySelector('.lightbox-inner');
+      var img = document.getElementById('lightbox-img');
+      inner.classList.remove('zoomed');
+      img.style.transform = 'scale(1) translate(0px, 0px)';
+    }
+
+    document.querySelector('.lightbox-inner').addEventListener('click', function(e) {
+      if (isPanning) return;
+      var img = document.getElementById('lightbox-img');
+      var inner = this;
+      if (!isZoomed) {
+        // Zoom into click point
+        var rect = inner.getBoundingClientRect();
+        var offsetX = e.clientX - rect.left - rect.width / 2;
+        var offsetY = e.clientY - rect.top - rect.height / 2;
+        panX = -offsetX;
+        panY = -offsetY;
+        isZoomed = true;
+        inner.classList.add('zoomed');
+        img.style.transform = 'scale(4) translate(' + (panX / 4) + 'px, ' + (panY / 4) + 'px)';
+      } else {
+        resetZoom();
+      }
+    });
+
+    // Drag to pan when zoomed
+    document.querySelector('.lightbox-inner').addEventListener('mousedown', function(e) {
+      if (!isZoomed) return;
+      isPanning = false;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+      this.addEventListener('mousemove', onPanMove);
+      window.addEventListener('mouseup', onPanEnd);
+    });
+
+    function onPanMove(e) {
+      isPanning = true;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      document.getElementById('lightbox-img').style.transform = 'scale(4) translate(' + (panX / 4) + 'px, ' + (panY / 4) + 'px)';
+    }
+    function onPanEnd() {
+      document.querySelector('.lightbox-inner').removeEventListener('mousemove', onPanMove);
+      window.removeEventListener('mouseup', onPanEnd);
+      setTimeout(function() { isPanning = false; }, 10);
+    }
+
+    // ── Pinch to zoom (touch) ──
+    var touchStartDist = 0;
+    var touchStartScale = 1;
+    var currentScale = 1;
+    var touchPanX = 0, touchPanY = 0;
+    var touchStartPanX = 0, touchStartPanY = 0;
+    var lastTouchMidX = 0, lastTouchMidY = 0;
+
+    function getTouchDist(touches) {
+      var dx = touches[0].clientX - touches[1].clientX;
+      var dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    function getTouchMid(touches) {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2
+      };
+    }
+    function applyTransform() {
+      var img = document.getElementById('lightbox-img');
+      var inner = document.querySelector('.lightbox-inner');
+      img.style.transform = 'scale(' + currentScale + ') translate(' + (touchPanX / currentScale) + 'px, ' + (touchPanY / currentScale) + 'px)';
+      if (currentScale > 1) inner.classList.add('zoomed');
+      else inner.classList.remove('zoomed');
+    }
+
+    var inner = document.querySelector('.lightbox-inner');
+    inner.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        touchStartDist = getTouchDist(e.touches);
+        touchStartScale = currentScale;
+        var mid = getTouchMid(e.touches);
+        lastTouchMidX = mid.x;
+        lastTouchMidY = mid.y;
+        touchStartPanX = touchPanX;
+        touchStartPanY = touchPanY;
+      } else if (e.touches.length === 1 && currentScale > 1) {
+        touchStartPanX = touchPanX;
+        touchStartPanY = touchPanY;
+        lastTouchMidX = e.touches[0].clientX;
+        lastTouchMidY = e.touches[0].clientY;
+      }
+    }, { passive: false });
+
+    inner.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        var dist = getTouchDist(e.touches);
+        currentScale = Math.min(Math.max(touchStartScale * (dist / touchStartDist), 1), 6);
+        var mid = getTouchMid(e.touches);
+        touchPanX = touchStartPanX + (mid.x - lastTouchMidX);
+        touchPanY = touchStartPanY + (mid.y - lastTouchMidY);
+        applyTransform();
+      } else if (e.touches.length === 1 && currentScale > 1) {
+        e.preventDefault();
+        touchPanX = touchStartPanX + (e.touches[0].clientX - lastTouchMidX);
+        touchPanY = touchStartPanY + (e.touches[0].clientY - lastTouchMidY);
+        applyTransform();
+      }
+    }, { passive: false });
+
+    inner.addEventListener('touchend', function(e) {
+      if (currentScale <= 1) {
+        currentScale = 1;
+        touchPanX = 0;
+        touchPanY = 0;
+        applyTransform();
+      }
+    });
+
+    // Reset touch zoom when changing images or closing
+    var origResetZoom = resetZoom;
+    resetZoom = function() {
+      origResetZoom();
+      currentScale = 1;
+      touchPanX = 0;
+      touchPanY = 0;
+    };
     function closeLightbox() {
       document.getElementById('lightbox').classList.remove('open');
       document.body.style.overflow = '';
+      resetZoom();
     }
     function closeLightboxOutside(e) {
       if (e.target === document.getElementById('lightbox')) closeLightbox();
@@ -625,8 +980,8 @@
     document.addEventListener('keydown', function(e) {
       if (!document.getElementById('lightbox').classList.contains('open')) return;
       if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') lightboxNav(-1);
-      if (e.key === 'ArrowRight') lightboxNav(1);
+      if (e.key === 'ArrowLeft') { resetZoom(); lightboxNav(-1); }
+      if (e.key === 'ArrowRight') { resetZoom(); lightboxNav(1); }
     });
   </script>
 

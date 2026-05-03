@@ -1,0 +1,8 @@
+{
+  "name": "panoramic-building",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node generate-manifest.js",
+    "watch": "npx nodemon --watch assets -e jpg,jpeg,png,webp --exec \"node generate-manifest.js\""
+  }
+}

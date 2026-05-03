@@ -378,20 +378,43 @@
       overflow: hidden;
       cursor: pointer;
     }
-    .gallery-item:nth-child(1) { background-image: url('assets/gallery-1.jpg'); }
-    .gallery-item:nth-child(2) { background-image: url('assets/gallery-2.jpg'); }
-    .gallery-item:nth-child(3) { background-image: url('assets/gallery-3.jpg'); }
-    .gallery-item:nth-child(4) { background-image: url('assets/gallery-4.jpg'); }
+    /* Gallery strip background images set via JS to support both .jpg and .jpeg */
     .gallery-item::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(20, 35, 60, 0);
+      background: rgba(10, 18, 35, 0.35);
       transition: background 0.3s;
     }
     .gallery-item:hover::after {
-      background: rgba(20, 35, 60, 0.45);
+      background: rgba(10, 18, 35, 0.6);
     }
+    .gallery-item-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .gallery-item-label span {
+      color: #fff;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .gallery-item-label svg {
+      width: 16px;
+      height: 16px;
+      stroke: #fff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .gallery-item:hover .gallery-item-label svg { opacity: 1; }
     .gallery-cta {
       text-align: center;
       padding: 36px 40px 64px;
@@ -705,10 +728,30 @@
       <div class="section-accent"></div>
     </div>
     <div class="gallery-strip">
-      <a href="gallery.html" class="gallery-item" aria-label="View gallery"></a>
-      <a href="gallery.html" class="gallery-item" aria-label="View gallery"></a>
-      <a href="gallery.html" class="gallery-item" aria-label="View gallery"></a>
-      <a href="gallery.html" class="gallery-item" aria-label="View gallery"></a>
+      <a href="gallery.html?tab=multifamily" class="gallery-item" aria-label="View Multifamily gallery">
+        <div class="gallery-item-label">
+          <span>Multifamily</span>
+          <svg fill="none" viewBox="0 0 16 16" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </a>
+      <a href="gallery.html?tab=custom" class="gallery-item" aria-label="View Custom Homes gallery">
+        <div class="gallery-item-label">
+          <span>Custom Homes</span>
+          <svg fill="none" viewBox="0 0 16 16" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </a>
+      <a href="gallery.html?tab=production" class="gallery-item" aria-label="View Production Homes gallery">
+        <div class="gallery-item-label">
+          <span>Production Homes</span>
+          <svg fill="none" viewBox="0 0 16 16" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </a>
+      <a href="gallery.html?tab=details" class="gallery-item" aria-label="View Details gallery">
+        <div class="gallery-item-label">
+          <span>Details</span>
+          <svg fill="none" viewBox="0 0 16 16" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </a>
     </div>
     <div class="gallery-cta">
       <a href="gallery.html" class="btn-outline">View Full Gallery</a>
@@ -765,8 +808,34 @@
     <span class="footer-copy">Licensed &amp; Insured &nbsp;·&nbsp; Utah &amp; Idaho</span>
   </div>
 
-  <!-- JS: Mobile menu toggle -->
+  <!-- JS: Mobile menu toggle + image helpers -->
   <script>
+    // Try .jpg then .jpeg for background images
+    function loadBgImage(el, base) {
+      var exts = ['.jpg', '.jpeg'];
+      var i = 0;
+      function tryNext() {
+        if (i >= exts.length) return;
+        var url = base + exts[i];
+        var img = new Image();
+        img.onload = function() { el.style.backgroundImage = "url('" + url + "')"; };
+        img.onerror = function() { i++; tryNext(); };
+        img.src = url;
+      }
+      tryNext();
+    }
+    // Load gallery strip images
+    var galleryImages = [
+      { selector: '.gallery-item:nth-child(1)', base: 'assets/gallery-multifamily' },
+      { selector: '.gallery-item:nth-child(2)', base: 'assets/gallery-custom' },
+      { selector: '.gallery-item:nth-child(3)', base: 'assets/gallery-production' },
+      { selector: '.gallery-item:nth-child(4)', base: 'assets/gallery-details' }
+    ];
+    galleryImages.forEach(function(item) {
+      var el = document.querySelector(item.selector);
+      if (el) loadBgImage(el, item.base);
+    });
+
     function toggleMenu(btn) {
       const nav = document.getElementById('nav-links');
       const isOpen = nav.classList.toggle('open');
