@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | Panoramic Building LLC</title>
+  <meta name="description" content="Project gallery for Panoramic Building LLC — multifamily, custom homes, production homes, and detail work across Northern Utah and Southern Idaho." />
+  <link rel="canonical" href="https://www.panoramicbuildingllc.com/gallery.html" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: #2E2E2E;
+      background: #fff;
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Utility Bar ── */
+    .util-bar {
+      background: #152847;
+      padding: 9px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .util-bar span { color: rgba(255,255,255,0.55); font-size: 12px; letter-spacing: 0.3px; }
+    .util-bar a { color: rgba(255,255,255,0.55); }
+    .util-bar a:hover { color: rgba(255,255,255,0.85); }
+
+    /* ── Navigation ── */
+    .nav {
+      background: #2E2E2E;
+      padding: 0 40px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; }
+    .nav-logo img { height: 60px; width: auto; object-fit: contain; }
+    .nav-logo-text { display: flex; flex-direction: column; }
+    .nav-logo-text .name { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; line-height: 1.2; }
+    .nav-logo-text .sub { color: rgba(255,255,255,0.4); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.7); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-links .btn-nav { background: #1F3971; color: #fff; padding: 9px 22px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: background 0.2s; }
+    .nav-links .btn-nav:hover { background: #163060; color: #fff; }
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: rgba(255,255,255,0.8); transition: all 0.3s; }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Page Header ── */
+    .page-header {
+      background: #2E2E2E;
+      padding: 56px 80px 48px;
+      text-align: center;
+    }
+    .page-header h1 {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .page-header p {
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+    .accent-line { width: 48px; height: 3px; background: #1F3971; margin: 0 auto 16px; }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      background: #fff;
+      border-bottom: 1px solid #D1D0CB;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      position: sticky;
+      top: 72px;
+      z-index: 90;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 18px 36px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #A2A092;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: #2E2E2E; }
+    .tab-btn.active { color: #1F3971; border-bottom-color: #1F3971; }
+
+    /* ── Tab Panels ── */
+    .tab-panel { display: none; padding: 64px 80px; }
+    .tab-panel.active { display: block; }
+
+    /* ── Photo Grid ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .photo-item {
+      aspect-ratio: 4/3;
+      background: #D1D0CB;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .photo-item:hover img { transform: scale(1.04); }
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8e7e3;
+      color: #A2A092;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── Multifamily Project Cards ── */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .project-card {
+      border: 0.5px solid #D1D0CB;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      position: relative;
+    }
+    .project-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .project-card-cover {
+      aspect-ratio: 16/9;
+      background: #e8e7e3;
+      overflow: hidden;
+    }
+    .project-card-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .project-card:hover .project-card-cover img { transform: scale(1.04); }
+    .project-card-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #A2A092;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .project-card-info {
+      padding: 20px 20px 24px;
+      border-top: 3px solid #1F3971;
+    }
+    .project-card-info h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2E2E2E;
+      margin-bottom: 4px;
+    }
+    .project-card-info p {
+      font-size: 12px;
+      color: #A2A092;
+      letter-spacing: 0.5px;
+    }
+    .project-card-arrow {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 28px;
+      height: 28px;
+      background: #1F3971;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .project-card:hover .project-card-arrow { opacity: 1; }
+    .project-card-arrow svg { width: 14px; height: 14px; fill: #fff; }
+
+    /* ── Sub-gallery (Multifamily project view) ── */
+    .sub-gallery { display: none; }
+    .sub-gallery.active { display: block; }
+    .sub-gallery-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 36px;
+      color: #1F3971;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      width: fit-content;
+    }
+    .sub-gallery-back:hover { color: #163060; }
+    .sub-gallery-back svg { width: 16px; height: 16px; }
+    .sub-gallery-title {
+      margin-bottom: 8px;
+    }
+    .sub-gallery-title h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2E2E2E;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .sub-gallery-title p {
+      color: #A2A092;
+      font-size: 13px;
+      margin-top: 4px;
+      margin-bottom: 32px;
+    }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+    .lightbox-inner img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      color: #fff;
+      font-size: 32px;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox-prev, .lightbox-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 40px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      padding: 16px;
+      user-select: none;
+    }
+    .lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #1a1a1a;
+      padding: 56px 80px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-top: 80px;
+    }
+    .footer-logo img { height: 52px; width: auto; object-fit: contain; margin-bottom: 16px; opacity: 0.8; }
+    .footer-tagline { color: rgba(255,255,255,0.28); font-size: 13px; line-height: 1.7; max-width: 260px; }
+    .footer-col-title { color: rgba(255,255,255,0.35); font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .footer-links a { color: rgba(255,255,255,0.38); font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: rgba(255,255,255,0.75); }
+    .footer-bottom {
+      background: #111;
+      padding: 15px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-copy { color: rgba(255,255,255,0.2); font-size: 11px; }
+    .accent-top { height: 3px; background: #1F3971; }
+
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      .util-bar { padding: 8px 20px; }
+      .util-bar .util-right { display: none; }
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: #2E2E2E; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+      .nav-links.open { display: flex; }
+      .nav-links li { width: 100%; }
+      .nav-links a { display: block; padding: 14px 24px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .nav-links .btn-nav { margin: 16px 24px 8px; padding: 12px 24px; text-align: center; }
+      .nav-toggle { display: flex; }
+      .page-header { padding: 40px 24px 32px; }
+      .tab-btn { padding: 14px 16px; font-size: 10px; letter-spacing: 1px; }
+      .tab-panel { padding: 40px 20px; }
+      .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .project-grid { grid-template-columns: 1fr; }
+      .footer { grid-template-columns: 1fr 1fr; padding: 48px 24px; gap: 36px; }
+      .footer-bottom { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+    @media (max-width: 480px) {
+      .photo-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 12px 10px; }
+      .footer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="accent-top"></div>
+
+  <!-- Utility Bar -->
+  <div class="util-bar">
+    <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
+    <span class="util-right">
+      <a href="tel:3852895872">&#9990; 385-289-5872</a>
+      &nbsp;&nbsp;
+      <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a>
+    </span>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="/" aria-label="Panoramic Building LLC home">
+      <img src="assets/logo.png" alt="Panoramic Building LLC logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <div class="nav-logo-text" style="display:none;">
+        <span class="name">Panoramic Building</span>
+        <span class="sub">LLC</span>
+      </div>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false" onclick="toggleMenu(this)">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
+    </ul>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Our Work</h1>
+    <div class="accent-line"></div>
+    <p>New construction exterior projects across Northern Utah and Southern Idaho.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('multifamily', this)">Multifamily</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('custom', this)">Custom Homes</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('production', this)">Production Homes</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('details', this)">Details</button>
+  </div>
+
+  <!-- ── Multifamily Tab ── -->
+  <div id="tab-multifamily" class="tab-panel active">
+
+    <!-- Project list view -->
+    <div id="mf-projects" class="project-grid">
+
+      <div class="project-card" onclick="openProject('orchard-grove')">
+        <div class="project-card-cover">
+          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        </div>
+        <div class="project-card-info">
+          <h3>Orchard Grove</h3>
+          <p>Idaho Falls, ID</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+
+      <div class="project-card" onclick="openProject('parkway')">
+        <div class="project-card-cover">
+          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        </div>
+        <div class="project-card-info">
+          <h3>Parkway</h3>
+          <p>Idaho Falls, ID</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+
+      <div class="project-card" onclick="openProject('4th-main')">
+        <div class="project-card-cover">
+          <div class="project-card-cover-placeholder">Photo Coming Soon</div>
+        </div>
+        <div class="project-card-info">
+          <h3>4th + Main</h3>
+          <p>Bountiful, UT</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sub-galleries (one per project) -->
+    <div id="sub-orchard-grove" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>Orchard Grove</h2>
+        <p>Idaho Falls, ID</p>
+      </div>
+      <div class="photo-grid" id="grid-orchard-grove">
+        <!-- Add images here: <div class="photo-item" onclick="openLightbox(this, 'grid-orchard-grove')"><img src="assets/multifamily/orchard-grove/01.jpeg" alt="Orchard Grove"></div> -->
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+    <div id="sub-parkway" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>Parkway</h2>
+        <p>Idaho Falls, ID</p>
+      </div>
+      <div class="photo-grid" id="grid-parkway">
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+    <div id="sub-4th-main" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>4th + Main</h2>
+        <p>Bountiful, UT</p>
+      </div>
+      <div class="photo-grid" id="grid-4th-main">
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Custom Homes Tab ── -->
+  <div id="tab-custom" class="tab-panel">
+    <div class="photo-grid" id="grid-custom">
+      <!-- Add images here: <div class="photo-item" onclick="openLightbox(this, 'grid-custom')"><img src="assets/custom/01.jpeg" alt="Custom Home"></div> -->
+      <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- ── Production Homes Tab ── -->
+  <div id="tab-production" class="tab-panel">
+    <div class="photo-grid" id="grid-production">
+      <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- ── Details Tab ── -->
+  <div id="tab-details" class="tab-panel">
+    <div class="photo-grid" id="grid-details">
+      <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <span class="lightbox-prev" onclick="lightboxNav(-1)">&#8249;</span>
+    <div class="lightbox-inner">
+      <img id="lightbox-img" src="" alt="" />
+    </div>
+    <span class="lightbox-next" onclick="lightboxNav(1)">&#8250;</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div>
+      <div class="footer-logo">
+        <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
+      </div>
+      <p class="footer-tagline">New construction exterior specialists serving Northern Utah, Southern Idaho, and the Wasatch Front.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">What We Do</p>
+      <ul class="footer-links">
+        <li>Siding</li>
+        <li>Gutters</li>
+        <li>Trim &amp; Soffit/Fascia</li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links">
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Contact</p>
+      <ul class="footer-links">
+        <li><a href="tel:3852895872">385-289-5872</a></li>
+        <li><a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a></li>
+        <li>Logan, Utah 84321</li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 Panoramic Building LLC. All rights reserved.</span>
+    <span class="footer-copy">Licensed &amp; Insured &nbsp;·&nbsp; Utah &amp; Idaho</span>
+  </div>
+
+  <script>
+    // ── Mobile nav ──
+    function toggleMenu(btn) {
+      const nav = document.getElementById('nav-links');
+      const isOpen = nav.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen);
+    }
+    document.querySelectorAll('#nav-links a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        document.getElementById('nav-links').classList.remove('open');
+        document.querySelector('.nav-toggle').classList.remove('open');
+      });
+    });
+
+    // ── Tabs ──
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      // Reset multifamily to project list when switching back
+      if (name === 'multifamily') closeProject();
+    }
+
+    // ── Multifamily sub-galleries ──
+    function openProject(id) {
+      document.getElementById('mf-projects').style.display = 'none';
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      document.getElementById('sub-' + id).classList.add('active');
+      window.scrollTo({ top: document.querySelector('.tab-bar').offsetTop - 80, behavior: 'smooth' });
+    }
+    function closeProject() {
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      document.getElementById('mf-projects').style.display = 'grid';
+    }
+
+    // ── Lightbox ──
+    let lightboxImages = [];
+    let lightboxIndex = 0;
+
+    function openLightbox(el, gridId) {
+      const grid = document.getElementById(gridId);
+      const items = grid.querySelectorAll('.photo-item img');
+      lightboxImages = Array.from(items).map(img => ({ src: img.src, alt: img.alt }));
+      const clickedSrc = el.querySelector('img').src;
+      lightboxIndex = lightboxImages.findIndex(i => i.src === clickedSrc);
+      showLightboxImage();
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function showLightboxImage() {
+      const img = document.getElementById('lightbox-img');
+      img.src = lightboxImages[lightboxIndex].src;
+      img.alt = lightboxImages[lightboxIndex].alt;
+    }
+    function lightboxNav(dir) {
+      lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+      showLightboxImage();
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function closeLightboxOutside(e) {
+      if (e.target === document.getElementById('lightbox')) closeLightbox();
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') lightboxNav(-1);
+      if (e.key === 'ArrowRight') lightboxNav(1);
+    });
+  </script>
+
+</body>
+</html>
