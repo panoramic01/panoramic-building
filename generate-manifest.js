@@ -3,9 +3,9 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const galleries = {
-  'custom':                    'assets/custom',
   'production':                'assets/production',
-  'details':                   'assets/details',
+  'custom/blacktail':          'assets/custom/blacktail',
+  'reserve':                   'assets/reserve',
   'multifamily/orchard-grove': 'assets/multifamily/orchard-grove',
   'multifamily/parkway':       'assets/multifamily/parkway',
   'multifamily/4th-main':      'assets/multifamily/4th-main',

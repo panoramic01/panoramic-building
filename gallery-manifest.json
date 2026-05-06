@@ -1,13 +1,38 @@
 {
-  "custom": {
-    "cover": null,
-    "photos": []
-  },
   "production": {
     "cover": null,
+    "photos": [
+      "assets/production/aidan-102-2.jpg",
+      "assets/production/aidan-106-2.jpg",
+      "assets/production/aidan-117-2.jpg",
+      "assets/production/aidan-142-2.jpg",
+      "assets/production/aidan-18-2.jpg",
+      "assets/production/aidan-206-2.jpg",
+      "assets/production/aidan-25-2.jpg",
+      "assets/production/aidan-269-2.jpg",
+      "assets/production/aidan-282-2.jpg",
+      "assets/production/aidan-289-2.jpg",
+      "assets/production/aidan-290-2.jpg",
+      "assets/production/aidan-291-2.jpg",
+      "assets/production/aidan-293.jpg",
+      "assets/production/aidan-5-2.jpg",
+      "assets/production/aidan-51-2.jpg",
+      "assets/production/aidan-55-2.jpg",
+      "assets/production/aidan-58-2.jpg",
+      "assets/production/aidan-72-2.jpg",
+      "assets/production/aidan-73-2.jpg",
+      "assets/production/aidan-76-2.jpg",
+      "assets/production/aidan-77-2.jpg",
+      "assets/production/aidan-78-2.jpg",
+      "assets/production/aidan-79-2.jpg",
+      "assets/production/aidan-81-2.jpg"
+    ]
+  },
+  "custom/blacktail": {
+    "cover": null,
     "photos": []
   },
-  "details": {
+  "reserve": {
     "cover": null,
     "photos": []
   },
@@ -34,6 +59,30 @@
     "photos": []
   },
   "multifamily/4th-main": {
+    "cover": "assets/multifamily/4th-main/cover.jpg",
+    "photos": [
+      "assets/multifamily/4th-main/aidan-10.jpg",
+      "assets/multifamily/4th-main/aidan-11.jpg",
+      "assets/multifamily/4th-main/aidan-13.jpg",
+      "assets/multifamily/4th-main/aidan-16.jpg",
+      "assets/multifamily/4th-main/aidan-17.jpg",
+      "assets/multifamily/4th-main/aidan-18.jpg",
+      "assets/multifamily/4th-main/aidan-19.jpg",
+      "assets/multifamily/4th-main/aidan-2.jpg",
+      "assets/multifamily/4th-main/aidan-3.jpg",
+      "assets/multifamily/4th-main/aidan-4.jpg",
+      "assets/multifamily/4th-main/aidan-5.jpg",
+      "assets/multifamily/4th-main/aidan-7.jpg",
+      "assets/multifamily/4th-main/aidan-8.jpg",
+      "assets/multifamily/4th-main/aidan-9.jpg",
+      "assets/multifamily/4th-main/aidan.jpg"
+    ]
+  },
+  "multifamily/the-crossing": {
+    "cover": null,
+    "photos": []
+  },
+  "multifamily/altura": {
     "cover": null,
     "photos": []
   }

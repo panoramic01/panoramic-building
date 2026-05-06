@@ -365,6 +365,17 @@
     .footer-copy { color: rgba(255,255,255,0.2); font-size: 11px; }
     .accent-top { height: 3px; background: #1F3971; }
 
+    /* Dropdown */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { display: flex; align-items: center; gap: 5px; }
+    .nav-dropdown > a svg { width: 10px; height: 10px; stroke: rgba(255,255,255,0.7); transition: stroke 0.2s, transform 0.2s; }
+    .nav-dropdown:hover > a svg { stroke: #fff; transform: rotate(180deg); }
+    .dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #2E2E2E; border-top: 2px solid #1F3971; min-width: 200px; z-index: 200; padding: 8px 0; }
+    .nav-dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu a { display: block; padding: 11px 20px; color: rgba(255,255,255,0.65); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.15s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .dropdown-menu a:last-child { border-bottom: none; }
+    .dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,0.05); padding-left: 26px; }
+
     /* ── Mobile ── */
     @media (max-width: 900px) {
       .util-bar { padding: 8px 20px; }
@@ -419,7 +430,15 @@
     </button>
     <ul class="nav-links" id="nav-links">
       <li><a href="/">Home</a></li>
-      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li class="nav-dropdown">
+        <a href="gallery.html" class="active">Gallery <svg fill="none" viewBox="0 0 10 10" stroke-width="2"><path d="M2 3l3 4 3-4"/></svg></a>
+        <div class="dropdown-menu">
+          <a href="gallery.html?tab=multifamily">Multifamily</a>
+          <a href="gallery.html?tab=reserve">Panoramic Reserve</a>
+          <a href="gallery.html?tab=custom">Custom Homes</a>
+          <a href="gallery.html?tab=production">Production Homes</a>
+        </div>
+      </li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
     </ul>
@@ -429,15 +448,14 @@
   <div class="page-header">
     <h1>Our Work</h1>
     <div class="accent-line"></div>
-    <p>New construction exterior projects across Northern Utah and Southern Idaho.</p>
   </div>
 
   <!-- Tabs -->
   <div class="tab-bar" role="tablist">
     <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('multifamily', this)">Multifamily</button>
+    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('reserve', this)">Panoramic Reserve</button>
     <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('custom', this)">Custom Homes</button>
     <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('production', this)">Production Homes</button>
-    <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('details', this)">Details</button>
   </div>
 
   <!-- ── Multifamily Tab ── -->
@@ -628,8 +646,51 @@
 
   <!-- ── Custom Homes Tab ── -->
   <div id="tab-custom" class="tab-panel">
-    <div class="photo-grid" id="grid-custom">
-      <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+
+    <div id="custom-projects" class="project-grid">
+      <div class="project-card" onclick="openCustomProject('blacktail')">
+        <div class="project-card-cover" id="cover-blacktail">
+          <div class="project-card-cover-placeholder">
+            <div class="ph-line"></div>
+            <div class="ph-name">Blacktail</div>
+            <div class="ph-location">Garden City, UT</div>
+          </div>
+          <div class="project-card-cover-overlay" style="display:none;">
+            <div class="ph-name">Blacktail</div>
+            <div class="ph-location">Garden City, UT</div>
+          </div>
+        </div>
+        <div class="project-card-info">
+          <h3>Blacktail</h3>
+          <p>Garden City, UT</p>
+        </div>
+        <div class="project-card-arrow">
+          <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="sub-custom-blacktail" class="sub-gallery">
+      <div class="sub-gallery-back" onclick="closeCustomProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        Back to Projects
+      </div>
+      <div class="sub-gallery-title">
+        <h2>Blacktail</h2>
+        <p>Garden City, UT</p>
+      </div>
+      <div class="photo-grid" id="grid-blacktail">
+        <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Panoramic Reserve Tab ── -->
+  <div id="tab-reserve" class="tab-panel">
+    <div id="reserve-projects" class="project-grid">
+      <!-- Project cards added here as projects are added -->
+      <div class="photo-placeholder" style="aspect-ratio:4/3;">Projects Coming Soon</div>
     </div>
   </div>
 
@@ -640,12 +701,6 @@
     </div>
   </div>
 
-  <!-- ── Details Tab ── -->
-  <div id="tab-details" class="tab-panel">
-    <div class="photo-grid" id="grid-details">
-      <div class="photo-placeholder" style="aspect-ratio:4/3;">Photos Coming Soon</div>
-    </div>
-  </div>
 
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
@@ -718,6 +773,8 @@
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
       if (name === 'multifamily') closeProject();
+      if (name === 'custom') closeCustomProject();
+      if (name === 'reserve') closeReserveProject();
     }
 
     // Open tab from URL param e.g. gallery.html?tab=custom
@@ -742,19 +799,45 @@
       document.getElementById('mf-projects').style.display = 'grid';
     }
 
+    // ── Panoramic Reserve sub-galleries ──
+    function openReserveProject(id) {
+      document.getElementById('reserve-projects').style.display = 'none';
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      document.getElementById('sub-reserve-' + id).classList.add('active');
+      window.scrollTo({ top: document.querySelector('.tab-bar').offsetTop - 80, behavior: 'smooth' });
+    }
+    function closeReserveProject() {
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      const rp = document.getElementById('reserve-projects');
+      if (rp) rp.style.display = 'grid';
+    }
+
+    // ── Custom Homes sub-galleries ──
+    function openCustomProject(id) {
+      document.getElementById('custom-projects').style.display = 'none';
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      document.getElementById('sub-custom-' + id).classList.add('active');
+      window.scrollTo({ top: document.querySelector('.tab-bar').offsetTop - 80, behavior: 'smooth' });
+    }
+    function closeCustomProject() {
+      document.querySelectorAll('.sub-gallery').forEach(s => s.classList.remove('active'));
+      document.getElementById('custom-projects').style.display = 'grid';
+    }
+
     // ── Load photos from manifest ──
     const gridMap = {
-      'custom':                    'grid-custom',
       'production':                'grid-production',
-      'details':                   'grid-details',
+      'custom/blacktail':          'grid-blacktail',
       'multifamily/orchard-grove': 'grid-orchard-grove',
       'multifamily/parkway':       'grid-parkway',
       'multifamily/4th-main':      'grid-4th-main',
       'multifamily/the-crossing':  'grid-the-crossing',
-      'multifamily/altura':        'grid-altura'
+      'multifamily/altura':        'grid-altura',
+      'reserve':                   'grid-reserve'
     };
 
     const coverMap = {
+      'custom/blacktail':          'cover-blacktail',
       'multifamily/orchard-grove': 'cover-orchard-grove',
       'multifamily/parkway':       'cover-parkway',
       'multifamily/4th-main':      'cover-4th-main',
