@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Received | Panoramic Building LLC</title>
+  <meta name="description" content="Your bid request has been received. Panoramic Building LLC will be in touch shortly." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2E2E2E; background: #fff; line-height: 1.6; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    .util-bar { background: #152847; padding: 9px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .util-bar span { color: rgba(255,255,255,0.55); font-size: 12px; letter-spacing: 0.3px; }
+    .util-bar a { color: rgba(255,255,255,0.55); }
+    .util-bar a:hover { color: rgba(255,255,255,0.85); }
+
+    .nav { background: #2E2E2E; padding: 0 40px; height: 72px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; }
+    .nav-logo img { height: 60px; width: auto; object-fit: contain; }
+    .nav-logo-text { display: flex; flex-direction: column; }
+    .nav-logo-text .name { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; line-height: 1.2; }
+    .nav-logo-text .sub { color: rgba(255,255,255,0.4); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.7); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-links .btn-nav { background: #1F3971; color: #fff; padding: 9px 22px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: background 0.2s; }
+    .nav-links .btn-nav:hover { background: #163060; color: #fff; }
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: rgba(255,255,255,0.8); transition: all 0.3s; }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .accent-top { height: 3px; background: #1F3971; }
+
+    /* Confirmation */
+    .confirm-wrap { min-height: calc(100vh - 180px); display: flex; align-items: center; justify-content: center; padding: 80px 40px; }
+    .confirm-card { max-width: 560px; width: 100%; text-align: center; }
+    .confirm-icon { width: 64px; height: 64px; background: #f0f4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px; }
+    .confirm-icon svg { width: 28px; height: 28px; stroke: #1F3971; fill: none; stroke-width: 2; }
+    .confirm-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #1F3971; margin-bottom: 16px; }
+    .confirm-card h1 { font-size: 28px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #2E2E2E; margin-bottom: 20px; line-height: 1.2; }
+    .accent-line { width: 48px; height: 3px; background: #1F3971; margin: 0 auto 24px; }
+    .confirm-card p { font-size: 15px; color: #6B6960; line-height: 1.8; margin-bottom: 12px; }
+    .confirm-card p strong { color: #2E2E2E; }
+    .confirm-actions { display: flex; gap: 16px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+    .btn-primary { background: #1F3971; color: #fff; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: background 0.2s; }
+    .btn-primary:hover { background: #163060; }
+    .btn-secondary { border: 1px solid #D1D0CB; color: #2E2E2E; padding: 14px 32px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: border-color 0.2s; }
+    .btn-secondary:hover { border-color: #2E2E2E; }
+
+    .confirm-divider { width: 1px; height: 48px; background: #e8e7e3; margin: 40px auto; }
+    .confirm-contact { font-size: 13px; color: #A2A092; }
+    .confirm-contact a { color: #1F3971; }
+    .confirm-contact a:hover { text-decoration: underline; }
+
+    /* Footer */
+    .footer { background: #1a1a1a; padding: 0 80px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-logo img { height: 52px; width: auto; object-fit: contain; opacity: 0.85; }
+    .footer-contact-info { display: flex; align-items: center; gap: 24px; }
+    .footer-contact-info a { color: rgba(255,255,255,0.45); font-size: 12px; transition: color 0.2s; }
+    .footer-contact-info a:hover { color: rgba(255,255,255,0.85); }
+    .footer-contact-info .footer-bid { color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.25); padding: 7px 16px; transition: border-color 0.2s; }
+    .footer-contact-info .footer-bid:hover { border-color: rgba(255,255,255,0.7); }
+    .footer-bottom { background: #111; padding: 15px 80px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-copy { color: rgba(255,255,255,0.2); font-size: 11px; }
+
+    @media (max-width: 900px) {
+      .util-bar { padding: 8px 20px; }
+      .util-bar .util-right { display: none; }
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: #2E2E2E; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+      .nav-links.open { display: flex; }
+      .nav-links li { width: 100%; }
+      .nav-links a { display: block; padding: 14px 24px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .nav-links .btn-nav { margin: 16px 24px 8px; padding: 12px 24px; text-align: center; }
+      .nav-toggle { display: flex; }
+      .confirm-wrap { padding: 60px 24px; }
+      .confirm-actions { flex-direction: column; align-items: center; }
+      .footer { padding: 0 24px; }
+      .footer-bottom { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="accent-top"></div>
+  <div class="util-bar">
+    <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
+    <span class="util-right"><a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></span>
+  </div>
+  <nav class="nav" role="navigation">
+    <a class="nav-logo" href="/" aria-label="Panoramic Building LLC home">
+      <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <div class="nav-logo-text" style="display:none;"><span class="name">Panoramic Building</span><span class="sub">LLC</span></div>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMenu(this)"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="multifamily.html">Multifamily</a></li>
+      <li><a href="reserve.html">Panoramic Reserve</a></li>
+      <li><a href="custom.html">Custom</a></li>
+      <li><a href="production.html">Production</a></li>
+      <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
+    </ul>
+  </nav>
+
+  <div class="confirm-wrap">
+    <div class="confirm-card">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="confirm-eyebrow">Request Received</div>
+      <h1>We'll Be in Touch</h1>
+      <div class="accent-line"></div>
+      <p>Thanks for reaching out. We've received your bid request and will review your project details.</p>
+      <p>Expect a response within <strong>one business day</strong>. If your project is time-sensitive, feel free to call us directly.</p>
+
+      <div class="confirm-actions">
+        <a href="index.html" class="btn-primary">Back to Home</a>
+        <a href="multifamily.html" class="btn-secondary">View Our Work</a>
+      </div>
+
+      <div class="confirm-divider"></div>
+      <p class="confirm-contact">
+        Questions? Call <a href="tel:3852895872">385-289-5872</a> or email <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      </p>
+    </div>
+  </div>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-logo">
+      <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
+    </div>
+    <div class="footer-contact-info">
+      <a href="tel:3852895872">385-289-5872</a>
+      <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      <a href="contact.html" class="footer-bid">Get a Bid</a>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 Panoramic Building LLC. All rights reserved.</span>
+    <span class="footer-copy">Licensed &amp; Insured &nbsp;·&nbsp; Utah &amp; Idaho</span>
+  </div>
+
+  <script>
+    function toggleMenu(btn) {
+      var nav = document.getElementById('nav-links');
+      var isOpen = nav.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen);
+    }
+  </script>
+</body>
+</html>

@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panoramic Reserve | Panoramic Building LLC</title>
-  <meta name="description" content="Panoramic Reserve — premium custom home exteriors by Panoramic Building LLC across Northern Utah and Southern Idaho." />
+  <title>Panoramic Reserve | Premium Custom Home Exteriors | Utah & Idaho</title>
+  <meta name="description" content="Panoramic Reserve is Panoramic Building LLC's premium custom home exterior program. Architectural siding, masonry, stucco, and full exterior packages for high-end custom builds in Northern Utah & Southern Idaho." />
+  <meta name="keywords" content="luxury home exterior contractor Utah, custom home siding Utah, premium exterior contractor Utah, architectural siding contractor Utah, custom home masonry Utah, high-end exterior contractor Logan Utah, custom home stucco Utah Idaho, luxury exterior package Utah" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Panoramic Building LLC" />
+  <link rel="canonical" href="https://www.panoramicbuildingllc.com/reserve.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.panoramicbuildingllc.com/reserve.html" />
+  <meta property="og:title" content="Panoramic Reserve | Premium Custom Home Exteriors" />
+  <meta property="og:description" content="Panoramic Building LLC's premium exterior program for high-end custom homes. Architectural siding, masonry, stucco & full exterior packages in Northern Utah & Southern Idaho." />
+  <meta property="og:image" content="https://www.panoramicbuildingllc.com/assets/hero.jpg" />
+  <meta property="og:site_name" content="Panoramic Building LLC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Panoramic Reserve | Premium Custom Home Exteriors" />
+  <meta name="twitter:description" content="Premium exterior packages for high-end custom homes in Northern Utah & Southern Idaho." />
+  <meta name="twitter:image" content="https://www.panoramicbuildingllc.com/assets/hero.jpg" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -28,6 +42,31 @@
     .nav-links a:hover, .nav-links a.active { color: #fff; }
     .nav-links .btn-nav { background: #1F3971; color: #fff; padding: 9px 22px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: background 0.2s; }
     .nav-links .btn-nav:hover { background: #163060; color: #fff; }
+
+    /* Site Search */
+    .nav-search-wrap { display: flex; align-items: center; position: relative; }
+    .nav-search-input { width: 0; opacity: 0; border: none; outline: none; background: rgba(255,255,255,0.08); font-family: inherit; font-size: 12px; letter-spacing: 0.5px; color: #fff; transition: width 0.3s ease, opacity 0.3s ease, padding 0.3s ease; padding: 0; pointer-events: none; border-radius: 2px; }
+    .nav-search-input.open { width: 220px; opacity: 1; pointer-events: auto; padding: 7px 30px 7px 12px; }
+    .nav-search-input::placeholder { color: rgba(255,255,255,0.35); }
+    .nav-search-btn { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.55); transition: color 0.2s; flex-shrink: 0; }
+    .nav-search-btn:hover { color: #fff; }
+    .nav-search-btn svg { width: 17px; height: 17px; }
+    .nav-search-clear { position: absolute; right: 32px; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.4); font-size: 16px; line-height: 1; display: none; padding: 2px; }
+    .nav-search-clear:hover { color: #fff; }
+    .nav-search-clear.visible { display: block; }
+    .search-results-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 98; }
+    .search-results-overlay.open { display: block; }
+    .search-results-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 99; max-height: 480px; overflow-y: auto; border-top: 2px solid #1F3971; }
+    .search-result-group-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #A2A092; padding: 12px 16px 6px; border-bottom: 1px solid #f0efe9; }
+    .search-result-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0efe9; transition: background 0.15s; }
+    .search-result-item:hover, .search-result-item.focused { background: #f7f6f2; }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-icon { width: 32px; height: 32px; background: #f0efe9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .search-result-icon svg { width: 14px; height: 14px; stroke: #1F3971; fill: none; stroke-width: 2; }
+    .search-result-title { font-size: 13px; font-weight: 600; color: #2E2E2E; letter-spacing: 0.3px; }
+    .search-result-sub { font-size: 11px; color: #A2A092; margin-top: 2px; letter-spacing: 0.3px; }
+    .search-no-results { padding: 28px 16px; text-align: center; color: #A2A092; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
+
     .nav-dropdown { position: relative; }
     .nav-dropdown > a { display: flex; align-items: center; gap: 5px; }
     .nav-dropdown > a svg { width: 10px; height: 10px; stroke: rgba(255,255,255,0.7); transition: stroke 0.2s, transform 0.2s; }
@@ -109,16 +148,19 @@
       .nav-links .btn-nav { margin: 16px 24px 8px; padding: 12px 24px; text-align: center; }
       .nav-toggle { display: flex; }
       .page-header { padding: 40px 24px 32px; }
-      .stats-bar { padding: 32px 20px; flex-wrap: wrap; gap: 24px; }
+      .page-header h1 { font-size: 24px; letter-spacing: 1px; }
+      .stats-bar { padding: 32px 20px; flex-wrap: wrap; gap: 24px; justify-content: center; }
       .stat-divider { display: none; }
       .gallery-section { padding: 40px 20px; }
       .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .footer { grid-template-columns: 1fr 1fr; padding: 48px 24px; gap: 36px; }
+      .search-results-dropdown { width: calc(100vw - 40px); right: 0; left: auto; }
+      .nav-search-input.open { width: 160px; }
+      .footer { flex-direction: column; height: auto; padding: 20px 24px; gap: 12px; align-items: flex-start; }
+      .footer-contact-info { flex-direction: column; align-items: flex-start; gap: 12px; }
       .footer-bottom { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
     }
     @media (max-width: 480px) {
       .photo-grid { grid-template-columns: 1fr; }
-      .footer { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -141,6 +183,17 @@
       <li><a href="custom.html">Custom</a></li>
       <li><a href="production.html">Production</a></li>
 
+      <li style="position:relative;">
+        <div class="nav-search-wrap" id="nav-search-wrap">
+          <input class="nav-search-input" id="site-search-input" type="text" placeholder="Search projects, materials…" autocomplete="off" />
+          <button class="nav-search-clear" id="site-search-clear" onclick="clearSiteSearch()" title="Clear">&#215;</button>
+          <button class="nav-search-btn" id="site-search-btn" onclick="toggleSiteSearch()" title="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <div class="search-results-dropdown" id="search-results-dropdown" style="display:none;"></div>
+        </div>
+        <div class="search-results-overlay" id="search-overlay" onclick="clearSiteSearch()"></div>
+      </li>
       <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
     </ul>
   </nav>
@@ -149,7 +202,7 @@
     <div class="page-header-inner">
       <h1>Panoramic Reserve Homes</h1>
       <div class="accent-line"></div>
-      <p>Our finest work — elevated custom home exteriors built to the highest standard of craftsmanship.</p>
+      <p>For homes that call for something different. We work with specialty materials most crews never touch — natural wood, Sàgiper, Châm Clad, full-bed stone — and get involved early to make sure they're spec'd and installed the way the manufacturer intended.</p>
     </div>
   </div>
 
@@ -213,8 +266,11 @@
     fetch('gallery-manifest.json').then(function(r) { return r.json(); }).then(function(manifest) {
       var entry = manifest['reserve'];
       if (!entry) return;
-      var photos = Array.isArray(entry) ? entry : entry.photos;
-      populateGrid('grid-reserve', photos);
+      var photos = Array.isArray(entry) ? entry : (entry.photos || []);
+      var cover = Array.isArray(entry) ? null : entry.cover;
+      // If no photos but cover exists, show cover as first image
+      var allPhotos = photos.length > 0 ? photos : (cover ? [cover] : []);
+      populateGrid('grid-reserve', allPhotos);
     }).catch(function(e) { console.warn('manifest error', e); });
 
     var lightboxImages = [], lightboxIndex = 0;
@@ -278,6 +334,105 @@
     function applyTransform(){var img=document.getElementById('lightbox-img');img.style.transform='scale('+currentScale+') translate('+(touchPanX/currentScale)+'px,'+(touchPanY/currentScale)+'px)';var inner=document.querySelector('.lightbox-inner');if(currentScale>1)inner.classList.add('zoomed');else inner.classList.remove('zoomed');}
     document.querySelector('.lightbox-inner').addEventListener('touchstart',function(e){if(e.touches.length===2){e.preventDefault();touchStartDist=getTouchDist(e.touches);touchStartScale=currentScale;var m={(x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2)};lastTouchMidX=m.x;lastTouchMidY=m.y;touchStartPanX=touchPanX;touchStartPanY=touchPanY;}else if(e.touches.length===1&&currentScale>1){touchStartPanX=touchPanX;touchStartPanY=touchPanY;lastTouchMidX=e.touches[0].clientX;lastTouchMidY=e.touches[0].clientY;}},{passive:false});
     document.querySelector('.lightbox-inner').addEventListener('touchmove',function(e){if(e.touches.length===2){e.preventDefault();currentScale=Math.min(Math.max(touchStartScale*(getTouchDist(e.touches)/touchStartDist),1),6);var m={(x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2)};touchPanX=touchStartPanX+(m.x-lastTouchMidX);touchPanY=touchStartPanY+(m.y-lastTouchMidY);applyTransform();}else if(e.touches.length===1&&currentScale>1){e.preventDefault();touchPanX=touchStartPanX+(e.touches[0].clientX-lastTouchMidX);touchPanY=touchStartPanY+(e.touches[0].clientY-lastTouchMidY);applyTransform();}},{passive:false});
+  </script>
+  <script>
+    var searchIndex = [
+      { type:'page',     title:'Home',                       sub:'panoramicbuildingllc.com',               url:'index.html',        keywords:'home exterior contractor utah idaho panoramic building turn-key siding masonry stucco' },
+      { type:'page',     title:'Multifamily',                sub:'Apartment & condo exterior packages',    url:'multifamily.html',  keywords:'multifamily apartment condo units buildings exterior' },
+      { type:'page',     title:'Panoramic Reserve',          sub:'Premium custom home exteriors',          url:'reserve.html',      keywords:'reserve premium luxury custom home exterior architectural' },
+      { type:'page',     title:'Custom Homes',               sub:'Custom home exterior packages',          url:'custom.html',       keywords:'custom home exterior single family residential' },
+      { type:'page',     title:'Production',                 sub:'High-volume production builder packages', url:'production.html',  keywords:'production builder volume subdivision new construction' },
+      { type:'page',     title:'Get a Bid',                  sub:'Request a project estimate',             url:'contact.html',      keywords:'bid quote estimate contact request' },
+      { type:'service',  title:'LP SmartSide Siding',        sub:'Engineered wood lap & panel siding',     url:'multifamily.html',  keywords:'lp smartside engineered wood siding lap panel' },
+      { type:'service',  title:'Hardie Board / Fiber Cement', sub:'James Hardie fiber cement products',    url:'multifamily.html',  keywords:'hardie board james hardie fiber cement smooth panel plank' },
+      { type:'service',  title:'Masonry & Stone',            sub:'Cultured stone and masonry veneer',      url:'index.html',        keywords:'masonry stone veneer cultured stone interstate' },
+      { type:'service',  title:'Stucco',                     sub:'Three-coat and synthetic stucco systems', url:'index.html',       keywords:'stucco synthetic three coat finish exterior' },
+      { type:'service',  title:'Soffit & Fascia',            sub:'Aluminum and composite soffit/fascia',   url:'index.html',        keywords:'soffit fascia aluminum composite trim' },
+      { type:'service',  title:'Gutters',                    sub:'Seamless gutter systems',                url:'index.html',        keywords:'gutters seamless gutter downspout' },
+      { type:'service',  title:'Exterior Paint',             sub:'Full exterior coating packages',         url:'index.html',        keywords:'paint exterior coating color finish' },
+      { type:'project',  title:'Orchard Grove',              sub:'Idaho Falls, ID · 55 units · 25,677 sq ft', url:'multifamily.html#orchard-grove', keywords:'orchard grove idaho falls idaho 55 units multifamily' },
+      { type:'project',  title:'4th + Main',                 sub:'Bountiful, UT · 24 units · 19,530 sq ft',  url:'multifamily.html#4th-main', keywords:'4th main bountiful utah 24 units multifamily' },
+      { type:'project',  title:'The Crossing',               sub:'Woods Cross, UT · 22 units · 34,120 sq ft', url:'multifamily.html#the-crossing', keywords:'the crossing woods cross utah 22 units lp smartside hardie nickelgap interstate smokey mountain coal king' },
+      { type:'project',  title:'Parkway',                    sub:'Idaho Falls, ID · Coming Soon',     url:'multifamily.html',  keywords:'parkway idaho falls idaho multifamily' },
+      { type:'project',  title:'Altura',                     sub:'Logan, UT · Coming Soon',           url:'multifamily.html',  keywords:'altura logan utah multifamily' },
+      { type:'project',  title:'Hyde Park Gateway',          sub:'Hyde Park, UT · Coming Soon',       url:'multifamily.html',  keywords:'hyde park gateway utah multifamily' },
+      { type:'project',  title:'Blacktail (Custom)',         sub:'Custom home project',                    url:'custom.html',       keywords:'blacktail custom home exterior' },
+      { type:'material', title:'LP SmartSide 8" Lap',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp smartside 8 lap siding engineered wood' },
+      { type:'material', title:'LP NickelGap',               sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp nickelgap shiplap panel nickel gap' },
+      { type:'material', title:'Smooth Hardie Panel',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'smooth hardie panel fiber cement james hardie' },
+      { type:'material', title:'Interstate Smokey Mountain Mod', sub:'Used on: The Crossing',              url:'multifamily.html',  keywords:'interstate smokey mountain mod stone veneer masonry' },
+      { type:'material', title:'Interstate Coal King',       sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'interstate coal king stone veneer masonry dark' },
+    ];
+    var ICONS = {
+      page:    '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      project: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>',
+      service: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+      material:'<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+    };
+    var searchFocusIndex = -1;
+    function toggleSiteSearch() {
+      var input = document.getElementById('site-search-input');
+      var isOpen = input.classList.toggle('open');
+      if (isOpen) { setTimeout(function(){ input.focus(); }, 50); }
+      else { clearSiteSearch(); }
+    }
+    function clearSiteSearch() {
+      var input = document.getElementById('site-search-input');
+      input.value = '';
+      input.classList.remove('open');
+      document.getElementById('site-search-clear').classList.remove('visible');
+      document.getElementById('search-results-dropdown').style.display = 'none';
+      document.getElementById('search-overlay').classList.remove('open');
+      searchFocusIndex = -1;
+    }
+    function runSiteSearch(query) {
+      var clear = document.getElementById('site-search-clear');
+      var dropdown = document.getElementById('search-results-dropdown');
+      var overlay = document.getElementById('search-overlay');
+      clear.classList.toggle('visible', query.length > 0);
+      searchFocusIndex = -1;
+      if (!query.trim()) { dropdown.style.display = 'none'; overlay.classList.remove('open'); return; }
+      var q = query.toLowerCase().trim();
+      var results = searchIndex.filter(function(item) {
+        return item.title.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q) || item.keywords.toLowerCase().includes(q);
+      });
+      dropdown.style.display = 'block';
+      overlay.classList.add('open');
+      if (!results.length) { dropdown.innerHTML = '<div class="search-no-results">No results for &ldquo;' + escH(query) + '&rdquo;</div>'; return; }
+      var groups = { project:[], material:[], service:[], page:[] };
+      results.forEach(function(r){ (groups[r.type]||groups.page).push(r); });
+      var labels = { project:'Projects', material:'Materials', service:'Services', page:'Pages' };
+      var html = ''; var idx = 0;
+      ['project','material','service','page'].forEach(function(type) {
+        if (!groups[type].length) return;
+        html += '<div class="search-result-group-label">' + labels[type] + '</div>';
+        groups[type].forEach(function(item) {
+          html += '<div class="search-result-item" onclick="handleSearchResult(\'' + (item.url||'') + '\')">' +
+            '<div class="search-result-icon">' + (ICONS[item.type]||ICONS.page) + '</div>' +
+            '<div><div class="search-result-title">' + escH(item.title) + '</div>' +
+            '<div class="search-result-sub">' + escH(item.sub) + '</div></div></div>';
+          idx++;
+        });
+      });
+      dropdown.innerHTML = html;
+    }
+    function handleSearchResult(url) { if (url) { clearSiteSearch(); window.location.href = url; } }
+    function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    document.addEventListener('DOMContentLoaded', function() {
+      var input = document.getElementById('site-search-input');
+      input.addEventListener('input', function(){ runSiteSearch(this.value); });
+      input.addEventListener('keydown', function(e) {
+        var items = document.querySelectorAll('.search-result-item');
+        if (e.key==='ArrowDown'){ e.preventDefault(); searchFocusIndex=Math.min(searchFocusIndex+1,items.length-1); updFocus(items); }
+        else if (e.key==='ArrowUp'){ e.preventDefault(); searchFocusIndex=Math.max(searchFocusIndex-1,0); updFocus(items); }
+        else if (e.key==='Enter' && searchFocusIndex>=0 && items[searchFocusIndex]){ items[searchFocusIndex].click(); }
+        else if (e.key==='Escape'){ clearSiteSearch(); }
+      });
+    });
+    function updFocus(items) {
+      items.forEach(function(el,i){ el.classList.toggle('focused', i===searchFocusIndex); });
+      if (items[searchFocusIndex]) items[searchFocusIndex].scrollIntoView({block:'nearest'});
+    }
   </script>
 </body>
 </html>
