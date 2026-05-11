@@ -99,10 +99,38 @@
     .stat-label { color: rgba(255,255,255,0.45); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; margin-top: 6px; }
     .stat-divider { width: 1px; height: 48px; background: rgba(255,255,255,0.1); }
 
-    /* Gallery Section */
-    .gallery-section { padding: 72px 80px; }
+    /* Projects */
+    .projects-section { padding: 72px 80px; }
     .section-h2 { color: #2E2E2E; font-size: 18px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
     .section-accent { width: 48px; height: 3px; background: #1F3971; margin-bottom: 48px; }
+    .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .project-card { border: 0.5px solid #D1D0CB; cursor: pointer; transition: box-shadow 0.2s; position: relative; }
+    .project-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .project-card-cover { aspect-ratio: 16/9; background: #1F3971; overflow: hidden; position: relative; }
+    .project-card-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .project-card:hover .project-card-cover img { transform: scale(1.04); }
+    .project-card-cover-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: linear-gradient(135deg, #1F3971 0%, #152847 100%); }
+    .project-card-cover-placeholder .ph-name { color: rgba(255,255,255,0.9); font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; }
+    .project-card-cover-placeholder .ph-location { color: rgba(255,255,255,0.6); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; }
+    .project-card-cover-placeholder .ph-line { width: 32px; height: 2px; background: rgba(255,255,255,0.25); }
+    .project-card-cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.48); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; gap: 10px; text-align: center; }
+    .project-card-cover-overlay .ph-name { color: #fff; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+    .project-card-cover-overlay .ph-location { color: rgba(255,255,255,0.85); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+    .project-card-arrow { position: absolute; top: 20px; right: 20px; width: 28px; height: 28px; background: #1F3971; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+    .project-card:hover .project-card-arrow { opacity: 1; }
+    .project-card-arrow svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2; }
+
+    /* Sub-gallery */
+    .sub-gallery { display: none; }
+    .sub-gallery.active { display: block; padding: 0 80px 72px; }
+
+    /* Project Page Header */
+    .project-page-header { background: #fff; padding: 40px 80px 32px; border-bottom: 1px solid #e8e7e3; display: none; }
+    .project-page-header.active { display: block; }
+    .project-page-header-back { display: flex; align-items: center; gap: 8px; color: #1F3971; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; cursor: pointer; margin-bottom: 20px; width: fit-content; }
+    .project-page-header-back:hover { color: #163060; }
+    .project-page-header-back svg { width: 16px; height: 16px; }
+    .project-page-header h1 { color: #2E2E2E; font-size: 28px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
 
     /* Photo Grid */
     .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -151,7 +179,11 @@
       .page-header h1 { font-size: 24px; letter-spacing: 1px; }
       .stats-bar { padding: 32px 20px; flex-wrap: wrap; gap: 24px; justify-content: center; }
       .stat-divider { display: none; }
-      .gallery-section { padding: 40px 20px; }
+      .projects-section { padding: 40px 20px; }
+      .project-grid { grid-template-columns: 1fr; }
+      .sub-gallery.active { padding: 0 20px 48px; }
+      .project-page-header { padding: 32px 20px 24px; }
+      .project-page-header h1 { font-size: 22px; letter-spacing: 1px; }
       .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .search-results-dropdown { width: calc(100vw - 40px); right: 0; left: auto; }
       .nav-search-input.open { width: 160px; }
@@ -162,6 +194,33 @@
     @media (max-width: 480px) {
       .photo-grid { grid-template-columns: 1fr; }
     }
+
+    /* Admin / Team Login */
+    .nav-admin-wrap { position: relative; display: flex; align-items: center; margin-left: 8px; }
+    .nav-admin-btn { background: none; border: none; cursor: pointer; padding: 6px; color: rgba(255,255,255,0.45); transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .nav-admin-btn:hover, .nav-admin-btn.active { color: #fff; }
+    .nav-admin-btn svg { width: 20px; height: 20px; }
+    .admin-dropdown { position: absolute; top: calc(100% + 12px); right: 0; width: 260px; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 200; border-top: 2px solid #1F3971; }
+    .admin-password-form { padding: 20px; }
+    .admin-password-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; margin-bottom: 10px; display: block; }
+    .admin-password-input { width: 100%; border: 1px solid #D1D0CB; padding: 8px 12px; font-size: 13px; outline: none; font-family: inherit; color: #2E2E2E; }
+    .admin-password-input:focus { border-color: #1F3971; }
+    .admin-password-btn { width: 100%; background: #1F3971; color: #fff; border: none; padding: 9px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; margin-top: 8px; font-family: inherit; transition: background 0.2s; }
+    .admin-password-btn:hover { background: #163060; }
+    .admin-password-error { font-size: 11px; color: #c0392b; margin-top: 6px; display: none; }
+    .admin-dropdown-header { padding: 12px 16px 8px; border-bottom: 1px solid #f0efe9; display: flex; align-items: center; justify-content: space-between; }
+    .admin-dropdown-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; }
+    .admin-logout { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #A2A092; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; transition: color 0.2s; }
+    .admin-logout:hover { color: #2E2E2E; }
+    .admin-links { padding: 4px 0; }
+    .admin-link-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; font-size: 12px; color: #2E2E2E; text-decoration: none; border-bottom: 1px solid #f0efe9; transition: background 0.15s; letter-spacing: 0.3px; }
+    .admin-link-item:hover { background: #f7f6f2; }
+    .admin-link-item:last-child { border-bottom: none; }
+    .nav-links .admin-link-item { color: #2E2E2E; text-decoration: none; }
+    .nav-links .admin-link-item:hover { color: #2E2E2E; }
+    .admin-link-item svg { width: 14px; height: 14px; stroke: #1F3971; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .admin-no-links { padding: 20px 16px; text-align: center; color: #A2A092; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .admin-tip { padding: 10px 16px; background: #f7f6f2; border-top: 1px solid #e8e7e3; font-size: 11px; color: #2E2E2E; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -195,6 +254,12 @@
         <div class="search-results-overlay" id="search-overlay" onclick="clearSiteSearch()"></div>
       </li>
       <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
+      <li class="nav-admin-wrap" id="nav-admin-wrap">
+        <button class="nav-admin-btn" id="nav-admin-btn" onclick="toggleAdminPanel()" title="Team Login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </button>
+        <div class="admin-dropdown" id="admin-dropdown" style="display:none;"></div>
+      </li>
     </ul>
   </nav>
 
@@ -207,15 +272,76 @@
   </div>
 
 
-  <div class="gallery-section">
+  <div class="project-page-header" id="project-page-header">
+    <div class="project-page-header-back" onclick="closeProject()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+      Back to Projects
+    </div>
+    <h1 id="project-page-title"></h1>
+  </div>
+
+  <div class="projects-section" id="projects-section">
     <h2 class="section-h2">Featured Projects</h2>
     <div class="section-accent"></div>
-    <div class="photo-grid" id="grid-reserve">
-      <div class="photo-placeholder">
-        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        Photos Coming Soon
+    <div class="project-grid">
+
+      <div class="project-card" onclick="openProject('lowell')">
+        <div class="project-card-cover" id="cover-lowell">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Lowell</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Lowell</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
       </div>
+
+      <div class="project-card" onclick="openProject('blacktail')">
+        <div class="project-card-cover" id="cover-blacktail">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Blacktail</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Blacktail</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      </div>
+
+      <div class="project-card" onclick="openProject('watson')">
+        <div class="project-card-cover" id="cover-watson">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Watson</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Watson</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      </div>
+
+      <div class="project-card" onclick="openProject('goble')">
+        <div class="project-card-cover" id="cover-goble">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Goble</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Goble</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      </div>
+
+      <div class="project-card" onclick="openProject('roberts')">
+        <div class="project-card-cover" id="cover-roberts">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Roberts</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Roberts</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      </div>
+
+      <div class="project-card" onclick="openProject('baker')">
+        <div class="project-card-cover" id="cover-baker">
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Baker</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Baker</div></div>
+        </div>
+        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      </div>
+
     </div>
+
+    <!-- Sub-galleries -->
+    <div id="sub-lowell"   class="sub-gallery"><div class="photo-grid" id="grid-lowell"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="sub-blacktail" class="sub-gallery"><div class="photo-grid" id="grid-blacktail"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="sub-watson"   class="sub-gallery"><div class="photo-grid" id="grid-watson"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="sub-goble"    class="sub-gallery"><div class="photo-grid" id="grid-goble"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="sub-roberts"  class="sub-gallery"><div class="photo-grid" id="grid-roberts"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="sub-baker"    class="sub-gallery"><div class="photo-grid" id="grid-baker"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
   </div>
 
   <!-- Lightbox -->
@@ -249,6 +375,31 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
+    var gridMap = {
+      'reserve/lowell':   'grid-lowell',
+      'reserve/blacktail':'grid-blacktail',
+      'reserve/watson':   'grid-watson',
+      'reserve/goble':    'grid-goble',
+      'reserve/roberts':  'grid-roberts',
+      'reserve/baker':    'grid-baker'
+    };
+    var coverMap = {
+      'reserve/lowell':   'cover-lowell',
+      'reserve/blacktail':'cover-blacktail',
+      'reserve/watson':   'cover-watson',
+      'reserve/goble':    'cover-goble',
+      'reserve/roberts':  'cover-roberts',
+      'reserve/baker':    'cover-baker'
+    };
+    var projectMeta = {
+      'lowell':   { name: 'Lowell' },
+      'blacktail':{ name: 'Blacktail' },
+      'watson':   { name: 'Watson' },
+      'goble':    { name: 'Goble' },
+      'roberts':  { name: 'Roberts' },
+      'baker':    { name: 'Baker' }
+    };
+
     function populateGrid(gridId, photos) {
       var grid = document.getElementById(gridId);
       if (!grid || !photos || photos.length === 0) return;
@@ -262,29 +413,65 @@
         div.appendChild(img); grid.appendChild(div);
       });
     }
+    function setCoverImage(coverId, src) {
+      var cover = document.getElementById(coverId);
+      if (!cover || !src) return;
+      cover.style.backgroundImage = "url('" + src + "')";
+      cover.style.backgroundSize = 'cover';
+      cover.style.backgroundPosition = 'center';
+      var ph = cover.querySelector('.project-card-cover-placeholder');
+      if (ph) ph.style.display = 'none';
+      var ov = cover.querySelector('.project-card-cover-overlay');
+      if (ov) ov.style.display = 'flex';
+    }
 
     fetch('gallery-manifest.json').then(function(r) { return r.json(); }).then(function(manifest) {
-      var entry = manifest['reserve'];
-      if (!entry) return;
-      var photos = Array.isArray(entry) ? entry : (entry.photos || []);
-      var cover = Array.isArray(entry) ? null : entry.cover;
-      // If no photos but cover exists, show cover as first image
-      var allPhotos = photos.length > 0 ? photos : (cover ? [cover] : []);
-      populateGrid('grid-reserve', allPhotos);
+      Object.keys(gridMap).forEach(function(key) {
+        var entry = manifest[key]; if (!entry) return;
+        var photos = Array.isArray(entry) ? entry : (entry.photos || []);
+        var cover = Array.isArray(entry) ? null : entry.cover;
+        var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
+        populateGrid(gridMap[key], allPhotos);
+        if (coverMap[key]) setCoverImage(coverMap[key], cover);
+      });
     }).catch(function(e) { console.warn('manifest error', e); });
+
+    var currentProject = null;
+    function openProject(slug) {
+      if (currentProject) {
+        document.getElementById('sub-' + currentProject).classList.remove('active');
+      }
+      currentProject = slug;
+      var meta = projectMeta[slug] || { name: slug };
+      document.getElementById('project-page-title').textContent = meta.name;
+      document.getElementById('project-page-header').classList.add('active');
+      document.getElementById('projects-section').style.display = 'none';
+      document.getElementById('sub-' + slug).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function closeProject() {
+      if (currentProject) {
+        document.getElementById('sub-' + currentProject).classList.remove('active');
+        currentProject = null;
+      }
+      document.getElementById('project-page-header').classList.remove('active');
+      document.getElementById('projects-section').style.display = '';
+    }
 
     var lightboxImages = [], lightboxIndex = 0;
     function openLightbox(el, gridId) {
       var grid = document.getElementById(gridId);
-      var items = grid.querySelectorAll('.photo-item img');
-      lightboxImages = Array.from(items).map(function(img) { return { src: img.src, alt: img.alt }; });
-      var clicked = el.querySelector('img').src;
-      lightboxIndex = lightboxImages.findIndex(function(i) { return i.src === clicked; });
+      var items = Array.from(grid.querySelectorAll('.photo-item img'));
+      lightboxImages = items.map(function(img) { return { src: img.getAttribute('src'), alt: img.alt }; });
+      var clickedImg = el.querySelector('img');
+      lightboxIndex = items.indexOf(clickedImg);
+      if (lightboxIndex < 0) lightboxIndex = 0;
       showLightboxImage();
       document.getElementById('lightbox').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
     function showLightboxImage() {
+      if (!lightboxImages[lightboxIndex]) return;
       var img = document.getElementById('lightbox-img');
       img.src = lightboxImages[lightboxIndex].src;
       img.alt = lightboxImages[lightboxIndex].alt;
@@ -357,6 +544,12 @@
       { type:'project',  title:'Altura',                     sub:'Logan, UT · Coming Soon',           url:'multifamily.html',  keywords:'altura logan utah multifamily' },
       { type:'project',  title:'Hyde Park Gateway',          sub:'Hyde Park, UT · Coming Soon',       url:'multifamily.html',  keywords:'hyde park gateway utah multifamily' },
       { type:'project',  title:'Blacktail (Custom)',         sub:'Custom home project',                    url:'custom.html',       keywords:'blacktail custom home exterior' },
+      { type:'project',  title:'Lowell',                    sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'lowell reserve custom home exterior premium' },
+      { type:'project',  title:'Blacktail (Reserve)',       sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'blacktail reserve custom home exterior premium' },
+      { type:'project',  title:'Watson',                    sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'watson reserve custom home exterior premium' },
+      { type:'project',  title:'Goble',                     sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'goble reserve custom home exterior premium' },
+      { type:'project',  title:'Roberts',                   sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'roberts reserve custom home exterior premium' },
+      { type:'project',  title:'Baker',                     sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'baker reserve custom home exterior premium' },
       { type:'material', title:'LP SmartSide 8" Lap',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp smartside 8 lap siding engineered wood' },
       { type:'material', title:'LP NickelGap',               sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp nickelgap shiplap panel nickel gap' },
       { type:'material', title:'Smooth Hardie Panel',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'smooth hardie panel fiber cement james hardie' },
@@ -433,6 +626,55 @@
       items.forEach(function(el,i){ el.classList.toggle('focused', i===searchFocusIndex); });
       if (items[searchFocusIndex]) items[searchFocusIndex].scrollIntoView({block:'nearest'});
     }
+  </script>
+  <script>
+    var _APH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
+    var _ENC = [
+      { label: 'PO Database',          d: 'P7T2Hxrcj3ZjUrmnSts3lCDt9FE2Wo2hEv2RBkvij+o86yfeLDpMJxaRTDAUdRfH3h5PBUrFgLCdoMaO2Bj9z2lD+vd2J6wUduO0a+FIoQ3axbp5Jfg8FxHAeTiopv30X7kgh229WpIROgw1YrihyIHIKTfH6pk+ZW/s0y2zUbmMTZimBDgAGoWiPvU1bg==' },
+      { label: 'Material Request',      d: 'GZ+uaXVLA15n7Yiu7zet5ttJjXC5GL7sM0NH23uSB5AtAozDaubJsQ5tQpqEJN7Xb63f1lsbT2K3eEHq89ztBqQJspBRVgfuQCWvyCWsp6NXYm6qFWduXcENvGIn0S0=' },
+      { label: 'Job Clean Up',          d: 'Up1RhMnYlCcy184eH8/x3izaSlz0ikdNxA60KPESy6KRccbxGglx5siFSF0sxuwox+loLTJsEJlaRre9o6M75uKa41rslYuhZJBVPxCPWYTZ5SR9KbqiISbtmz8CdDw=' },
+      { label: 'New Exterior Project',  d: 'RVJvw3YkPB8jN/zogiKvQtidsHH0/sHBBWuVR8sGypD3z+1qqYExsfZXqxIfU6BbjNVK2zn2aXeklcaCRhB49dhcsij14FoAMekVxLyzMWEdz37cgFUC0TEVgFQ046g=' }
+    ];
+    async function _dec(b64, keyHex) {
+      var raw = Uint8Array.from(atob(b64), function(c){return c.charCodeAt(0);});
+      var iv = raw.slice(0,12), body = raw.slice(12);
+      var kb = Uint8Array.from(keyHex.match(/.{2}/g).map(function(b){return parseInt(b,16);}));
+      var k = await crypto.subtle.importKey('raw', kb, {name:'AES-GCM'}, false, ['decrypt']);
+      var dec = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, k, body);
+      return new TextDecoder().decode(dec);
+    }
+    function toggleAdminPanel() {
+      var dd = document.getElementById('admin-dropdown');
+      var btn = document.getElementById('nav-admin-btn');
+      var isOpen = dd.style.display !== 'none';
+      if (isOpen) { dd.style.display = 'none'; btn.classList.remove('active'); }
+      else { dd.style.display = 'block'; btn.classList.add('active'); renderAdminDropdown(); setTimeout(function(){ var i=document.getElementById('admin-pw-input'); if(i)i.focus(); }, 60); }
+    }
+    function renderAdminDropdown() {
+      var dd = document.getElementById('admin-dropdown');
+      if (sessionStorage.getItem('pb_admin') === '1') {
+        dd.innerHTML = '<div class="admin-dropdown-header"><span class="admin-dropdown-title">Team</span><button class="admin-logout" onclick="adminLogout()">Log out</button></div><div class="admin-links" id="admin-links-inner"><div class="admin-no-links">Loading…</div></div><div class="admin-tip">📱 To add to home screen: open on phone → tap ⋮ → <strong>Add to Home Screen</strong></div>';
+        var stored = sessionStorage.getItem('pb_links');
+        if (stored) { document.getElementById('admin-links-inner').innerHTML = stored; return; }
+        var keyHex = sessionStorage.getItem('pb_k');
+        if (!keyHex) return;
+        Promise.all(_ENC.map(function(item){ return _dec(item.d, keyHex).then(function(url){ return '<a class="admin-link-item" href="'+url+'" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 12h8M8 8h5M8 16h4"/></svg>'+item.label+'</a>'; }); })).then(function(items){ var html=items.join(''); document.getElementById('admin-links-inner').innerHTML=html; sessionStorage.setItem('pb_links',html); });
+      } else {
+        dd.innerHTML = '<div class="admin-password-form"><span class="admin-password-label">Team Login</span><input class="admin-password-input" id="admin-pw-input" type="password" placeholder="Password" onkeydown="if(event.key===\'Enter\')checkAdminPw()" /><button class="admin-password-btn" onclick="checkAdminPw()">Enter</button><div class="admin-password-error" id="admin-pw-error">Incorrect password</div></div>';
+      }
+    }
+    async function checkAdminPw() {
+      var v = document.getElementById('admin-pw-input').value;
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+      var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+      if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k',hash); renderAdminDropdown(); }
+      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
+    }
+    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    document.addEventListener('click', function(e) {
+      var w = document.getElementById('nav-admin-wrap');
+      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    });
   </script>
 </body>
 </html>

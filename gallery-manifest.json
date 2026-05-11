@@ -36,6 +36,30 @@
     "cover": null,
     "photos": []
   },
+  "reserve/lowell": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/blacktail": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/watson": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/goble": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/roberts": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/baker": {
+    "cover": null,
+    "photos": []
+  },
   "multifamily/orchard-grove": {
     "cover": "assets/multifamily/orchard-grove/cover.jpg",
     "photos": [

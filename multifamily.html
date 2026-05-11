@@ -198,7 +198,8 @@
       .nav-links .btn-nav { margin: 16px 24px 8px; padding: 12px 24px; text-align: center; }
       .nav-toggle { display: flex; }
       .page-header { padding: 40px 24px 32px; }
-      .stats-bar { padding: 32px 20px; flex-wrap: wrap; gap: 24px; }
+      .page-header h1 { font-size: 24px; letter-spacing: 1px; }
+      .stats-bar { padding: 32px 20px; flex-wrap: wrap; gap: 24px; justify-content: center; }
       .stat-divider { display: none; }
       .projects-section { padding: 40px 20px; }
       .project-grid { grid-template-columns: 1fr; }
@@ -206,14 +207,41 @@
       .search-results-dropdown { width: calc(100vw - 40px); right: 0; left: auto; }
       .nav-search-input.open { width: 160px; }
       .project-page-header { padding: 32px 20px 24px; }
+      .project-page-header h1 { font-size: 22px; letter-spacing: 1px; }
       .footer { flex-direction: column; height: auto; padding: 20px 24px; gap: 12px; align-items: flex-start; }
       .footer-contact-info { flex-direction: column; align-items: flex-start; gap: 12px; }
       .footer-bottom { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 8px; }
     }
     @media (max-width: 480px) {
       .photo-grid { grid-template-columns: 1fr; }
-      .footer { grid-template-columns: 1fr; }
     }
+
+    /* Admin / Team Login */
+    .nav-admin-wrap { position: relative; display: flex; align-items: center; margin-left: 8px; }
+    .nav-admin-btn { background: none; border: none; cursor: pointer; padding: 6px; color: rgba(255,255,255,0.45); transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .nav-admin-btn:hover, .nav-admin-btn.active { color: #fff; }
+    .nav-admin-btn svg { width: 20px; height: 20px; }
+    .admin-dropdown { position: absolute; top: calc(100% + 12px); right: 0; width: 260px; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 200; border-top: 2px solid #1F3971; }
+    .admin-password-form { padding: 20px; }
+    .admin-password-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; margin-bottom: 10px; display: block; }
+    .admin-password-input { width: 100%; border: 1px solid #D1D0CB; padding: 8px 12px; font-size: 13px; outline: none; font-family: inherit; color: #2E2E2E; }
+    .admin-password-input:focus { border-color: #1F3971; }
+    .admin-password-btn { width: 100%; background: #1F3971; color: #fff; border: none; padding: 9px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; margin-top: 8px; font-family: inherit; transition: background 0.2s; }
+    .admin-password-btn:hover { background: #163060; }
+    .admin-password-error { font-size: 11px; color: #c0392b; margin-top: 6px; display: none; }
+    .admin-dropdown-header { padding: 12px 16px 8px; border-bottom: 1px solid #f0efe9; display: flex; align-items: center; justify-content: space-between; }
+    .admin-dropdown-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; }
+    .admin-logout { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #A2A092; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; transition: color 0.2s; }
+    .admin-logout:hover { color: #2E2E2E; }
+    .admin-links { padding: 4px 0; }
+    .admin-link-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; font-size: 12px; color: #2E2E2E; text-decoration: none; border-bottom: 1px solid #f0efe9; transition: background 0.15s; letter-spacing: 0.3px; }
+    .admin-link-item:hover { background: #f7f6f2; }
+    .admin-link-item:last-child { border-bottom: none; }
+    .nav-links .admin-link-item { color: #2E2E2E; text-decoration: none; }
+    .nav-links .admin-link-item:hover { color: #2E2E2E; }
+    .admin-link-item svg { width: 14px; height: 14px; stroke: #1F3971; fill: none; stroke-width: 2; flex-shrink: 0; }
+    .admin-no-links { padding: 20px 16px; text-align: center; color: #A2A092; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .admin-tip { padding: 10px 16px; background: #f7f6f2; border-top: 1px solid #e8e7e3; font-size: 11px; color: #2E2E2E; line-height: 1.5; }
   </style>
 
   <!-- Structured Data -->
@@ -275,6 +303,12 @@
         <div class="search-results-overlay" id="search-overlay" onclick="clearSiteSearch()"></div>
       </li>
       <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
+      <li class="nav-admin-wrap" id="nav-admin-wrap">
+        <button class="nav-admin-btn" id="nav-admin-btn" onclick="toggleAdminPanel()" title="Team Login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </button>
+        <div class="admin-dropdown" id="admin-dropdown" style="display:none;"></div>
+      </li>
     </ul>
   </nav>
 
@@ -801,6 +835,62 @@
     function applyTransform(){var img=document.getElementById('lightbox-img');img.style.transform='scale('+currentScale+') translate('+(touchPanX/currentScale)+'px,'+(touchPanY/currentScale)+'px)';var inner=document.querySelector('.lightbox-inner');if(currentScale>1)inner.classList.add('zoomed');else inner.classList.remove('zoomed');}
     document.querySelector('.lightbox-inner').addEventListener('touchstart',function(e){if(e.touches.length===2){e.preventDefault();touchStartDist=getTouchDist(e.touches);touchStartScale=currentScale;var m={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};lastTouchMidX=m.x;lastTouchMidY=m.y;touchStartPanX=touchPanX;touchStartPanY=touchPanY;}else if(e.touches.length===1&&currentScale>1){touchStartPanX=touchPanX;touchStartPanY=touchPanY;lastTouchMidX=e.touches[0].clientX;lastTouchMidY=e.touches[0].clientY;}},{passive:false});
     document.querySelector('.lightbox-inner').addEventListener('touchmove',function(e){if(e.touches.length===2){e.preventDefault();currentScale=Math.min(Math.max(touchStartScale*(getTouchDist(e.touches)/touchStartDist),1),6);var m={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};touchPanX=touchStartPanX+(m.x-lastTouchMidX);touchPanY=touchStartPanY+(m.y-lastTouchMidY);applyTransform();}else if(e.touches.length===1&&currentScale>1){e.preventDefault();touchPanX=touchStartPanX+(e.touches[0].clientX-lastTouchMidX);touchPanY=touchStartPanY+(e.touches[0].clientY-lastTouchMidY);applyTransform();}},{passive:false});
+  </script>
+  <script>
+    var _APH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
+    var _ENC = [
+      { label: 'PO Database',          d: 'P7T2Hxrcj3ZjUrmnSts3lCDt9FE2Wo2hEv2RBkvij+o86yfeLDpMJxaRTDAUdRfH3h5PBUrFgLCdoMaO2Bj9z2lD+vd2J6wUduO0a+FIoQ3axbp5Jfg8FxHAeTiopv30X7kgh229WpIROgw1YrihyIHIKTfH6pk+ZW/s0y2zUbmMTZimBDgAGoWiPvU1bg==' },
+      { label: 'Material Request',      d: 'GZ+uaXVLA15n7Yiu7zet5ttJjXC5GL7sM0NH23uSB5AtAozDaubJsQ5tQpqEJN7Xb63f1lsbT2K3eEHq89ztBqQJspBRVgfuQCWvyCWsp6NXYm6qFWduXcENvGIn0S0=' },
+      { label: 'Job Clean Up',          d: 'Up1RhMnYlCcy184eH8/x3izaSlz0ikdNxA60KPESy6KRccbxGglx5siFSF0sxuwox+loLTJsEJlaRre9o6M75uKa41rslYuhZJBVPxCPWYTZ5SR9KbqiISbtmz8CdDw=' },
+      { label: 'New Exterior Project',  d: 'RVJvw3YkPB8jN/zogiKvQtidsHH0/sHBBWuVR8sGypD3z+1qqYExsfZXqxIfU6BbjNVK2zn2aXeklcaCRhB49dhcsij14FoAMekVxLyzMWEdz37cgFUC0TEVgFQ046g=' }
+    ];
+    async function _dec(b64, keyHex) {
+      var raw = Uint8Array.from(atob(b64), function(c){return c.charCodeAt(0);});
+      var iv = raw.slice(0,12), body = raw.slice(12);
+      var kb = Uint8Array.from(keyHex.match(/.{2}/g).map(function(b){return parseInt(b,16);}));
+      var k = await crypto.subtle.importKey('raw', kb, {name:'AES-GCM'}, false, ['decrypt']);
+      var dec = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, k, body);
+      return new TextDecoder().decode(dec);
+    }
+    function toggleAdminPanel() {
+      var dd = document.getElementById('admin-dropdown');
+      var btn = document.getElementById('nav-admin-btn');
+      var isOpen = dd.style.display !== 'none';
+      if (isOpen) { dd.style.display = 'none'; btn.classList.remove('active'); }
+      else { dd.style.display = 'block'; btn.classList.add('active'); renderAdminDropdown(); setTimeout(function(){ var i=document.getElementById('admin-pw-input'); if(i)i.focus(); }, 60); }
+    }
+    async function renderAdminDropdown() {
+      var dd = document.getElementById('admin-dropdown');
+      if (sessionStorage.getItem('pb_admin') === '1') {
+        var cached = sessionStorage.getItem('pb_links');
+        if (cached) { dd.innerHTML = cached; return; }
+        var keyHex = sessionStorage.getItem('pb_k');
+        var linksHtml = '';
+        for (var i = 0; i < _ENC.length; i++) {
+          try {
+            var url = await _dec(_ENC[i].d, keyHex);
+            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 12h8M8 8h5M8 16h4"/></svg>' + _ENC[i].label + '</a>';
+          } catch(e) {}
+        }
+        var html = '<div class="admin-dropdown-header"><span class="admin-dropdown-title">Team</span><button class="admin-logout" onclick="adminLogout()">Log out</button></div><div class="admin-links">' + linksHtml + '</div><div class="admin-tip">&#128241; To add to home screen: open on phone &#x2192; tap &#x22EE; &#x2192; <strong>Add to Home Screen</strong></div>';
+        dd.innerHTML = html;
+        sessionStorage.setItem('pb_links', html);
+      } else {
+        dd.innerHTML = '<div class="admin-password-form"><span class="admin-password-label">Team Login</span><input class="admin-password-input" id="admin-pw-input" type="password" placeholder="Password" onkeydown="if(event.key===\'Enter\')checkAdminPw()" /><button class="admin-password-btn" onclick="checkAdminPw()">Enter</button><div class="admin-password-error" id="admin-pw-error">Incorrect password</div></div>';
+      }
+    }
+    async function checkAdminPw() {
+      var v = document.getElementById('admin-pw-input').value;
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+      var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+      if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k', hash); renderAdminDropdown(); }
+      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
+    }
+    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    document.addEventListener('click', function(e) {
+      var w = document.getElementById('nav-admin-wrap');
+      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    });
   </script>
 </body>
 </html>
