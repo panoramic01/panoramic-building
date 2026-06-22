@@ -79,8 +79,10 @@
     ]
   },
   "multifamily/parkway": {
-    "cover": null,
-    "photos": []
+    "cover": "assets/multifamily/parkway/cover.png",
+    "photos": [
+      "assets/multifamily/parkway/cover.png"
+    ]
   },
   "multifamily/4th-main": {
     "cover": "assets/multifamily/4th-main/cover.jpg",

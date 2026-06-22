@@ -323,7 +323,7 @@
 
 <!-- ── TOASTS + FILE INPUT ───────────────────────────────────────────── -->
 <div id="toasts"></div>
-<input type="file" id="file-input" multiple accept="image/*" />
+<input type="file" id="file-input" multiple accept="image/*,.heic,.heif,.tiff,.tif,.avif" />
 
 <script>
   // ── Constants ──────────────────────────────────────────────────────
@@ -747,7 +747,7 @@
     try {
       const folderPath = `assets/${currentSlug}`;
       const items = await ghApi('GET', `${folderPath}?ref=${cfg.branch}`);
-      const IMAGE_EXTS = /\.(jpg|jpeg|png|webp|gif)$/i;
+      const IMAGE_EXTS = /\.(jpg|jpeg|png|webp|gif|heic|heif|tiff|tif|avif|bmp|svg)$/i;
       const repoFiles = items
         .filter(f => f.type === 'file' && IMAGE_EXTS.test(f.name))
         .map(f => `${folderPath}/${f.name}`);
