@@ -1118,7 +1118,7 @@
   </script>
   <script>
     // Load site settings from site-config.json (no coding needed to update)
-    fetch('site-config.json').then(function(r) { return r.json(); }).then(function(cfg) {
+    fetch('site-config.json?v=' + Date.now()).then(function(r) { return r.json(); }).then(function(cfg) {
       var site = cfg._site || {};
       // Util bar
       // Rebuild util-bar from scratch so it works even if HTML structure was corrupted
@@ -1131,30 +1131,4 @@
         bar.innerHTML =
           '<span>' + a + '</span>' +
           '<span class="util-right">' +
-            '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
-            ' &nbsp;&nbsp; ' +
-            '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
-          '</span>';
-      }
-      // Hero
-      var hero = site.hero || {};
-      var eyebrowEl = document.querySelector('.hero-eyebrow');
-      var h1El      = document.querySelector('.hero-h1');
-      var subEl     = document.querySelector('.hero-sub');
-      if (eyebrowEl && hero.eyebrow) eyebrowEl.innerHTML = hero.eyebrow;
-      if (h1El      && hero.h1)      h1El.innerHTML      = hero.h1;
-      if (subEl     && hero.sub)     subEl.innerHTML     = hero.sub;
-      // Hero phone
-      var heroPhoneEl = document.querySelector('.hero-phone a');
-      if (heroPhoneEl && site.phone) { heroPhoneEl.href = 'tel:' + site.phone; heroPhoneEl.textContent = site.phoneFmt || site.phone; }
-      // SEO
-      var seo = site.seo || {};
-      if (seo.index) {
-        if (seo.index.title) document.title = seo.index.title;
-        var metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc && seo.index.desc) metaDesc.setAttribute('content', seo.index.desc);
-      }
-    }).catch(function(e) { console.warn('site-config error', e); });
-  </script>
-</body>
-</html>
+            '<a href="tel:'

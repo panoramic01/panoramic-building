@@ -556,8 +556,8 @@
     function closeLightboxOutside(e) { if (e.target === document.getElementById('lightbox')) closeLightbox(); }
 
     Promise.all([
-      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
-      fetch('site-config.json').then(function(r) { return r.json(); })
+      fetch('gallery-manifest.json?v=' + Date.now()).then(function(r) { return r.json(); }),
+      fetch('site-config.json?v=' + Date.now()).then(function(r) { return r.json(); })
     ]).then(function(results) {
       var manifest = results[0];
       var cfg      = results[1];
