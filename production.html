@@ -316,12 +316,21 @@
     fetch('site-config.json').then(function(r) { return r.json(); }).then(function(cfg) {
       var site = cfg._site || {};
       // Util bar
-      var areaEl  = document.querySelector('.util-bar span:first-child');
-      var phoneEl = document.querySelector('.util-bar .util-right a:first-child');
-      var emailEl = document.querySelector('.util-bar .util-right a:last-child');
-      if (areaEl  && site.serviceArea) areaEl.innerHTML  = site.serviceArea;
-      if (phoneEl && site.phone)       { phoneEl.href = 'tel:' + site.phone; phoneEl.innerHTML = '&#9990; ' + (site.phoneFmt || site.phone); }
-      if (emailEl && site.email)       { emailEl.href = 'mailto:' + site.email; emailEl.innerHTML = '&#9993; ' + site.email; }
+      // Rebuild util-bar from scratch so it works even if HTML structure was corrupted
+      var bar = document.querySelector('.util-bar');
+      if (bar) {
+        var p  = site.phone       || '3852895872';
+        var pf = site.phoneFmt    || p;
+        var e  = site.email       || 'info@panoramicbuildingllc.com';
+        var a  = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
+        bar.innerHTML =
+          '<span>' + a + '</span>' +
+          '<span class="util-right">' +
+            '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
+            ' &nbsp;&nbsp; ' +
+            '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
+          '</span>';
+      }
       // SEO
       var seo = site.seo || {};
       if (seo.production) {
@@ -567,17 +576,4 @@
       }
     }
     async function checkAdminPw() {
-      var v = document.getElementById('admin-pw-input').value;
-      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
-      var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-      if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k', hash); renderAdminDropdown(); }
-      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
-    }
-    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    document.addEventListener('click', function(e) {
-      var w = document.getElementById('nav-admin-wrap');
-      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    });
-  </script>
-</body>
-</html>
+      var v = document.getElementById('admin-pw-inpu

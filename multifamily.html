@@ -435,12 +435,19 @@
     }
     // ── Util bar & project grid — driven by site-config.json ────────────
     function applyUtilBar(site) {
-      var areaEl  = document.querySelector('.util-bar span:first-child');
-      var phoneEl = document.querySelector('.util-bar .util-right a:first-child');
-      var emailEl = document.querySelector('.util-bar .util-right a:last-child');
-      if (areaEl  && site.serviceArea) areaEl.innerHTML  = site.serviceArea;
-      if (phoneEl && site.phone)       { phoneEl.href = 'tel:' + site.phone; phoneEl.innerHTML = '&#9990; ' + (site.phoneFmt || site.phone); }
-      if (emailEl && site.email)       { emailEl.href = 'mailto:' + site.email; emailEl.innerHTML = '&#9993; ' + site.email; }
+      var bar = document.querySelector('.util-bar');
+      if (!bar || !site) return;
+      var p  = site.phone       || '3852895872';
+      var pf = site.phoneFmt    || p;
+      var e  = site.email       || 'info@panoramicbuildingllc.com';
+      var a  = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
+      bar.innerHTML =
+        '<span>' + a + '</span>' +
+        '<span class="util-right">' +
+          '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
+          ' &nbsp;&nbsp; ' +
+          '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
+        '</span>';
     }
 
     function buildProjectGrid(manifest, cfg) {
