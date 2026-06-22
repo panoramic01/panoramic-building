@@ -107,7 +107,9 @@
     "photos": []
   },
   "multifamily/altura": {
-    "cover": null,
-    "photos": []
+    "cover": "assets/multifamily/altura/cover.jpg",
+    "photos": [
+      "assets/multifamily/altura/cover.jpg"
+    ]
   }
 }
