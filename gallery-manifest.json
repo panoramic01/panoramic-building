@@ -107,7 +107,17 @@
     "photos": []
   },
   "multifamily/altura": {
-    "cover": null,
-    "photos": []
+    "cover": "assets/multifamily/altura/cover.png",
+    "photos": [
+      "assets/multifamily/altura/cover.png",
+      "assets/multifamily/altura/aidan_ALT.jpg",
+      "assets/multifamily/altura/aidan_ALT-2.jpg",
+      "assets/multifamily/altura/aidan_ALT-3.jpg",
+      "assets/multifamily/altura/aidan_ALT-4.jpg",
+      "assets/multifamily/altura/aidan_ALT-5.jpg",
+      "assets/multifamily/altura/aidan_ALT-6.jpg",
+      "assets/multifamily/altura/aidan_ALT-7.jpg",
+      "assets/multifamily/altura/aidan_ALT-8.jpg"
+    ]
   }
 }
