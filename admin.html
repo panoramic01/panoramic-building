@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Admin | Panoramic Building</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f3ef; color: #2E2E2E; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Auth ─────────────────────────────────────────────────────── */
+    #auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #2E2E2E; }
+    .auth-box { width: 320px; }
+    .auth-brand { text-align: center; margin-bottom: 36px; }
+    .auth-brand strong { display: block; color: #fff; font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+    .auth-brand span { color: rgba(255,255,255,0.35); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; }
+    .auth-label { color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .auth-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 12px 16px; font-size: 14px; font-family: inherit; outline: none; }
+    .auth-input:focus { border-color: #1F3971; }
+    .auth-btn { width: 100%; background: #1F3971; color: #fff; border: none; padding: 12px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; margin-top: 10px; font-family: inherit; transition: background 0.2s; }
+    .auth-btn:hover { background: #163060; }
+    .auth-error { color: #e74c3c; font-size: 11px; margin-top: 8px; display: none; letter-spacing: 0.3px; }
+
+    /* ── Setup ─────────────────────────────────────────────────────── */
+    #setup-screen { min-height: 100vh; display: none; align-items: center; justify-content: center; background: #f4f3ef; }
+    #setup-screen.show { display: flex; }
+    .setup-box { width: 480px; background: #fff; padding: 40px; border-top: 3px solid #1F3971; }
+    .setup-title { font-size: 17px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .setup-sub { color: #8A887E; font-size: 13px; margin-bottom: 32px; line-height: 1.6; }
+    .setup-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .setup-hint { font-size: 11px; color: #A2A092; margin-bottom: 10px; line-height: 1.5; }
+    .setup-hint a { color: #1F3971; }
+    .setup-input { width: 100%; border: 1px solid #D1D0CB; padding: 10px 14px; font-size: 13px; font-family: inherit; color: #2E2E2E; outline: none; margin-bottom: 20px; }
+    .setup-input:focus { border-color: #1F3971; }
+    .setup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .setup-btn { background: #1F3971; color: #fff; border: none; padding: 12px 28px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .setup-btn:hover { background: #163060; }
+
+    /* ── Admin Layout ──────────────────────────────────────────────── */
+    #admin-ui { display: none; flex-direction: column; min-height: 100vh; }
+    #admin-ui.show { display: flex; }
+    .admin-header { background: #2E2E2E; height: 60px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .admin-header-brand { display: flex; align-items: center; gap: 14px; }
+    .admin-header-brand img { height: 42px; }
+    .admin-header-title { color: rgba(255,255,255,0.45); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+    .admin-header-title span { color: rgba(255,255,255,0.15); margin: 0 8px; }
+    .admin-header-title strong { color: rgba(255,255,255,0.7); }
+    .admin-header-actions { display: flex; align-items: center; gap: 12px; }
+    .admin-deploy-btn { background: #1F3971; color: #fff; border: none; padding: 7px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .admin-deploy-btn:hover { background: #163060; }
+    .admin-logout-btn { background: none; border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.5); padding: 6px 14px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .admin-logout-btn:hover { border-color: rgba(255,255,255,0.55); color: #fff; }
+
+    .admin-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ──────────────────────────────────────────────────── */
+    .admin-sidebar { width: 210px; background: #fff; border-right: 1px solid #e8e7e3; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; }
+    .sidebar-sec { padding: 20px 0 8px; }
+    .sidebar-sec-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #A2A092; padding: 0 18px; margin-bottom: 4px; }
+    .sidebar-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 18px; cursor: pointer; font-size: 12px; color: #2E2E2E; transition: background 0.12s; border-left: 3px solid transparent; user-select: none; }
+    .sidebar-item:hover { background: #f7f6f2; }
+    .sidebar-item.active { background: #eef2fb; color: #1F3971; font-weight: 600; border-left-color: #1F3971; }
+    .sidebar-badge { font-size: 10px; background: #e8e7e3; color: #8A887E; padding: 1px 7px; border-radius: 10px; }
+    .sidebar-item.active .sidebar-badge { background: #d5e0f7; color: #1F3971; }
+    .sidebar-divider { height: 1px; background: #e8e7e3; margin: 8px 0; }
+    .sidebar-link { display: flex; align-items: center; gap: 8px; padding: 9px 18px; cursor: pointer; font-size: 11px; color: #A2A092; background: none; border: none; font-family: inherit; width: 100%; text-align: left; transition: color 0.15s; }
+    .sidebar-link:hover { color: #2E2E2E; }
+    .sidebar-link svg { flex-shrink: 0; }
+    .sidebar-bottom { margin-top: auto; padding-bottom: 12px; }
+
+    /* ── Main ─────────────────────────────────────────────────────── */
+    .admin-main { flex: 1; overflow-y: auto; padding: 32px 36px; }
+
+    /* ── Content header ───────────────────────────────────────────── */
+    .ch { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+    .ch-left h2 { font-size: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .ch-left p { color: #A2A092; font-size: 12px; margin-top: 4px; }
+    .btn-primary { background: #1F3971; color: #fff; border: none; padding: 10px 20px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary:hover { background: #163060; }
+    .btn-secondary { background: #fff; color: #2E2E2E; border: 1px solid #D1D0CB; padding: 9px 18px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: all 0.18s; }
+    .btn-secondary:hover { border-color: #2E2E2E; }
+    .btn-danger { background: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 7px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: all 0.18s; }
+    .btn-danger:hover { background: #c0392b; color: #fff; }
+
+    /* ── Project grid ─────────────────────────────────────────────── */
+    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .proj-card { background: #fff; border: 1px solid #e8e7e3; cursor: pointer; transition: box-shadow 0.18s; }
+    .proj-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.09); }
+    .proj-cover { aspect-ratio: 16/9; background: linear-gradient(135deg,#1F3971,#152847); overflow: hidden; position: relative; }
+    .proj-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .proj-cover-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    .proj-body { padding: 14px 16px 16px; border-top: 2px solid #1F3971; }
+    .proj-name { font-size: 13px; font-weight: 700; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .proj-meta { display: flex; align-items: center; justify-content: space-between; }
+    .proj-count { font-size: 11px; color: #A2A092; }
+    .proj-cat { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; background: #f0efe9; color: #8A887E; padding: 2px 8px; }
+    .proj-add { background: #fff; border: 1.5px dashed #D1D0CB; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 170px; color: #A2A092; }
+    .proj-add:hover { border-color: #1F3971; color: #1F3971; background: #eef2fb; }
+    .proj-add svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+    .proj-add span { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+    /* ── Project detail ───────────────────────────────────────────── */
+    .back-btn { background: none; border: none; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; color: #1F3971; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; padding: 0; margin-bottom: 22px; }
+    .back-btn:hover { color: #163060; }
+    .back-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* ── Upload zone ──────────────────────────────────────────────── */
+    .upload-zone { border: 2px dashed #D1D0CB; padding: 36px; text-align: center; margin-bottom: 24px; cursor: pointer; background: #fff; transition: all 0.18s; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: #1F3971; background: #eef2fb; }
+    .upload-zone-icon { margin: 0 auto 12px; color: #D1D0CB; }
+    .upload-zone-icon svg { width: 36px; height: 36px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+    .upload-zone p { font-size: 13px; color: #8A887E; }
+    .upload-zone p strong { color: #1F3971; }
+    .upload-zone small { font-size: 11px; color: #D1D0CB; display: block; margin-top: 5px; }
+    #file-input { display: none; }
+
+    /* ── Upload progress ──────────────────────────────────────────── */
+    .up-list { margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .up-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #fff; border: 1px solid #e8e7e3; }
+    .up-name { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .up-bar { width: 90px; height: 3px; background: #e8e7e3; border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+    .up-fill { height: 100%; background: #1F3971; transition: width 0.25s; }
+    .up-status { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; width: 70px; text-align: right; }
+    .up-status.done { color: #27ae60; }
+    .up-status.error { color: #c0392b; }
+    .up-status.pending { color: #1F3971; }
+
+    /* ── Photos grid ──────────────────────────────────────────────── */
+    .photos-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .photos-title { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+    .photo-card { position: relative; aspect-ratio: 4/3; background: #e8e7e3; overflow: hidden; }
+    .photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.18s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; }
+    .photo-card:hover .photo-overlay { opacity: 1; }
+    .photo-btn { width: 118px; padding: 6px 0; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: inherit; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35); color: #fff; transition: background 0.15s; text-align: center; }
+    .photo-btn:hover { background: rgba(255,255,255,0.28); }
+    .photo-btn.set-cover { border-color: rgba(241,196,15,0.7); color: #f1c40f; }
+    .photo-btn.del-photo { border-color: rgba(231,76,60,0.7); color: #e74c3c; }
+    .cover-badge { position: absolute; top: 7px; left: 7px; background: #f1c40f; color: #2E2E2E; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 7px; }
+    .empty-state { color: #A2A092; font-size: 13px; text-align: center; padding: 48px; }
+
+    /* ── Note banner ──────────────────────────────────────────────── */
+    .note-banner { background: #fff8e1; border-left: 3px solid #f1c40f; padding: 10px 16px; font-size: 12px; color: #6B6960; margin-bottom: 20px; line-height: 1.5; }
+
+    /* ── Modal ────────────────────────────────────────────────────── */
+    .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.48); z-index: 500; align-items: center; justify-content: center; }
+    .modal-wrap.open { display: flex; }
+    .modal { background: #fff; width: 420px; border-top: 3px solid #1F3971; }
+    .modal-head { padding: 18px 22px 14px; border-bottom: 1px solid #f0efe9; display: flex; align-items: center; justify-content: space-between; }
+    .modal-head h3 { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .modal-close { background: none; border: none; cursor: pointer; color: #A2A092; font-size: 20px; line-height: 1; padding: 0; }
+    .modal-close:hover { color: #2E2E2E; }
+    .modal-body { padding: 22px; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0efe9; display: flex; gap: 10px; justify-content: flex-end; }
+    .form-grp { margin-bottom: 18px; }
+    .form-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .form-input { width: 100%; border: 1px solid #D1D0CB; padding: 9px 13px; font-size: 13px; font-family: inherit; color: #2E2E2E; outline: none; }
+    .form-input:focus { border-color: #1F3971; }
+    .form-select { width: 100%; border: 1px solid #D1D0CB; padding: 9px 13px; font-size: 13px; font-family: inherit; color: #2E2E2E; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232E2E2E' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 13px center; appearance: none; cursor: pointer; }
+    .form-select:focus { border-color: #1F3971; }
+
+    /* ── Toast ────────────────────────────────────────────────────── */
+    #toasts { position: fixed; bottom: 22px; right: 22px; z-index: 900; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 11px 18px; font-size: 12px; color: #fff; animation: toastIn 0.18s ease; max-width: 280px; letter-spacing: 0.2px; }
+    .toast.success { background: #27ae60; }
+    .toast.error   { background: #c0392b; }
+    .toast.info    { background: #1F3971; }
+    @keyframes toastIn { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* ── Loading ──────────────────────────────────────────────────── */
+    .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 72px; color: #A2A092; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+    .spinner { width: 18px; height: 18px; border: 2px solid #e8e7e3; border-top-color: #1F3971; border-radius: 50%; animation: spin 0.65s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH ─────────────────────────────────────────────────────────── -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-brand">
+      <strong>Panoramic Building</strong>
+      <span>Site Administration</span>
+    </div>
+    <label class="auth-label">Password</label>
+    <input class="auth-input" id="auth-input" type="password" placeholder="Enter password" autocomplete="current-password" />
+    <button class="auth-btn" onclick="authSubmit()">Sign In</button>
+    <div class="auth-error" id="auth-error">Incorrect password</div>
+  </div>
+</div>
+
+<!-- ── SETUP ─────────────────────────────────────────────────────────── -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <div class="setup-title">GitHub Setup</div>
+    <div class="setup-sub">Connect your GitHub repository. The admin panel will read and write directly to your repo — uploading photos and updating the manifest automatically. You only need to do this once per browser.</div>
+
+    <label class="setup-label">Personal Access Token</label>
+    <div class="setup-hint">Go to <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> → Generate new token (Classic) → check the <strong>repo</strong> scope. Paste it here. Stored only in this browser.</div>
+    <input class="setup-input" id="cfg-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+
+    <div class="setup-row">
+      <div>
+        <label class="setup-label">GitHub Username / Org</label>
+        <input class="setup-input" id="cfg-owner" type="text" value="panoramic01" />
+      </div>
+      <div>
+        <label class="setup-label">Repository</label>
+        <input class="setup-input" id="cfg-repo" type="text" value="panoramic-building" />
+      </div>
+    </div>
+    <label class="setup-label">Branch</label>
+    <input class="setup-input" id="cfg-branch" type="text" value="main" />
+
+    <button class="setup-btn" onclick="saveSetup()">Save &amp; Continue</button>
+  </div>
+</div>
+
+<!-- ── ADMIN ─────────────────────────────────────────────────────────── -->
+<div id="admin-ui">
+  <header class="admin-header">
+    <div class="admin-header-brand">
+      <img src="assets/logo.png" alt="" onerror="this.style.display='none'" />
+      <div class="admin-header-title">Panoramic Building <span>|</span> <strong>Admin</strong></div>
+    </div>
+    <div class="admin-header-actions">
+      <button class="admin-logout-btn" onclick="logout()">Log Out</button>
+    </div>
+  </header>
+  <div class="admin-body">
+    <aside class="admin-sidebar">
+      <div class="sidebar-sec">
+        <div class="sidebar-sec-label">Projects</div>
+        <div class="sidebar-item active" id="cat-all" onclick="setCategory('all')">
+          <span>All</span><span class="sidebar-badge" id="cnt-all">—</span>
+        </div>
+        <div class="sidebar-item" id="cat-multifamily" onclick="setCategory('multifamily')">
+          <span>Multifamily</span><span class="sidebar-badge" id="cnt-multifamily">—</span>
+        </div>
+        <div class="sidebar-item" id="cat-reserve" onclick="setCategory('reserve')">
+          <span>Reserve</span><span class="sidebar-badge" id="cnt-reserve">—</span>
+        </div>
+        <div class="sidebar-item" id="cat-custom" onclick="setCategory('custom')">
+          <span>Custom</span><span class="sidebar-badge" id="cnt-custom">—</span>
+        </div>
+        <div class="sidebar-item" id="cat-production" onclick="setCategory('production')">
+          <span>Production</span><span class="sidebar-badge" id="cnt-production">—</span>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-link" onclick="goToSite()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          View Site
+        </button>
+        <button class="sidebar-link" onclick="openSetup()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          GitHub Settings
+        </button>
+      </div>
+    </aside>
+    <main class="admin-main" id="admin-main">
+      <div class="loading"><div class="spinner"></div>Loading…</div>
+    </main>
+  </div>
+</div>
+
+<!-- ── ADD PROJECT MODAL ─────────────────────────────────────────────── -->
+<div class="modal-wrap" id="add-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add Project</h3>
+      <button class="modal-close" onclick="closeModal('add-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="note-banner">New projects also need a tile added to the corresponding HTML page before they appear on the site. Add photos here first, then ask me to add the tile.</div>
+      <div class="form-grp">
+        <label class="form-lbl">Project Name</label>
+        <input class="form-input" id="np-name" type="text" placeholder="e.g. Riverstone, Maple Park" />
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Location</label>
+        <input class="form-input" id="np-location" type="text" placeholder="City, State" />
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Category</label>
+        <select class="form-select" id="np-cat">
+          <option value="multifamily">Multifamily</option>
+          <option value="reserve">Panoramic Reserve</option>
+          <option value="custom">Custom</option>
+          <option value="production">Production</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('add-modal')">Cancel</button>
+      <button class="btn-primary" onclick="createProject()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 5v14M5 12h14"/></svg>
+        Create
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE MODAL ──────────────────────────────────────────────────── -->
+<div class="modal-wrap" id="del-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Delete Photo?</h3>
+      <button class="modal-close" onclick="closeModal('del-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#6B6960;line-height:1.6;">This permanently deletes the photo from the repository. It cannot be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('del-modal')">Cancel</button>
+      <button class="btn-danger" id="del-confirm-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOASTS + FILE INPUT ───────────────────────────────────────────── -->
+<div id="toasts"></div>
+<input type="file" id="file-input" multiple accept="image/*" />
+
+<script>
+  // ── Constants ──────────────────────────────────────────────────────
+  const PW_HASH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
+  const MANIFEST_PATH = 'gallery-manifest.json';
+  const CAT_LABELS = { multifamily:'Multifamily', reserve:'Panoramic Reserve', custom:'Custom', production:'Production' };
+
+  // ── State ──────────────────────────────────────────────────────────
+  let cfg = null;
+  let manifest = null;
+  let manifestSha = null;
+  let currentCat = 'all';
+  let currentSlug = null;
+  let pendingDeletePath = null;
+
+  // ── Init ───────────────────────────────────────────────────────────
+  (function init() {
+    const savedCfg = localStorage.getItem('pb_cfg');
+    if (sessionStorage.getItem('pb_admin') === '1') {
+      document.getElementById('auth-screen').style.display = 'none';
+      if (savedCfg) { cfg = JSON.parse(savedCfg); showAdmin(); }
+      else { document.getElementById('setup-screen').classList.add('show'); }
+    }
+    document.getElementById('auth-input').addEventListener('keydown', e => { if (e.key === 'Enter') authSubmit(); });
+    document.getElementById('file-input').addEventListener('change', e => handleFiles(e.target.files));
+    document.querySelectorAll('.modal-wrap').forEach(el => {
+      el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+    });
+  })();
+
+  // ── Auth ───────────────────────────────────────────────────────────
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function authSubmit() {
+    const v = document.getElementById('auth-input').value;
+    const h = await sha256(v);
+    if (h === PW_HASH) {
+      sessionStorage.setItem('pb_admin','1');
+      document.getElementById('auth-screen').style.display = 'none';
+      const saved = localStorage.getItem('pb_cfg');
+      if (saved) { cfg = JSON.parse(saved); showAdmin(); }
+      else { document.getElementById('setup-screen').classList.add('show'); }
+    } else {
+      const err = document.getElementById('auth-error');
+      err.style.display = 'block';
+      document.getElementById('auth-input').value = '';
+      document.getElementById('auth-input').focus();
+      setTimeout(() => err.style.display = 'none', 3000);
+    }
+  }
+
+  function logout() { sessionStorage.removeItem('pb_admin'); location.reload(); }
+  function goToSite() { window.open('index.html', '_blank'); }
+
+  // ── Setup ──────────────────────────────────────────────────────────
+  function saveSetup() {
+    const token  = document.getElementById('cfg-token').value.trim();
+    const owner  = document.getElementById('cfg-owner').value.trim();
+    const repo   = document.getElementById('cfg-repo').value.trim();
+    const branch = document.getElementById('cfg-branch').value.trim();
+    if (!token || !owner || !repo || !branch) { toast('All fields are required', 'error'); return; }
+    cfg = { token, owner, repo, branch };
+    localStorage.setItem('pb_cfg', JSON.stringify(cfg));
+    document.getElementById('setup-screen').classList.remove('show');
+    showAdmin();
+  }
+
+  function openSetup() {
+    if (cfg) {
+      document.getElementById('cfg-owner').value = cfg.owner || '';
+      document.getElementById('cfg-repo').value = cfg.repo || '';
+      document.getElementById('cfg-branch').value = cfg.branch || 'main';
+    }
+    document.getElementById('admin-ui').classList.remove('show');
+    document.getElementById('setup-screen').classList.add('show');
+  }
+
+  // ── GitHub API ─────────────────────────────────────────────────────
+  async function ghApi(method, path, body) {
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Authorization': `token ${cfg.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (method === 'DELETE' && res.status === 200) return {};
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message || `GitHub ${res.status}`); }
+    return res.json();
+  }
+
+  async function getFileSha(path) {
+    try { const r = await ghApi('GET', `${path}?ref=${cfg.branch}`); return r.sha; } catch(e) { return null; }
+  }
+
+  // ── Manifest ───────────────────────────────────────────────────────
+  async function loadManifest() {
+    const r = await ghApi('GET', `${MANIFEST_PATH}?ref=${cfg.branch}`);
+    manifestSha = r.sha;
+    manifest = JSON.parse(atob(r.content.replace(/\s/g,'')));
+  }
+
+  async function saveManifest(msg) {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(manifest, null, 2))));
+    const r = await ghApi('PUT', MANIFEST_PATH, { message: msg, content: encoded, sha: manifestSha, branch: cfg.branch });
+    manifestSha = r.content.sha;
+  }
+
+  // ── Show admin ─────────────────────────────────────────────────────
+  async function showAdmin() {
+    document.getElementById('admin-ui').classList.add('show');
+    try {
+      await loadManifest();
+      renderProjects();
+    } catch(e) {
+      document.getElementById('admin-main').innerHTML = `<div style="color:#c0392b;padding:40px;font-size:13px;line-height:1.7;">
+        <strong>Could not connect to GitHub.</strong><br>${escH(e.message)}<br><br>
+        Check your token and repo settings via <strong>GitHub Settings</strong> in the sidebar.
+      </div>`;
+    }
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────
+  function slugify(s) { return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function catOf(slug) { return slug.split('/')[0]; }
+  function nameOf(slug) { return slug.split('/').slice(1).join('/').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
+  function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ── Categories ─────────────────────────────────────────────────────
+  function setCategory(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('cat-'+cat).classList.add('active');
+    currentSlug = null;
+    renderProjects();
+  }
+
+  // ── Project list ───────────────────────────────────────────────────
+  function renderProjects() {
+    currentSlug = null;
+    const slugs = Object.keys(manifest);
+    const cats = ['multifamily','reserve','custom','production'];
+
+    document.getElementById('cnt-all').textContent = slugs.length;
+    cats.forEach(c => {
+      document.getElementById('cnt-'+c).textContent = slugs.filter(s=>catOf(s)===c).length;
+    });
+
+    const filtered = currentCat === 'all' ? slugs : slugs.filter(s=>catOf(s)===currentCat);
+    const label = currentCat === 'all' ? 'All Projects' : CAT_LABELS[currentCat];
+
+    let cards = filtered.map(slug => {
+      const e = manifest[slug] || {};
+      const photos = e.photos || [];
+      const cover = e.cover;
+      const cat = catOf(slug);
+      return `<div class="proj-card" onclick="openProject('${escH(slug)}')">
+        <div class="proj-cover">${cover
+          ? `<img src="${escH(cover)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=proj-cover-ph>No Cover</div>'" />`
+          : '<div class="proj-cover-ph">No Cover</div>'}</div>
+        <div class="proj-body">
+          <div class="proj-name">${escH(nameOf(slug))}</div>
+          <div class="proj-meta">
+            <span class="proj-count">${photos.length} photo${photos.length!==1?'s':''}</span>
+            <span class="proj-cat">${escH(CAT_LABELS[cat]||cat)}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="ch">
+        <div class="ch-left">
+          <h2>${escH(label)}</h2>
+          <p>${filtered.length} project${filtered.length!==1?'s':''}</p>
+        </div>
+        <button class="btn-primary" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 5v14M5 12h14"/></svg>
+          Add Project
+        </button>
+      </div>
+      <div class="project-grid">
+        ${cards}
+        <div class="proj-add" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+          <span>New Project</span>
+        </div>
+      </div>`;
+  }
+
+  // ── Project detail ─────────────────────────────────────────────────
+  function openProject(slug) {
+    currentSlug = slug;
+    renderDetail();
+  }
+
+  function renderDetail() {
+    const slug = currentSlug;
+    const e = manifest[slug] || { cover: null, photos: [] };
+    const photos = e.photos || [];
+    const cover = e.cover;
+    const name = nameOf(slug);
+    const cat = catOf(slug);
+
+    const photoCards = photos.map(p => {
+      const isCover = p === cover;
+      return `<div class="photo-card">
+        <img src="${escH(p)}" loading="lazy" onerror="this.parentElement.style.background='#d8d7d3'" />
+        ${isCover ? '<div class="cover-badge">Cover</div>' : ''}
+        <div class="photo-overlay">
+          ${isCover
+            ? '<div class="photo-btn set-cover" style="opacity:0.5;cursor:default;">Current Cover</div>'
+            : `<button class="photo-btn set-cover" onclick="setCover('${escH(p)}',event)">Set as Cover</button>`}
+          <button class="photo-btn del-photo" onclick="askDelete('${escH(p)}',event)">Delete</button>
+        </div>
+      </div>`;
+    }).join('') || '<div class="empty-state">No photos yet — upload some above</div>';
+
+    document.getElementById('admin-main').innerHTML = `
+      <button class="back-btn" onclick="renderProjects()">
+        <svg viewBox="0 0 16 16"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        All Projects
+      </button>
+      <div class="ch">
+        <div class="ch-left">
+          <h2>${escH(name)}</h2>
+          <p>${escH(CAT_LABELS[cat]||cat)} &nbsp;·&nbsp; ${photos.length} photo${photos.length!==1?'s':''}</p>
+        </div>
+      </div>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div class="upload-zone-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+        <p>Drag &amp; drop photos here or <strong>browse files</strong></p>
+        <small>JPG &nbsp;·&nbsp; PNG &nbsp;·&nbsp; WEBP</small>
+      </div>
+      <div id="up-list" class="up-list"></div>
+      <div class="photos-header">
+        <div class="photos-title">Photos (${photos.length})</div>
+      </div>
+      <div class="photos-grid" id="photos-grid">${photoCards}</div>`;
+
+    setupDrop();
+    document.getElementById('file-input').value = '';
+  }
+
+  // ── Upload ─────────────────────────────────────────────────────────
+  function setupDrop() {
+    const zone = document.getElementById('upload-zone');
+    if (!zone) return;
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+  }
+
+  async function handleFiles(files) {
+    if (!files || !files.length || !currentSlug) return;
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!arr.length) { toast('No image files selected', 'error'); return; }
+
+    const list = document.getElementById('up-list');
+    list.innerHTML = '';
+    const uploaded = [];
+
+    for (const file of arr) {
+      const id = 'u' + Date.now() + Math.random().toString(36).slice(2,6);
+      list.insertAdjacentHTML('beforeend', `
+        <div class="up-item" id="${id}">
+          <span class="up-name">${escH(file.name)}</span>
+          <div class="up-bar"><div class="up-fill" id="${id}f" style="width:0%"></div></div>
+          <span class="up-status pending" id="${id}s">Uploading…</span>
+        </div>`);
+
+      try {
+        fill(id, 20);
+        const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+        const base = slugify(file.name.replace(/\.[^.]+$/,''));
+        const filename = base + '.' + ext;
+        const repoPath = `assets/${currentSlug}/${filename}`;
+        const content  = await fileToBase64(file);
+        fill(id, 55);
+        const sha = await getFileSha(repoPath);
+        const body = { message: `Upload ${filename} to ${currentSlug}`, content, branch: cfg.branch };
+        if (sha) body.sha = sha;
+        await ghApi('PUT', repoPath, body);
+        fill(id, 100);
+        setStatus(id, 'Done', 'done');
+        uploaded.push(repoPath);
+      } catch(e) {
+        setStatus(id, 'Failed', 'error');
+        toast(`Failed: ${file.name} — ${e.message}`, 'error');
+      }
+    }
+
+    if (uploaded.length) {
+      if (!manifest[currentSlug]) manifest[currentSlug] = { cover: null, photos: [] };
+      const entry = manifest[currentSlug];
+      if (!entry.photos) entry.photos = [];
+      uploaded.forEach(p => { if (!entry.photos.includes(p)) entry.photos.push(p); });
+      if (!entry.cover) entry.cover = uploaded[0];
+      try {
+        await saveManifest(`Add ${uploaded.length} photo(s) to ${currentSlug}`);
+        toast(`${uploaded.length} photo${uploaded.length>1?'s':''} uploaded`, 'success');
+        renderDetail();
+      } catch(e) {
+        toast('Manifest save failed: ' + e.message, 'error');
+      }
+    }
+    document.getElementById('file-input').value = '';
+  }
+
+  function fill(id, pct) { const el=document.getElementById(id+'f'); if(el) el.style.width=pct+'%'; }
+  function setStatus(id, text, cls) { const el=document.getElementById(id+'s'); if(el){el.textContent=text; el.className='up-status '+cls;} }
+
+  function fileToBase64(file) {
+    return new Promise((res,rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  // ── Cover ──────────────────────────────────────────────────────────
+  async function setCover(path, e) {
+    e.stopPropagation();
+    if (!currentSlug) return;
+    manifest[currentSlug].cover = path;
+    try {
+      await saveManifest(`Set cover for ${currentSlug}`);
+      toast('Cover updated', 'success');
+      renderDetail();
+    } catch(err) { toast('Failed: ' + err.message, 'error'); }
+  }
+
+  // ── Delete ─────────────────────────────────────────────────────────
+  function askDelete(path, e) {
+    e.stopPropagation();
+    pendingDeletePath = path;
+    document.getElementById('del-confirm-btn').onclick = doDelete;
+    openModal('del-modal');
+  }
+
+  async function doDelete() {
+    closeModal('del-modal');
+    const path = pendingDeletePath;
+    pendingDeletePath = null;
+    if (!path || !currentSlug) return;
+    try {
+      const sha = await getFileSha(path);
+      if (sha) await ghApi('DELETE', path, { message: `Delete ${path}`, sha, branch: cfg.branch });
+      const entry = manifest[currentSlug];
+      if (entry) {
+        entry.photos = (entry.photos||[]).filter(p => p !== path);
+        if (entry.cover === path) entry.cover = entry.photos[0] || null;
+      }
+      await saveManifest(`Remove photo from ${currentSlug}`);
+      toast('Photo deleted', 'success');
+      renderDetail();
+    } catch(err) { toast('Delete failed: ' + err.message, 'error'); }
+  }
+
+  // ── Add project ────────────────────────────────────────────────────
+  function openAddModal() {
+    document.getElementById('np-name').value = '';
+    document.getElementById('np-location').value = '';
+    if (currentCat !== 'all') document.getElementById('np-cat').value = currentCat;
+    openModal('add-modal');
+  }
+
+  async function createProject() {
+    const name     = document.getElementById('np-name').value.trim();
+    const location = document.getElementById('np-location').value.trim();
+    const cat      = document.getElementById('np-cat').value;
+    if (!name) { toast('Project name is required', 'error'); return; }
+    const slug = cat + '/' + slugify(name);
+    if (manifest[slug]) { toast('Project already exists', 'error'); return; }
+    manifest[slug] = { cover: null, photos: [], location };
+    try {
+      await saveManifest(`Add project: ${slug}`);
+      closeModal('add-modal');
+      toast('Project created — now upload photos', 'success');
+      currentSlug = slug;
+      renderDetail();
+    } catch(e) {
+      delete manifest[slug];
+      toast('Failed: ' + e.message, 'error');
+    }
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────────
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // ── Toast ──────────────────────────────────────────────────────────
+  function toast(msg, type='info') {
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+</script>
+</body>
+</html>
