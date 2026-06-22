@@ -1,0 +1,61 @@
+{
+  "multifamily": {
+    "orchard-grove": {
+      "name": "Orchard Grove",
+      "location": "Idaho Falls, ID",
+      "description": "",
+      "stats": { "units": 55, "sqft": 25677, "buildings": 1 },
+      "materials": ["LP 8\" Lap Expert Finish", "LP Panel B&B Expert Finish", "Dryvit Stucco", "Harristone Slate Lueders"]
+    },
+    "parkway": {
+      "name": "Parkway Apartments",
+      "location": "Idaho Falls, ID",
+      "description": "",
+      "stats": { "units": 0, "sqft": 0, "buildings": 0 },
+      "materials": []
+    },
+    "4th-main": {
+      "name": "4th + Main",
+      "location": "Bountiful, UT",
+      "description": "",
+      "stats": { "units": 24, "sqft": 19530, "buildings": 2 },
+      "materials": []
+    },
+    "altura": {
+      "name": "Altura Apartments",
+      "location": "Logan, UT",
+      "description": "",
+      "stats": { "units": 168, "sqft": 141369, "buildings": 8 },
+      "materials": []
+    },
+    "the-crossing": {
+      "name": "The Crossing",
+      "location": "Woods Cross, UT",
+      "description": "",
+      "stats": { "units": 22, "sqft": 34120, "buildings": 5 },
+      "materials": ["LP SmartSide 8\" Lap", "LP NickelGap", "Interstate Smokey Mountain Mod", "Interstate Coal King", "Smooth Hardie Panel"]
+    },
+    "hyde-park-gateway": {
+      "name": "Hyde Park Gateway",
+      "location": "Hyde Park, UT",
+      "description": "",
+      "stats": { "units": 0, "sqft": 0, "buildings": 0 },
+      "materials": []
+    }
+  },
+  "reserve": {
+    "lowell":   { "name": "Lowell",   "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
+    "blacktail":{ "name": "Blacktail","location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
+    "watson":   { "name": "Watson",   "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
+    "goble":    { "name": "Goble",    "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
+    "roberts":  { "name": "Roberts",  "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
+    "baker":    { "name": "Baker",    "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] }
+  },
+  "custom": {
+    "blacktail": { "name": "Blacktail", "location": "Garden City, UT", "description": "", "materials": [] }
+  },
+  "production": {
+    "description": "",
+    "materials": []
+  }
+}

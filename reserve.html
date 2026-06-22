@@ -195,6 +195,22 @@
       .photo-grid { grid-template-columns: 1fr; }
     }
 
+    /* Project Stats Bar */
+    .mf-stats-bar { background: #152847; padding: 18px 80px; display: flex; justify-content: center; align-items: center; gap: 0; }
+    .mf-stat { display: flex; flex-direction: column; align-items: center; padding: 0 40px; }
+    .mf-stat-num { font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -0.5px; line-height: 1.1; }
+    .mf-stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .mf-stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .materials-bar { background: #f4f3ef; border-bottom: 1px solid #e8e7e3; padding: 10px 80px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0; }
+    .material-tag { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #2E2E2E; padding: 0 20px; }
+    .material-divider { width: 1px; height: 14px; background: #D1D0CB; flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .mf-stats-bar { padding: 18px 20px; flex-wrap: wrap; gap: 16px; }
+      .mf-stat { padding: 0 20px; }
+      .materials-bar { padding: 10px 24px; gap: 4px; }
+      .material-tag { padding: 0 12px; }
+    }
+
     /* Admin / Team Login */
     .nav-admin-wrap { position: relative; display: flex; align-items: center; margin-left: 8px; }
     .nav-admin-btn { background: none; border: none; cursor: pointer; padding: 6px; color: rgba(255,255,255,0.45); transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -279,6 +295,20 @@
     </div>
     <h1 id="project-page-title"></h1>
   </div>
+
+  <div class="mf-stats-bar" id="project-stats" style="display:none;">
+    <div class="mf-stat">
+      <span class="mf-stat-num" id="proj-sqft"></span>
+      <span class="mf-stat-label">Sq Ft of Exterior Wall</span>
+    </div>
+    <div class="mf-stat-divider"></div>
+    <div class="mf-stat">
+      <span class="mf-stat-num" id="proj-buildings"></span>
+      <span class="mf-stat-label">Finished Buildings</span>
+    </div>
+  </div>
+
+  <div class="materials-bar" id="project-materials" style="display:none;"></div>
 
   <div class="projects-section" id="projects-section">
     <h2 class="section-h2">Featured Projects</h2>
@@ -391,14 +421,19 @@
       'reserve/roberts':  'cover-roberts',
       'reserve/baker':    'cover-baker'
     };
-    var projectMeta = {
-      'lowell':   { name: 'Lowell' },
-      'blacktail':{ name: 'Blacktail' },
-      'watson':   { name: 'Watson' },
-      'goble':    { name: 'Goble' },
-      'roberts':  { name: 'Roberts' },
-      'baker':    { name: 'Baker' }
-    };
+    var projectMeta      = {};
+    var projectStats     = {};
+    var projectMaterials = {};
+
+    function applyConfig(cfg) {
+      var rv = cfg.reserve || {};
+      Object.keys(rv).forEach(function(id) {
+        var p = rv[id];
+        projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
+        projectStats[id]     = p.stats || { sqft: 0, buildings: 0 };
+        projectMaterials[id] = p.materials || [];
+      });
+    }
 
     function populateGrid(gridId, photos) {
       var grid = document.getElementById(gridId);
@@ -425,16 +460,22 @@
       if (ov) ov.style.display = 'flex';
     }
 
-    fetch('gallery-manifest.json').then(function(r) { return r.json(); }).then(function(manifest) {
+    Promise.all([
+      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
+      fetch('site-config.json').then(function(r) { return r.json(); })
+    ]).then(function(results) {
+      var manifest = results[0];
+      var cfg      = results[1];
+      applyConfig(cfg);
       Object.keys(gridMap).forEach(function(key) {
         var entry = manifest[key]; if (!entry) return;
         var photos = Array.isArray(entry) ? entry : (entry.photos || []);
-        var cover = Array.isArray(entry) ? null : entry.cover;
+        var cover  = Array.isArray(entry) ? null : entry.cover;
         var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
         populateGrid(gridMap[key], allPhotos);
         if (coverMap[key]) setCoverImage(coverMap[key], cover);
       });
-    }).catch(function(e) { console.warn('manifest error', e); });
+    }).catch(function(e) { console.warn('config/manifest error', e); });
 
     var currentProject = null;
     function openProject(slug) {
@@ -442,11 +483,32 @@
         document.getElementById('sub-' + currentProject).classList.remove('active');
       }
       currentProject = slug;
-      var meta = projectMeta[slug] || { name: slug };
+      var meta  = projectMeta[slug]      || { name: slug };
+      var stats = projectStats[slug]     || { sqft: 0, buildings: 0 };
+      var mats  = projectMaterials[slug] || [];
       document.getElementById('project-page-title').textContent = meta.name;
       document.getElementById('project-page-header').classList.add('active');
       document.getElementById('projects-section').style.display = 'none';
       document.getElementById('sub-' + slug).classList.add('active');
+      // Stats banner
+      if (stats.sqft > 0 || stats.buildings > 0) {
+        document.getElementById('proj-sqft').textContent      = (stats.sqft || 0).toLocaleString();
+        document.getElementById('proj-buildings').textContent = (stats.buildings || 0).toLocaleString();
+        document.getElementById('project-stats').style.display = 'flex';
+      } else {
+        document.getElementById('project-stats').style.display = 'none';
+      }
+      // Materials bar
+      var matsEl = document.getElementById('project-materials');
+      if (mats && mats.length > 0) {
+        matsEl.innerHTML = mats.map(function(m, i) {
+          return (i > 0 ? '<div class="material-divider"></div>' : '') +
+                 '<span class="material-tag">' + m + '</span>';
+        }).join('');
+        matsEl.style.display = 'flex';
+      } else {
+        matsEl.style.display = 'none';
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function closeProject() {
@@ -455,6 +517,8 @@
         currentProject = null;
       }
       document.getElementById('project-page-header').classList.remove('active');
+      document.getElementById('project-stats').style.display = 'none';
+      document.getElementById('project-materials').style.display = 'none';
       document.getElementById('projects-section').style.display = '';
     }
 

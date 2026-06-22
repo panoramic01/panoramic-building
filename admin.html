@@ -173,6 +173,30 @@
     .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 72px; color: #A2A092; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
     .spinner { width: 18px; height: 18px; border: 2px solid #e8e7e3; border-top-color: #1F3971; border-radius: 50%; animation: spin 0.65s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Content Editor ───────────────────────────────────────────── */
+    .content-proj-list { display: flex; flex-direction: column; margin-bottom: 28px; }
+    .content-proj-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; background: #fff; border: 1px solid #e8e7e3; border-bottom: none; cursor: pointer; transition: background 0.12s; }
+    .content-proj-row:last-child { border-bottom: 1px solid #e8e7e3; }
+    .content-proj-row:hover { background: #f7f6f2; }
+    .content-proj-name { font-size: 13px; font-weight: 600; }
+    .content-proj-sub { font-size: 11px; color: #A2A092; margin-top: 2px; }
+    .content-proj-arrow { color: #A2A092; font-size: 18px; }
+    .ce-form { background: #fff; border: 1px solid #e8e7e3; padding: 28px; }
+    .ce-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .ce-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .ce-stat-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ce-textarea { width: 100%; border: 1px solid #D1D0CB; padding: 9px 13px; font-size: 13px; font-family: inherit; color: #2E2E2E; outline: none; min-height: 80px; resize: vertical; }
+    .ce-textarea:focus { border-color: #1F3971; }
+    .mat-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; min-height: 20px; }
+    .mat-chip { display: inline-flex; align-items: center; gap: 6px; background: #eef2fb; color: #1F3971; font-size: 11px; letter-spacing: 0.5px; padding: 4px 10px; }
+    .mat-chip-del { background: none; border: none; cursor: pointer; color: #1F3971; font-size: 16px; line-height: 1; padding: 0; display: flex; align-items: center; opacity: 0.6; }
+    .mat-chip-del:hover { opacity: 1; }
+    .mat-add-row { display: flex; gap: 8px; }
+    .mat-add-input { flex: 1; border: 1px solid #D1D0CB; padding: 8px 12px; font-size: 12px; font-family: inherit; color: #2E2E2E; outline: none; }
+    .mat-add-input:focus { border-color: #1F3971; }
+    .mat-add-btn { background: #1F3971; color: #fff; border: none; padding: 8px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: background 0.2s; white-space: nowrap; }
+    .mat-add-btn:hover { background: #163060; }
   </style>
 </head>
 <body>
@@ -247,6 +271,22 @@
         </div>
         <div class="sidebar-item" id="cat-production" onclick="setCategory('production')">
           <span>Production</span><span class="sidebar-badge" id="cnt-production">—</span>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sec">
+        <div class="sidebar-sec-label">Content</div>
+        <div class="sidebar-item" id="content-nav-multifamily" onclick="showContent('multifamily')">
+          <span>Multifamily</span>
+        </div>
+        <div class="sidebar-item" id="content-nav-reserve" onclick="showContent('reserve')">
+          <span>Reserve</span>
+        </div>
+        <div class="sidebar-item" id="content-nav-custom" onclick="showContent('custom')">
+          <span>Custom</span>
+        </div>
+        <div class="sidebar-item" id="content-nav-production" onclick="showContent('production')">
+          <span>Production</span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -329,15 +369,21 @@
   // ── Constants ──────────────────────────────────────────────────────
   const PW_HASH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
   const MANIFEST_PATH = 'gallery-manifest.json';
+  const CONFIG_PATH   = 'site-config.json';
   const CAT_LABELS = { multifamily:'Multifamily', reserve:'Panoramic Reserve', custom:'Custom', production:'Production' };
 
   // ── State ──────────────────────────────────────────────────────────
   let cfg = null;
   let manifest = null;
   let manifestSha = null;
+  let siteConfig = null;
+  let siteConfigSha = null;
   let currentCat = 'all';
   let currentSlug = null;
   let pendingDeletePath = null;
+  let contentCat = null;
+  let contentSlug = null;
+  let contentMaterials = [];
 
   // ── Init ───────────────────────────────────────────────────────────
   (function init() {
@@ -454,7 +500,7 @@
   async function showAdmin() {
     document.getElementById('admin-ui').classList.add('show');
     try {
-      await loadManifest();
+      await Promise.all([loadManifest(), loadSiteConfig()]);
       renderProjects();
     } catch(e) {
       document.getElementById('admin-main').innerHTML = `<div style="color:#c0392b;padding:40px;font-size:13px;line-height:1.7;">
@@ -472,7 +518,9 @@
 
   // ── Categories ─────────────────────────────────────────────────────
   function setCategory(cat) {
-    currentCat = cat;
+    currentCat  = cat;
+    contentCat  = null;
+    contentSlug = null;
     document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
     document.getElementById('cat-'+cat).classList.add('active');
     currentSlug = null;
@@ -602,7 +650,8 @@
 
   async function handleFiles(files) {
     if (!files || !files.length || !currentSlug) return;
-    const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+    const IMAGE_EXT_RE = /\.(jpg|jpeg|png|webp|gif|heic|heif|tiff|tif|avif|bmp|svg)$/i;
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/') || IMAGE_EXT_RE.test(f.name));
     if (!arr.length) { toast('No image files selected', 'error'); return; }
 
     const list = document.getElementById('up-list');
@@ -810,6 +859,247 @@
     t.textContent = msg;
     c.appendChild(t);
     setTimeout(() => t.remove(), 3500);
+  }
+
+  // ── Site Config ────────────────────────────────────────────────────
+  async function loadSiteConfig() {
+    try {
+      const r = await ghApi('GET', `${CONFIG_PATH}?ref=${cfg.branch}`);
+      siteConfigSha = r.sha;
+      siteConfig = JSON.parse(atob(r.content.replace(/\s/g,'')));
+    } catch(e) {
+      // If site-config.json doesn't exist yet, start with empty object
+      siteConfig = { multifamily:{}, reserve:{}, custom:{}, production:{ description:'', materials:[] } };
+      siteConfigSha = null;
+    }
+  }
+
+  async function saveSiteConfig(msg) {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(siteConfig, null, 2))));
+    const body = { message: msg, content: encoded, branch: cfg.branch };
+    if (siteConfigSha) body.sha = siteConfigSha;
+    try {
+      const r = await ghApi('PUT', CONFIG_PATH, body);
+      siteConfigSha = r.content.sha;
+    } catch(e) {
+      if (e.message && (e.message.includes('does not match') || e.message.includes('409') || e.message.includes('conflict'))) {
+        const fresh = await ghApi('GET', `${CONFIG_PATH}?ref=${cfg.branch}`);
+        siteConfigSha = fresh.sha;
+        body.sha = siteConfigSha;
+        const r2 = await ghApi('PUT', CONFIG_PATH, body);
+        siteConfigSha = r2.content.sha;
+      } else { throw e; }
+    }
+  }
+
+  // ── Content Editor ─────────────────────────────────────────────────
+  function showContent(cat) {
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('content-nav-' + cat).classList.add('active');
+    contentCat  = cat;
+    contentSlug = null;
+    currentCat  = null;
+    currentSlug = null;
+    if (cat === 'production') {
+      contentSlug = 'production';
+      renderContentForm();
+    } else {
+      renderContentList();
+    }
+  }
+
+  function renderContentList() {
+    const cat = contentCat;
+    const label = CAT_LABELS[cat] || cat;
+    const projects = (siteConfig && siteConfig[cat]) || {};
+    const rows = Object.keys(projects).map(id => {
+      const p = projects[id];
+      return `<div class="content-proj-row" onclick="openContentProject('${escH(id)}')">
+        <div>
+          <div class="content-proj-name">${escH(p.name || id)}</div>
+          <div class="content-proj-sub">${escH(p.location || '—')}</div>
+        </div>
+        <span class="content-proj-arrow">›</span>
+      </div>`;
+    }).join('') || '<div class="empty-state">No projects in config yet</div>';
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="ch">
+        <div class="ch-left">
+          <h2>${escH(label)} Content</h2>
+          <p>Click a project to edit its name, description, stats, and materials</p>
+        </div>
+      </div>
+      <div class="content-proj-list">${rows}</div>`;
+  }
+
+  function openContentProject(id) {
+    contentSlug = id;
+    renderContentForm();
+  }
+
+  function renderContentForm() {
+    const cat = contentCat;
+    const isProduction = cat === 'production';
+    const id = contentSlug;
+    const hasUnits = cat === 'multifamily';
+    const hasStats = cat !== 'custom' && !isProduction;
+
+    const data = isProduction
+      ? (siteConfig.production || {})
+      : ((siteConfig[cat] || {})[id] || {});
+
+    contentMaterials = Array.isArray(data.materials) ? [...data.materials] : [];
+    const stats = data.stats || {};
+
+    const chipHtml = () => contentMaterials.map((m, i) =>
+      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMaterial(${i})" title="Remove">×</button></div>`
+    ).join('');
+
+    const statsHtml = !hasStats ? '' : `
+      <div class="form-grp">
+        <label class="form-lbl">Stats</label>
+        <div class="${hasUnits ? 'ce-stat-row' : 'ce-stat-row-2'}">
+          ${hasUnits ? `<div><label class="form-lbl" style="font-size:9px;margin-top:6px;">Units</label><input class="form-input" id="ce-units" type="number" min="0" value="${stats.units||0}" /></div>` : ''}
+          <div><label class="form-lbl" style="font-size:9px;margin-top:6px;">Sq Ft</label><input class="form-input" id="ce-sqft" type="number" min="0" value="${stats.sqft||0}" /></div>
+          <div><label class="form-lbl" style="font-size:9px;margin-top:6px;">Buildings</label><input class="form-input" id="ce-buildings" type="number" min="0" value="${stats.buildings||0}" /></div>
+        </div>
+      </div>`;
+
+    const backLabel = escH(CAT_LABELS[cat] || cat);
+
+    document.getElementById('admin-main').innerHTML = `
+      ${!isProduction ? `<button class="back-btn" onclick="renderContentList()">
+        <svg viewBox="0 0 16 16"><path d="M13 8H3M7 12l-4-4 4-4"/></svg>
+        ${backLabel} Content
+      </button>` : ''}
+      <div class="ch">
+        <div class="ch-left">
+          <h2>${isProduction ? 'Production' : escH(data.name || id)}</h2>
+          <p>${isProduction ? 'Page-level content' : escH(CAT_LABELS[cat] || cat)}</p>
+        </div>
+      </div>
+      <div class="ce-form">
+        ${!isProduction ? `
+        <div class="form-grp">
+          <div class="ce-form-row">
+            <div>
+              <label class="form-lbl">Project Name</label>
+              <input class="form-input" id="ce-name" type="text" value="${escH(data.name || '')}" />
+            </div>
+            <div>
+              <label class="form-lbl">Location</label>
+              <input class="form-input" id="ce-location" type="text" placeholder="City, ST" value="${escH(data.location || '')}" />
+            </div>
+          </div>
+        </div>` : ''}
+        <div class="form-grp">
+          <label class="form-lbl">Description</label>
+          <textarea class="ce-textarea" id="ce-description">${escH(data.description || '')}</textarea>
+        </div>
+        ${statsHtml}
+        <div class="form-grp">
+          <label class="form-lbl">Materials</label>
+          <div class="mat-chips" id="mat-chips">${chipHtml()}</div>
+          <div class="mat-add-row">
+            <input class="mat-add-input" id="mat-add-input" type="text" placeholder='e.g. LP SmartSide 8" Lap' />
+            <button class="mat-add-btn" onclick="addMaterial()">Add</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
+          <button class="btn-primary" id="ce-save-btn" onclick="saveContentProject()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>`;
+
+    const matInput = document.getElementById('mat-add-input');
+    if (matInput) matInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addMaterial(); } });
+  }
+
+  function addMaterial() {
+    const input = document.getElementById('mat-add-input');
+    if (!input) return;
+    const val = input.value.trim();
+    if (!val) return;
+    contentMaterials.push(val);
+    input.value = '';
+    refreshChips();
+    input.focus();
+  }
+
+  function removeMaterial(idx) {
+    contentMaterials.splice(idx, 1);
+    refreshChips();
+  }
+
+  function refreshChips() {
+    const el = document.getElementById('mat-chips');
+    if (!el) return;
+    el.innerHTML = contentMaterials.map((m, i) =>
+      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMaterial(${i})" title="Remove">×</button></div>`
+    ).join('');
+  }
+
+  async function saveContentProject() {
+    const btn = document.getElementById('ce-save-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const cat = contentCat;
+    const isProduction = cat === 'production';
+    const id = contentSlug;
+    const hasUnits = cat === 'multifamily';
+    const hasStats = cat !== 'custom' && !isProduction;
+
+    try {
+      if (isProduction) {
+        if (!siteConfig.production) siteConfig.production = {};
+        const descEl = document.getElementById('ce-description');
+        siteConfig.production.description = descEl ? descEl.value.trim() : '';
+        siteConfig.production.materials   = [...contentMaterials];
+      } else {
+        if (!siteConfig[cat]) siteConfig[cat] = {};
+        if (!siteConfig[cat][id]) siteConfig[cat][id] = {};
+        const proj = siteConfig[cat][id];
+        const nameEl     = document.getElementById('ce-name');
+        const locationEl = document.getElementById('ce-location');
+        const descEl     = document.getElementById('ce-description');
+        if (nameEl)     proj.name        = nameEl.value.trim();
+        if (locationEl) proj.location    = locationEl.value.trim();
+        if (descEl)     proj.description = descEl.value.trim();
+        proj.materials = [...contentMaterials];
+        if (hasStats) {
+          const sqftEl      = document.getElementById('ce-sqft');
+          const buildingsEl = document.getElementById('ce-buildings');
+          const sqft      = parseInt(sqftEl ? sqftEl.value : 0) || 0;
+          const buildings = parseInt(buildingsEl ? buildingsEl.value : 0) || 0;
+          if (hasUnits) {
+            const unitsEl = document.getElementById('ce-units');
+            const units   = parseInt(unitsEl ? unitsEl.value : 0) || 0;
+            proj.stats = { units, sqft, buildings };
+          } else {
+            proj.stats = { sqft, buildings };
+          }
+        }
+      }
+
+      await saveSiteConfig(`Update content: ${isProduction ? 'production' : cat + '/' + id}`);
+      toast('Content saved', 'success');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved`;
+      setTimeout(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes`;
+        }
+      }, 2500);
+    } catch(e) {
+      toast('Save failed: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Save Changes';
+    }
   }
 </script>
 </body>

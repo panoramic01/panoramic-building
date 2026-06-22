@@ -378,8 +378,8 @@
 
       <div class="project-card" onclick="openProject('parkway')">
         <div class="project-card-cover" id="cover-parkway">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Parkway</div><div class="ph-location">Idaho Falls, ID</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Parkway</div><div class="ph-location">Idaho Falls, ID</div></div>
+          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Parkway Apartments</div><div class="ph-location">Idaho Falls, ID</div></div>
+          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Parkway Apartments</div><div class="ph-location">Idaho Falls, ID</div></div>
         </div>
         <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
       </div>
@@ -526,58 +526,53 @@
       var ov = cover.querySelector('.project-card-cover-overlay');
       if (ov) ov.style.display = 'flex';
     }
-    fetch('gallery-manifest.json').then(function(r) { return r.json(); }).then(function(manifest) {
+    // ── Project data — loaded from site-config.json ───────────────────
+    var projectMaterials = {};
+    var projectStats = {};
+    var projectMeta = {};
+
+    function applyConfig(cfg) {
+      var mf = cfg.multifamily || {};
+      Object.keys(mf).forEach(function(id) {
+        var p = mf[id];
+        projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
+        projectStats[id]     = p.stats || { units: 0, sqft: 0, buildings: 0 };
+        projectMaterials[id] = p.materials || [];
+      });
+      // Update portfolio totals
+      var totUnits = 0, totSqft = 0, totBuildings = 0;
+      Object.values(projectStats).forEach(function(s) {
+        totUnits    += s.units    || 0;
+        totSqft     += s.sqft    || 0;
+        totBuildings+= s.buildings|| 0;
+      });
+      document.getElementById('total-units').textContent    = totUnits.toLocaleString();
+      document.getElementById('total-sqft').textContent     = totSqft.toLocaleString();
+      document.getElementById('total-projects').textContent = totBuildings;
+      // Update card placeholder names in case config has different names
+      Object.keys(projectMeta).forEach(function(id) {
+        var p = projectMeta[id];
+        document.querySelectorAll('#cover-' + id + ' .ph-name').forEach(function(el) { el.textContent = p.name; });
+        document.querySelectorAll('#cover-' + id + ' .ph-location').forEach(function(el) { el.textContent = p.location; });
+      });
+    }
+
+    Promise.all([
+      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
+      fetch('site-config.json').then(function(r) { return r.json(); })
+    ]).then(function(results) {
+      var manifest = results[0];
+      var cfg      = results[1];
+      applyConfig(cfg);
       Object.keys(gridMap).forEach(function(key) {
         var entry = manifest[key]; if (!entry) return;
         var photos = Array.isArray(entry) ? entry : entry.photos;
-        var cover = Array.isArray(entry) ? null : entry.cover;
+        var cover  = Array.isArray(entry) ? null : entry.cover;
         var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
         populateGrid(gridMap[key], allPhotos);
         if (coverMap[key]) setCoverImage(coverMap[key], cover);
       });
-    }).catch(function(e) { console.warn('manifest error', e); });
-
-    // ── Materials per project (add as projects are completed) ─────────
-    var projectMaterials = {
-      'orchard-grove':     ['LP 8" Lap Expert Finish', 'LP Panel B&B Expert Finish', 'Dryvit Stucco', 'Harristone Slate Lueders'],
-      'parkway':           [],
-      '4th-main':          [],
-      'altura':            [],
-      'the-crossing':      ['LP SmartSide 8" Lap', 'LP NickelGap', 'Interstate Smokey Mountain Mod', 'Interstate Coal King', 'Smooth Hardie Panel'],
-      'hyde-park-gateway': []
-    };
-
-    // ── Add stats here as projects are completed ──────────────────────
-    var projectStats = {
-      'orchard-grove':     { units: 55,  sqft: 25677, buildings: 1 },
-      'parkway':           { units: 0,   sqft: 0,     buildings: 0 },
-      '4th-main':          { units: 24,  sqft: 19530, buildings: 2 },
-      'altura':            { units: 0,   sqft: 0,     buildings: 0 },
-      'the-crossing':      { units: 22,  sqft: 34120, buildings: 5 },
-      'hyde-park-gateway': { units: 0,   sqft: 0,     buildings: 0 }
-    };
-    // ─────────────────────────────────────────────────────────────────
-
-    (function buildTotals() {
-      var totUnits = 0, totSqft = 0, totProjects = 0;
-      Object.values(projectStats).forEach(function(s) {
-        totUnits    += s.units;
-        totSqft     += s.sqft;
-        totProjects += s.buildings;
-      });
-      document.getElementById('total-units').textContent    = totUnits.toLocaleString();
-      document.getElementById('total-sqft').textContent     = totSqft.toLocaleString();
-      document.getElementById('total-projects').textContent = totProjects;
-    })();
-
-    var projectMeta = {
-      'orchard-grove': { name: 'Orchard Grove', location: 'Idaho Falls, ID' },
-      'parkway':       { name: 'Parkway',        location: 'Idaho Falls, ID' },
-      '4th-main':      { name: '4th + Main',     location: 'Bountiful, UT' },
-      'altura':        { name: 'Altura Apartments',          location: 'Logan, UT' },
-      'the-crossing':  { name: 'The Crossing',   location: 'Woods Cross, UT' },
-      'hyde-park-gateway': { name: 'Hyde Park Gateway', location: 'Hyde Park, UT' }
-    };
+    }).catch(function(e) { console.warn('config/manifest error', e); });
 
     // ── Site Search ───────────────────────────────────────────────────
     var searchIndex = [
@@ -604,7 +599,7 @@
       { type: 'material', title: 'Slate Lueders Harristone',      sub: 'Used on: Orchard Grove',                    action: 'orchard-grove', keywords: 'slate lueders harristone stone veneer masonry' },
       { type: 'project', title: '4th + Main', sub: 'Bountiful, UT · 24 units · 19,530 sq ft', action: '4th-main', keywords: '4th main bountiful utah 24 units multifamily' },
       { type: 'project', title: 'The Crossing', sub: 'Woods Cross, UT · 22 units · 34,120 sq ft', action: 'the-crossing', keywords: 'the crossing woods cross utah 22 units multifamily lp smartside hardie nickelgap interstate smokey mountain coal king' },
-      { type: 'project', title: 'Parkway', sub: 'Idaho Falls, ID · Coming Soon', action: 'parkway', keywords: 'parkway idaho falls idaho multifamily' },
+      { type: 'project', title: 'Parkway Apartments', sub: 'Idaho Falls, ID · Coming Soon', action: 'parkway', keywords: 'parkway idaho falls idaho multifamily' },
       { type: 'project', title: 'Altura Apartments', sub: 'Logan, UT · Coming Soon', action: 'altura', keywords: 'altura logan utah multifamily' },
       { type: 'project', title: 'Hyde Park Gateway', sub: 'Hyde Park, UT · Coming Soon', action: 'hyde-park-gateway', keywords: 'hyde park gateway utah multifamily' },
       { type: 'project', title: 'Blacktail (Custom)', sub: 'Custom home project', action: null, url: 'custom.html', keywords: 'blacktail custom home exterior' },

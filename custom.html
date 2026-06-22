@@ -154,6 +154,11 @@
     .lightbox-prev { left: 16px; }
     .lightbox-next { right: 16px; }
 
+    /* Materials Bar */
+    .materials-bar { background: #f4f3ef; border-bottom: 1px solid #e8e7e3; padding: 10px 80px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0; }
+    .material-tag { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #2E2E2E; padding: 0 20px; }
+    .material-divider { width: 1px; height: 14px; background: #D1D0CB; flex-shrink: 0; }
+
     /* Footer */
     .footer { background: #1a1a1a; padding: 0 80px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
     .footer-logo img { height: 52px; width: auto; object-fit: contain; opacity: 0.85; }
@@ -289,7 +294,8 @@
     <!-- Sub-galleries -->
     <div id="sub-blacktail" class="sub-gallery">
       <div class="sub-gallery-back" onclick="closeProject()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg> Back to Projects</div>
-      <div class="sub-gallery-title"><h2>Blacktail</h2><p>Garden City, UT</p></div>
+      <div class="sub-gallery-title"><h2 id="sub-title-blacktail">Blacktail</h2><p id="sub-location-blacktail">Garden City, UT</p></div>
+      <div class="materials-bar" id="sub-materials-blacktail" style="display:none; margin: 0 -80px; width: calc(100% + 160px);"></div>
       <div class="photo-grid" id="grid-blacktail"><div class="photo-placeholder">Photos Coming Soon</div></div>
     </div>
   </div>
@@ -325,8 +331,25 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
-    var gridMap = { 'custom/blacktail': 'grid-blacktail' };
+    var gridMap  = { 'custom/blacktail': 'grid-blacktail' };
     var coverMap = { 'custom/blacktail': 'cover-blacktail' };
+
+    var projectMeta      = {};
+    var projectMaterials = {};
+
+    function applyConfig(cfg) {
+      var cu = cfg.custom || {};
+      Object.keys(cu).forEach(function(id) {
+        var p = cu[id];
+        projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
+        projectMaterials[id] = p.materials || [];
+        // Update static placeholder text in sub-gallery if elements exist
+        var titleEl    = document.getElementById('sub-title-' + id);
+        var locationEl = document.getElementById('sub-location-' + id);
+        if (titleEl)    titleEl.textContent    = p.name || id;
+        if (locationEl) locationEl.textContent = p.location || '';
+      });
+    }
 
     function populateGrid(gridId, photos) {
       var grid = document.getElementById(gridId);
@@ -352,20 +375,40 @@
       var ov = cover.querySelector('.project-card-cover-overlay');
       if (ov) ov.style.display = 'flex';
     }
-    fetch('gallery-manifest.json').then(function(r) { return r.json(); }).then(function(manifest) {
+    Promise.all([
+      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
+      fetch('site-config.json').then(function(r) { return r.json(); })
+    ]).then(function(results) {
+      var manifest = results[0];
+      var cfg      = results[1];
+      applyConfig(cfg);
       Object.keys(gridMap).forEach(function(key) {
         var entry = manifest[key]; if (!entry) return;
         var photos = Array.isArray(entry) ? entry : entry.photos;
-        var cover = Array.isArray(entry) ? null : entry.cover;
+        var cover  = Array.isArray(entry) ? null : entry.cover;
         populateGrid(gridMap[key], photos);
         if (coverMap[key]) setCoverImage(coverMap[key], cover);
       });
-    }).catch(function(e) { console.warn('manifest error', e); });
+    }).catch(function(e) { console.warn('config/manifest error', e); });
 
     function openProject(id) {
       document.getElementById('custom-projects').style.display = 'none';
       document.querySelectorAll('.sub-gallery').forEach(function(s) { s.classList.remove('active'); });
       document.getElementById('sub-' + id).classList.add('active');
+      // Materials
+      var mats    = projectMaterials[id] || [];
+      var matsEl  = document.getElementById('sub-materials-' + id);
+      if (matsEl) {
+        if (mats.length > 0) {
+          matsEl.innerHTML = mats.map(function(m, i) {
+            return (i > 0 ? '<div class="material-divider"></div>' : '') +
+                   '<span class="material-tag">' + m + '</span>';
+          }).join('');
+          matsEl.style.display = 'flex';
+        } else {
+          matsEl.style.display = 'none';
+        }
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function closeProject() {

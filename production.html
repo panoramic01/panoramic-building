@@ -126,6 +126,15 @@
     .lightbox-prev { left: 16px; }
     .lightbox-next { right: 16px; }
 
+    /* Materials Bar */
+    .materials-bar { background: #f4f3ef; border-bottom: 1px solid #e8e7e3; padding: 10px 80px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0; }
+    .material-tag { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #2E2E2E; padding: 0 20px; }
+    .material-divider { width: 1px; height: 14px; background: #D1D0CB; flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .materials-bar { padding: 10px 24px; gap: 4px; }
+      .material-tag { padding: 0 12px; }
+    }
+
     /* Footer */
     .footer { background: #1a1a1a; padding: 0 80px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
     .footer-logo img { height: 52px; width: auto; object-fit: contain; opacity: 0.85; }
@@ -235,10 +244,11 @@
     <div class="page-header-inner">
       <h1>Production Homes</h1>
       <div class="accent-line"></div>
-      <p>High-volume exterior packages for production builders — consistent quality across every lot.</p>
+      <p id="production-description">High-volume exterior packages for production builders — consistent quality across every lot.</p>
     </div>
   </div>
 
+  <div class="materials-bar" id="production-materials" style="display:none;"></div>
 
   <div class="gallery-section">
     <h2 class="section-h2">Project Photos</h2>
@@ -301,6 +311,23 @@
       btn.classList.toggle('open', isOpen);
       btn.setAttribute('aria-expanded', isOpen);
     }
+
+    // Load production description & materials from site-config.json
+    fetch('site-config.json').then(function(r) { return r.json(); }).then(function(cfg) {
+      var prod = cfg.production || {};
+      if (prod.description) {
+        document.getElementById('production-description').textContent = prod.description;
+      }
+      var mats   = prod.materials || [];
+      var matsEl = document.getElementById('production-materials');
+      if (mats.length > 0) {
+        matsEl.innerHTML = mats.map(function(m, i) {
+          return (i > 0 ? '<div class="material-divider"></div>' : '') +
+                 '<span class="material-tag">' + m + '</span>';
+        }).join('');
+        matsEl.style.display = 'flex';
+      }
+    }).catch(function(e) { console.warn('site-config error', e); });
 
     function populateGrid(gridId, photos) {
       var grid = document.getElementById(gridId);
