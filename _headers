@@ -1,0 +1,6 @@
+# Netlify cache headers
+# admin.html must never be cached — it contains JS that manages all site content
+/admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0

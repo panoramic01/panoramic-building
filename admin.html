@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Site Admin | Panoramic Building</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -543,6 +546,40 @@
     const binary = atob(b64.replace(/\s/g, ''));
     const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
     return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  // Fix UTF-8 double/triple-encoding corruption that occurred from prior atob saves.
+  // Called when loading site-config.json so corrupted data is self-healed before
+  // any save can re-persist it.
+  function sanitizeVal(str) {
+    if (!str || typeof str !== 'string') return str;
+    return str
+      // Middle-dot corruptions (most common — results from saving U+00B7 via old atob path)
+      .replace(/ÃÂ·/g, '&#183;')  // triple corruption
+      .replace(/ÃÂ·/g, '&#183;')          // double corruption
+      .replace(/Â·/g, '&#183;')                 // single corruption
+      .replace(/·/g, '&#183;')                        // bare Unicode middle-dot
+      // Em-dash corruptions (U+2014 → â€" → Ã¢ÂÂ control chars)
+      .replace(/Ã¢ÂÂ/g, '&mdash;')  // double-corrupted —
+      .replace(/â/g, '&mdash;')                      // single-corrupted —
+      .replace(/—/g, '&mdash;')                                   // bare Unicode —
+      // Curly quotes
+      .replace(/â/g, '&rsquo;')
+      .replace(/’/g, '&rsquo;')
+      // Strip any remaining lone Ã/Â artifacts that are leftover corruption bytes
+      .replace(/Ã[-¿]/g, '')
+      .replace(/Â[-¿]/g, '');
+  }
+
+  // Insert &nbsp;&#183;&nbsp; at the cursor in a text field
+  function insertDot(fieldId) {
+    const el = document.getElementById(fieldId);
+    if (!el) return;
+    const start = el.selectionStart, end = el.selectionEnd;
+    const ins = '&nbsp;&#183;&nbsp;';
+    el.value = el.value.slice(0, start) + ins + el.value.slice(end);
+    el.selectionStart = el.selectionEnd = start + ins.length;
+    el.focus();
   }
 
   async function loadManifest() {
@@ -1249,6 +1286,23 @@
       const r = await ghApi('GET', `${CONFIG_PATH}?ref=${cfg.branch}`);
       siteConfigSha = r.sha;
       siteConfig = JSON.parse(b64ToUtf8(r.content));
+      // Auto-heal any UTF-8 corruption that crept in from prior saves.
+      // This means even if the JSON was corrupted, the next admin save will fix it.
+      const s = siteConfig._site;
+      if (s) {
+        if (s.serviceArea) s.serviceArea = sanitizeVal(s.serviceArea);
+        if (s.hero) {
+          if (s.hero.eyebrow) s.hero.eyebrow = sanitizeVal(s.hero.eyebrow);
+          if (s.hero.h1)      s.hero.h1      = sanitizeVal(s.hero.h1);
+          if (s.hero.sub)     s.hero.sub     = sanitizeVal(s.hero.sub);
+        }
+        if (s.seo) {
+          Object.values(s.seo).forEach(pg => {
+            if (pg && pg.title) pg.title = sanitizeVal(pg.title);
+            if (pg && pg.desc)  pg.desc  = sanitizeVal(pg.desc);
+          });
+        }
+      }
     } catch(e) {
       siteConfig = { multifamily:{}, reserve:{}, custom:{}, production:{ description:'', materials:[] } };
       siteConfigSha = null;
@@ -1315,7 +1369,10 @@
           <div class="form-grp">
             <label class="form-lbl">Service Area Tagline (HTML allowed)</label>
             <input class="form-input" id="ss-area" type="text" value="${escH(area)}" />
-            <p style="font-size:11px;color:#A2A092;margin-top:6px;">Use &amp;nbsp;&amp;middot;&amp;nbsp; for centered dots. Changes go live on all pages immediately.</p>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+              <button type="button" onclick="insertDot('ss-area')" style="font-size:10px;padding:3px 10px;background:#eef2fb;border:1px solid #d5e0f7;color:#1F3971;cursor:pointer;letter-spacing:0.5px;font-family:inherit;">&#183; Insert Dot Separator</button>
+              <span style="font-size:11px;color:#A2A092;">Click to insert &amp;nbsp;&#183;&amp;nbsp; at cursor</span>
+            </div>
           </div>
           <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
             <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('company')">
@@ -1340,7 +1397,10 @@
           <div class="form-grp">
             <label class="form-lbl">Eyebrow Text</label>
             <input class="form-input" id="ss-eyebrow" type="text" value="${escH(eyebrow)}" />
-            <p style="font-size:11px;color:#A2A092;margin-top:6px;">HTML allowed (e.g. &amp;nbsp;&amp;middot;&amp;nbsp; for dots)</p>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+              <button type="button" onclick="insertDot('ss-eyebrow')" style="font-size:10px;padding:3px 10px;background:#eef2fb;border:1px solid #d5e0f7;color:#1F3971;cursor:pointer;letter-spacing:0.5px;font-family:inherit;">&#183; Insert Dot Separator</button>
+              <span style="font-size:11px;color:#A2A092;">Click to insert &amp;nbsp;&#183;&amp;nbsp; at cursor</span>
+            </div>
           </div>
           <div class="form-grp">
             <label class="form-lbl">Heading (&lt;br&gt; for line break)</label>
@@ -1479,86 +1539,4 @@
       if (isProduction) {
         if (!siteConfig.production) siteConfig.production = {};
         const descEl = document.getElementById('ce-description');
-        siteConfig.production.description = descEl ? descEl.value.trim() : '';
-        siteConfig.production.materials   = [...contentMaterials];
-        await saveSiteConfig('Update production content');
-
-      } else {
-        const catEl      = document.getElementById('ce-category');
-        const nameEl     = document.getElementById('ce-name');
-        const locationEl = document.getElementById('ce-location');
-        const descEl     = document.getElementById('ce-description');
-        const newCat     = catEl ? catEl.value : oldCat;
-
-        const proj = Object.assign({}, (siteConfig[oldCat] || {})[id] || {});
-        if (nameEl)     proj.name        = nameEl.value.trim();
-        if (locationEl) proj.location    = locationEl.value.trim();
-        if (descEl)     proj.description = descEl.value.trim();
-        proj.materials = [...contentMaterials];
-
-        const yearEl     = document.getElementById('ce-year');
-        const featuredEl = document.getElementById('ce-featured');
-        const yearVal    = yearEl ? parseInt(yearEl.value) : 0;
-        if (yearVal >= 2000 && yearVal <= 2099) proj.year = yearVal;
-        else delete proj.year;
-        proj.featured = featuredEl ? featuredEl.checked : false;
-
-        if (newCat === 'multifamily') {
-          const unitsEl     = document.getElementById('ce-units');
-          const sqftEl      = document.getElementById('ce-sqft');
-          const buildingsEl = document.getElementById('ce-buildings');
-          proj.stats = {
-            units:     parseInt(unitsEl     ? unitsEl.value     : 0) || 0,
-            sqft:      parseInt(sqftEl      ? sqftEl.value      : 0) || 0,
-            buildings: parseInt(buildingsEl ? buildingsEl.value : 0) || 0
-          };
-        } else {
-          delete proj.stats;
-        }
-
-        const catChanged = newCat !== oldCat;
-
-        if (catChanged) {
-          if (siteConfig[oldCat]) delete siteConfig[oldCat][id];
-          if (!siteConfig[newCat]) siteConfig[newCat] = {};
-          siteConfig[newCat][id] = proj;
-
-          const oldManifestKey = oldCat + '/' + id;
-          const newManifestKey = newCat + '/' + id;
-          if (manifest[oldManifestKey] !== undefined) {
-            manifest[newManifestKey] = manifest[oldManifestKey];
-            delete manifest[oldManifestKey];
-          }
-
-          await Promise.all([
-            saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`),
-            saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
-          ]);
-
-          contentCat  = newCat;
-          currentSlug = newManifestKey;
-
-        } else {
-          if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
-          siteConfig[oldCat][id] = proj;
-          await saveSiteConfig(`Update content: ${oldCat}/${id}`);
-        }
-      }
-
-      toast('Saved', 'success');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
-      setTimeout(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
-        }
-      }, 2500);
-    } catch(e) {
-      toast('Save failed: ' + e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = 'Save Changes';
-    }
-  }
-</script>
-</body>
-</html>
+        siteConfig.production.descr
