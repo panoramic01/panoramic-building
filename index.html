@@ -1159,4 +1159,9 @@
       if (seo.index) {
         if (seo.index.title) document.title = seo.index.title;
         var metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc && seo.index.desc) metaDesc.set
+        if (metaDesc && seo.index.desc) metaDesc.setAttribute('content', seo.index.desc);
+      }
+    }).catch(function(e) { console.warn('site-config error', e); });
+  </script>
+</body>
+</html>
