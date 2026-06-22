@@ -311,67 +311,17 @@
   <div class="materials-bar" id="project-materials" style="display:none;"></div>
 
   <div class="projects-section" id="projects-section">
-    <h2 class="section-h2">Featured Projects</h2>
-    <div class="section-accent"></div>
+    <div id="rv-header">
+      <h2 class="section-h2">Featured Projects</h2>
+      <div class="section-accent"></div>
+    </div>
     <div class="project-grid">
 
-      <div class="project-card" onclick="openProject('lowell')">
-        <div class="project-card-cover" id="cover-lowell">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Lowell</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Lowell</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
-      <div class="project-card" onclick="openProject('blacktail')">
-        <div class="project-card-cover" id="cover-blacktail">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Blacktail</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Blacktail</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
-      <div class="project-card" onclick="openProject('watson')">
-        <div class="project-card-cover" id="cover-watson">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Watson</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Watson</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
-      <div class="project-card" onclick="openProject('goble')">
-        <div class="project-card-cover" id="cover-goble">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Goble</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Goble</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
-      <div class="project-card" onclick="openProject('roberts')">
-        <div class="project-card-cover" id="cover-roberts">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Roberts</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Roberts</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
-      <div class="project-card" onclick="openProject('baker')">
-        <div class="project-card-cover" id="cover-baker">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Baker</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Baker</div></div>
-        </div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
+      <!-- project cards built dynamically from site-config.json + gallery-manifest.json -->
     </div>
-
-    <!-- Sub-galleries -->
-    <div id="sub-lowell"   class="sub-gallery"><div class="photo-grid" id="grid-lowell"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
-    <div id="sub-blacktail" class="sub-gallery"><div class="photo-grid" id="grid-blacktail"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
-    <div id="sub-watson"   class="sub-gallery"><div class="photo-grid" id="grid-watson"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
-    <div id="sub-goble"    class="sub-gallery"><div class="photo-grid" id="grid-goble"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
-    <div id="sub-roberts"  class="sub-gallery"><div class="photo-grid" id="grid-roberts"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
-    <div id="sub-baker"    class="sub-gallery"><div class="photo-grid" id="grid-baker"><div class="photo-placeholder">Photos Coming Soon</div></div></div>
+    <div id="rv-subs">
+      <!-- sub-galleries built dynamically -->
+    </div>
   </div>
 
   <!-- Lightbox -->
@@ -405,39 +355,26 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
-    var gridMap = {
-      'reserve/lowell':   'grid-lowell',
-      'reserve/blacktail':'grid-blacktail',
-      'reserve/watson':   'grid-watson',
-      'reserve/goble':    'grid-goble',
-      'reserve/roberts':  'grid-roberts',
-      'reserve/baker':    'grid-baker'
-    };
-    var coverMap = {
-      'reserve/lowell':   'cover-lowell',
-      'reserve/blacktail':'cover-blacktail',
-      'reserve/watson':   'cover-watson',
-      'reserve/goble':    'cover-goble',
-      'reserve/roberts':  'cover-roberts',
-      'reserve/baker':    'cover-baker'
-    };
+    var gridMap = {};
+    var coverMap = {};
+    // ── Project data ─────────────────────────────────────────────────────
     var projectMeta      = {};
     var projectStats     = {};
     var projectMaterials = {};
 
-    function applyConfig(cfg) {
-      var rv = cfg.reserve || {};
-      Object.keys(rv).forEach(function(id) {
-        var p = rv[id];
-        projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
-        projectStats[id]     = p.stats || { sqft: 0, buildings: 0 };
-        projectMaterials[id] = p.materials || [];
-      });
+    // ── Util bar & project grid ───────────────────────────────────────────
+    function applyUtilBar(site) {
+      var areaEl  = document.querySelector('.util-bar span:first-child');
+      var phoneEl = document.querySelector('.util-bar .util-right a:first-child');
+      var emailEl = document.querySelector('.util-bar .util-right a:last-child');
+      if (areaEl  && site.serviceArea) areaEl.innerHTML  = site.serviceArea;
+      if (phoneEl && site.phone)       { phoneEl.href = 'tel:' + site.phone; phoneEl.innerHTML = '&#9990; ' + (site.phoneFmt || site.phone); }
+      if (emailEl && site.email)       { emailEl.href = 'mailto:' + site.email; emailEl.innerHTML = '&#9993; ' + site.email; }
     }
 
     function populateGrid(gridId, photos) {
       var grid = document.getElementById(gridId);
-      if (!grid || !photos || photos.length === 0) return;
+      if (!grid || !photos || !photos.length) return;
       grid.innerHTML = '';
       photos.forEach(function(src) {
         var div = document.createElement('div');
@@ -448,6 +385,7 @@
         div.appendChild(img); grid.appendChild(div);
       });
     }
+
     function setCoverImage(coverId, src) {
       var cover = document.getElementById(coverId);
       if (!cover || !src) return;
@@ -460,37 +398,99 @@
       if (ov) ov.style.display = 'flex';
     }
 
-    Promise.all([
-      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
-      fetch('site-config.json').then(function(r) { return r.json(); })
-    ]).then(function(results) {
-      var manifest = results[0];
-      var cfg      = results[1];
-      applyConfig(cfg);
-      Object.keys(gridMap).forEach(function(key) {
-        var entry = manifest[key]; if (!entry) return;
-        var photos = Array.isArray(entry) ? entry : (entry.photos || []);
-        var cover  = Array.isArray(entry) ? null : entry.cover;
-        var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
-        populateGrid(gridMap[key], allPhotos);
-        if (coverMap[key]) setCoverImage(coverMap[key], cover);
-      });
-    }).catch(function(e) { console.warn('config/manifest error', e); });
+    function buildProjectGrid(manifest, cfg) {
+      var cat  = 'reserve';
+      var data = cfg[cat] || {};
+      var grid = document.querySelector('#projects-section .project-grid');
+      var subs = document.getElementById('rv-subs');
+      if (!grid || !subs) return;
+      grid.innerHTML = '';
+      subs.innerHTML = '';
+      Object.keys(data).forEach(function(id) {
+        var key    = cat + '/' + id;
+        var entry  = manifest[key] || { photos: [], cover: null };
+        var meta   = data[id] || {};
+        var name   = meta.name || id;
+        var loc    = meta.location || '';
+        var cover  = entry.cover || null;
+        var photos = Array.isArray(entry.photos) ? entry.photos : [];
 
-    var currentProject = null;
-    function openProject(slug) {
-      if (currentProject) {
-        document.getElementById('sub-' + currentProject).classList.remove('active');
+        gridMap[key]  = 'grid-'  + id;
+        coverMap[key] = 'cover-' + id;
+
+        var card = document.createElement('div');
+        card.className = 'project-card';
+        card.onclick = (function(pid) { return function() { openProject(pid); }; })(id);
+        var coverDiv = document.createElement('div');
+        coverDiv.className = 'project-card-cover';
+        coverDiv.id = 'cover-' + id;
+        if (cover) {
+          coverDiv.style.backgroundImage = "url('" + cover + "')";
+          coverDiv.style.backgroundSize  = 'cover';
+          coverDiv.style.backgroundPosition = 'center';
+          var ov = document.createElement('div');
+          ov.className = 'project-card-cover-overlay';
+          ov.innerHTML = '<div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ov);
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 'project-card-cover-placeholder';
+          ph.innerHTML = '<div class="ph-line"></div><div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ph);
+          var ov2 = document.createElement('div');
+          ov2.className = 'project-card-cover-overlay';
+          ov2.style.display = 'none';
+          ov2.innerHTML = '<div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ov2);
+        }
+        var arrow = document.createElement('div');
+        arrow.className = 'project-card-arrow';
+        arrow.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+        card.appendChild(coverDiv);
+        card.appendChild(arrow);
+        grid.appendChild(card);
+
+        var sub = document.createElement('div');
+        sub.id = 'sub-' + id;
+        sub.className = 'sub-gallery';
+        var photoGrid = document.createElement('div');
+        photoGrid.className = 'photo-grid';
+        photoGrid.id = 'grid-' + id;
+        if (!photos.length && !cover) {
+          photoGrid.innerHTML = '<div class="photo-placeholder">Photos Coming Soon</div>';
+        }
+        sub.appendChild(photoGrid);
+        subs.appendChild(sub);
+
+        var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
+        if (allPhotos.length) populateGrid('grid-' + id, allPhotos);
+      });
+    }
+
+    function applyConfig(cfg) {
+      var rv = cfg.reserve || {};
+      Object.keys(rv).forEach(function(id) {
+        var p = rv[id];
+        projectMeta[id]      = { name: p.name || id, location: p.location || '' };
+        projectStats[id]     = p.stats || { sqft: 0, buildings: 0 };
+        projectMaterials[id] = p.materials || [];
+      });
+      // SEO
+      var seo = (cfg._site || {}).seo || {};
+      if (seo.reserve) {
+        if (seo.reserve.title) document.title = seo.reserve.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc && seo.reserve.desc) metaDesc.setAttribute('content', seo.reserve.desc);
       }
-      currentProject = slug;
-      var meta  = projectMeta[slug]      || { name: slug };
-      var stats = projectStats[slug]     || { sqft: 0, buildings: 0 };
-      var mats  = projectMaterials[slug] || [];
-      document.getElementById('project-page-title').textContent = meta.name;
-      document.getElementById('project-page-header').classList.add('active');
-      document.getElementById('projects-section').style.display = 'none';
-      document.getElementById('sub-' + slug).classList.add('active');
-      // Stats banner
+    }
+
+    function openProject(id) {
+      var meta  = projectMeta[id]  || {};
+      var stats = projectStats[id] || {};
+      var mats  = projectMaterials[id] || [];
+      document.querySelector('.page-header').style.display = 'none';
+      document.getElementById('project-page-header').style.display = 'block';
+      document.getElementById('project-page-title').textContent = meta.name || id;
       if (stats.sqft > 0 || stats.buildings > 0) {
         document.getElementById('proj-sqft').textContent      = (stats.sqft || 0).toLocaleString();
         document.getElementById('proj-buildings').textContent = (stats.buildings || 0).toLocaleString();
@@ -498,134 +498,71 @@
       } else {
         document.getElementById('project-stats').style.display = 'none';
       }
-      // Materials bar
-      var matsEl = document.getElementById('project-materials');
-      if (mats && mats.length > 0) {
-        matsEl.innerHTML = mats.map(function(m, i) {
-          return (i > 0 ? '<div class="material-divider"></div>' : '') +
-                 '<span class="material-tag">' + m + '</span>';
-        }).join('');
-        matsEl.style.display = 'flex';
-      } else {
-        matsEl.style.display = 'none';
-      }
+      var matBar = document.getElementById('project-materials');
+      if (mats.length > 0) {
+        var matHtml = '';
+        mats.forEach(function(m, i) { if (i > 0) matHtml += '<div class="material-divider"></div>'; matHtml += '<span class="material-tag">' + m + '</span>'; });
+        matBar.innerHTML = matHtml; matBar.style.display = 'flex';
+      } else { matBar.innerHTML = ''; matBar.style.display = 'none'; }
+      var rvHdr = document.getElementById('rv-header');
+      if (rvHdr) rvHdr.style.display = 'none';
+      var pg = document.querySelector('#projects-section .project-grid');
+      if (pg) pg.style.display = 'none';
+      document.querySelectorAll('.sub-gallery').forEach(function(s) { s.style.display = 'none'; });
+      var subEl = document.getElementById('sub-' + id);
+      if (subEl) subEl.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function closeProject() {
-      if (currentProject) {
-        document.getElementById('sub-' + currentProject).classList.remove('active');
-        currentProject = null;
-      }
-      document.getElementById('project-page-header').classList.remove('active');
-      document.getElementById('project-stats').style.display = 'none';
-      document.getElementById('project-materials').style.display = 'none';
-      document.getElementById('projects-section').style.display = '';
+      document.getElementById('project-page-header').style.display = 'none';
+      document.getElementById('project-stats').style.display       = 'none';
+      document.getElementById('project-materials').style.display   = 'none';
+      document.querySelector('.page-header').style.display = 'block';
+      var rvHdr = document.getElementById('rv-header');
+      if (rvHdr) rvHdr.style.display = '';
+      var pg = document.querySelector('#projects-section .project-grid');
+      if (pg) pg.style.display = 'grid';
+      document.querySelectorAll('.sub-gallery').forEach(function(s) { s.style.display = 'none'; });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     var lightboxImages = [], lightboxIndex = 0;
     function openLightbox(el, gridId) {
-      var grid = document.getElementById(gridId);
-      var items = Array.from(grid.querySelectorAll('.photo-item img'));
-      lightboxImages = items.map(function(img) { return { src: img.getAttribute('src'), alt: img.alt }; });
-      var clickedImg = el.querySelector('img');
-      lightboxIndex = items.indexOf(clickedImg);
+      var grid  = document.getElementById(gridId);
+      var items = grid.querySelectorAll('.photo-item img');
+      lightboxImages = Array.from(items).map(function(img) { return { src: img.src, alt: img.alt }; });
+      var clicked = el.querySelector('img').src;
+      lightboxIndex = lightboxImages.findIndex(function(i) { return i.src === clicked; });
       if (lightboxIndex < 0) lightboxIndex = 0;
       showLightboxImage();
       document.getElementById('lightbox').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
     function showLightboxImage() {
-      if (!lightboxImages[lightboxIndex]) return;
       var img = document.getElementById('lightbox-img');
       img.src = lightboxImages[lightboxIndex].src;
       img.alt = lightboxImages[lightboxIndex].alt;
-      resetZoom();
     }
     function lightboxNav(dir) { lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length; showLightboxImage(); }
-    function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; resetZoom(); }
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; }
     function closeLightboxOutside(e) { if (e.target === document.getElementById('lightbox')) closeLightbox(); }
-    document.addEventListener('keydown', function(e) {
-      if (!document.getElementById('lightbox').classList.contains('open')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') { resetZoom(); lightboxNav(-1); }
-      if (e.key === 'ArrowRight') { resetZoom(); lightboxNav(1); }
-    });
 
-    var isZoomed = false, panX = 0, panY = 0, startX = 0, startY = 0, isPanning = false;
-    function resetZoom() {
-      isZoomed = false; panX = 0; panY = 0;
-      var inner = document.querySelector('.lightbox-inner');
-      var img = document.getElementById('lightbox-img');
-      if (inner) inner.classList.remove('zoomed');
-      if (img) img.style.transform = 'scale(1) translate(0px,0px)';
-      currentScale = 1; touchPanX = 0; touchPanY = 0;
-    }
-    document.querySelector('.lightbox-inner').addEventListener('click', function(e) {
-      if (isPanning) return;
-      var img = document.getElementById('lightbox-img');
-      if (!isZoomed) {
-        var rect = this.getBoundingClientRect();
-        panX = -(e.clientX - rect.left - rect.width/2);
-        panY = -(e.clientY - rect.top - rect.height/2);
-        isZoomed = true; this.classList.add('zoomed');
-        img.style.transform = 'scale(4) translate('+(panX/4)+'px,'+(panY/4)+'px)';
-      } else { resetZoom(); }
-    });
-    document.querySelector('.lightbox-inner').addEventListener('mousedown', function(e) {
-      if (!isZoomed) return; isPanning = false;
-      startX = e.clientX - panX; startY = e.clientY - panY;
-      this.addEventListener('mousemove', onPanMove);
-      window.addEventListener('mouseup', onPanEnd);
-    });
-    function onPanMove(e) { isPanning = true; panX = e.clientX - startX; panY = e.clientY - startY; document.getElementById('lightbox-img').style.transform = 'scale(4) translate('+(panX/4)+'px,'+(panY/4)+'px)'; }
-    function onPanEnd() { document.querySelector('.lightbox-inner').removeEventListener('mousemove', onPanMove); window.removeEventListener('mouseup', onPanEnd); setTimeout(function(){isPanning=false;},10); }
+    Promise.all([
+      fetch('gallery-manifest.json').then(function(r) { return r.json(); }),
+      fetch('site-config.json').then(function(r) { return r.json(); })
+    ]).then(function(results) {
+      var manifest = results[0];
+      var cfg      = results[1];
+      buildProjectGrid(manifest, cfg);
+      applyConfig(cfg);
+      applyUtilBar(cfg._site || {});
+      var hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById('sub-' + hash)) {
+        setTimeout(function() { openProject(hash); }, 50);
+      }
+    }).catch(function(e) { console.warn('reserve config/manifest error', e); });
 
-    var currentScale=1, touchPanX=0, touchPanY=0, touchStartDist=0, touchStartScale=1, lastTouchMidX=0, lastTouchMidY=0, touchStartPanX=0, touchStartPanY=0;
-    function getTouchDist(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
-    function applyTransform(){var img=document.getElementById('lightbox-img');img.style.transform='scale('+currentScale+') translate('+(touchPanX/currentScale)+'px,'+(touchPanY/currentScale)+'px)';var inner=document.querySelector('.lightbox-inner');if(currentScale>1)inner.classList.add('zoomed');else inner.classList.remove('zoomed');}
-    document.querySelector('.lightbox-inner').addEventListener('touchstart',function(e){if(e.touches.length===2){e.preventDefault();touchStartDist=getTouchDist(e.touches);touchStartScale=currentScale;var m={(x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2)};lastTouchMidX=m.x;lastTouchMidY=m.y;touchStartPanX=touchPanX;touchStartPanY=touchPanY;}else if(e.touches.length===1&&currentScale>1){touchStartPanX=touchPanX;touchStartPanY=touchPanY;lastTouchMidX=e.touches[0].clientX;lastTouchMidY=e.touches[0].clientY;}},{passive:false});
-    document.querySelector('.lightbox-inner').addEventListener('touchmove',function(e){if(e.touches.length===2){e.preventDefault();currentScale=Math.min(Math.max(touchStartScale*(getTouchDist(e.touches)/touchStartDist),1),6);var m={(x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2)};touchPanX=touchStartPanX+(m.x-lastTouchMidX);touchPanY=touchStartPanY+(m.y-lastTouchMidY);applyTransform();}else if(e.touches.length===1&&currentScale>1){e.preventDefault();touchPanX=touchStartPanX+(e.touches[0].clientX-lastTouchMidX);touchPanY=touchStartPanY+(e.touches[0].clientY-lastTouchMidY);applyTransform();}},{passive:false});
-  </script>
-  <script>
-    var searchIndex = [
-      { type:'page',     title:'Home',                       sub:'panoramicbuildingllc.com',               url:'index.html',        keywords:'home exterior contractor utah idaho panoramic building turn-key siding masonry stucco' },
-      { type:'page',     title:'Multifamily',                sub:'Apartment & condo exterior packages',    url:'multifamily.html',  keywords:'multifamily apartment condo units buildings exterior' },
-      { type:'page',     title:'Panoramic Reserve',          sub:'Premium custom home exteriors',          url:'reserve.html',      keywords:'reserve premium luxury custom home exterior architectural' },
-      { type:'page',     title:'Custom Homes',               sub:'Custom home exterior packages',          url:'custom.html',       keywords:'custom home exterior single family residential' },
-      { type:'page',     title:'Production',                 sub:'High-volume production builder packages', url:'production.html',  keywords:'production builder volume subdivision new construction' },
-      { type:'page',     title:'Get a Bid',                  sub:'Request a project estimate',             url:'contact.html',      keywords:'bid quote estimate contact request' },
-      { type:'service',  title:'LP SmartSide Siding',        sub:'Engineered wood lap & panel siding',     url:'multifamily.html',  keywords:'lp smartside engineered wood siding lap panel' },
-      { type:'service',  title:'Hardie Board / Fiber Cement', sub:'James Hardie fiber cement products',    url:'multifamily.html',  keywords:'hardie board james hardie fiber cement smooth panel plank' },
-      { type:'service',  title:'Masonry & Stone',            sub:'Cultured stone and masonry veneer',      url:'index.html',        keywords:'masonry stone veneer cultured stone interstate' },
-      { type:'service',  title:'Stucco',                     sub:'Three-coat and synthetic stucco systems', url:'index.html',       keywords:'stucco synthetic three coat finish exterior' },
-      { type:'service',  title:'Soffit & Fascia',            sub:'Aluminum and composite soffit/fascia',   url:'index.html',        keywords:'soffit fascia aluminum composite trim' },
-      { type:'service',  title:'Gutters',                    sub:'Seamless gutter systems',                url:'index.html',        keywords:'gutters seamless gutter downspout' },
-      { type:'service',  title:'Exterior Paint',             sub:'Full exterior coating packages',         url:'index.html',        keywords:'paint exterior coating color finish' },
-      { type:'project',  title:'Orchard Grove',              sub:'Idaho Falls, ID · 55 units · 25,677 sq ft', url:'multifamily.html#orchard-grove', keywords:'orchard grove idaho falls idaho 55 units multifamily' },
-      { type:'project',  title:'4th + Main',                 sub:'Bountiful, UT · 24 units · 19,530 sq ft',  url:'multifamily.html#4th-main', keywords:'4th main bountiful utah 24 units multifamily' },
-      { type:'project',  title:'The Crossing',               sub:'Woods Cross, UT · 22 units · 34,120 sq ft', url:'multifamily.html#the-crossing', keywords:'the crossing woods cross utah 22 units lp smartside hardie nickelgap interstate smokey mountain coal king' },
-      { type:'project',  title:'Parkway',                    sub:'Idaho Falls, ID · Coming Soon',     url:'multifamily.html',  keywords:'parkway idaho falls idaho multifamily' },
-      { type:'project',  title:'Altura',                     sub:'Logan, UT · Coming Soon',           url:'multifamily.html',  keywords:'altura logan utah multifamily' },
-      { type:'project',  title:'Hyde Park Gateway',          sub:'Hyde Park, UT · Coming Soon',       url:'multifamily.html',  keywords:'hyde park gateway utah multifamily' },
-      { type:'project',  title:'Blacktail (Custom)',         sub:'Custom home project',                    url:'custom.html',       keywords:'blacktail custom home exterior' },
-      { type:'project',  title:'Lowell',                    sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'lowell reserve custom home exterior premium' },
-      { type:'project',  title:'Blacktail (Reserve)',       sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'blacktail reserve custom home exterior premium' },
-      { type:'project',  title:'Watson',                    sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'watson reserve custom home exterior premium' },
-      { type:'project',  title:'Goble',                     sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'goble reserve custom home exterior premium' },
-      { type:'project',  title:'Roberts',                   sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'roberts reserve custom home exterior premium' },
-      { type:'project',  title:'Baker',                     sub:'Panoramic Reserve',                      url:'reserve.html',      keywords:'baker reserve custom home exterior premium' },
-      { type:'material', title:'LP SmartSide 8" Lap',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp smartside 8 lap siding engineered wood' },
-      { type:'material', title:'LP NickelGap',               sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp nickelgap shiplap panel nickel gap' },
-      { type:'material', title:'Smooth Hardie Panel',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'smooth hardie panel fiber cement james hardie' },
-      { type:'material', title:'Interstate Smokey Mountain Mod', sub:'Used on: The Crossing',              url:'multifamily.html',  keywords:'interstate smokey mountain mod stone veneer masonry' },
-      { type:'material', title:'Interstate Coal King',       sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'interstate coal king stone veneer masonry dark' },
-    ];
-    var ICONS = {
-      page:    '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-      project: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>',
-      service: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
-      material:'<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
-    };
     var searchFocusIndex = -1;
     function toggleSiteSearch() {
       var input = document.getElementById('site-search-input');

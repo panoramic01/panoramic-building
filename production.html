@@ -312,8 +312,23 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
-    // Load production description & materials from site-config.json
+    // Load production description, materials, and site settings from site-config.json
     fetch('site-config.json').then(function(r) { return r.json(); }).then(function(cfg) {
+      var site = cfg._site || {};
+      // Util bar
+      var areaEl  = document.querySelector('.util-bar span:first-child');
+      var phoneEl = document.querySelector('.util-bar .util-right a:first-child');
+      var emailEl = document.querySelector('.util-bar .util-right a:last-child');
+      if (areaEl  && site.serviceArea) areaEl.innerHTML  = site.serviceArea;
+      if (phoneEl && site.phone)       { phoneEl.href = 'tel:' + site.phone; phoneEl.innerHTML = '&#9990; ' + (site.phoneFmt || site.phone); }
+      if (emailEl && site.email)       { emailEl.href = 'mailto:' + site.email; emailEl.innerHTML = '&#9993; ' + site.email; }
+      // SEO
+      var seo = site.seo || {};
+      if (seo.production) {
+        if (seo.production.title) document.title = seo.production.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc && seo.production.desc) metaDesc.setAttribute('content', seo.production.desc);
+      }
       var prod = cfg.production || {};
       if (prod.description) {
         document.getElementById('production-description').textContent = prod.description;

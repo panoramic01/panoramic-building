@@ -1114,59 +1114,10 @@
   }
 
   // ── Auto-create page tile ──────────────────────────────────────────────
+  // Gallery pages are now fully data-driven (built from site-config.json + gallery-manifest.json).
+  // No HTML tile writing needed — new projects appear automatically when the page loads.
   async function writeTileToPage(cat, id, name, location) {
-    if (cat === 'production') return;
-    const pageFile = cat + '.html';
-    const r = await ghApi('GET', `${pageFile}?ref=${cfg.branch}`);
-    const pageSha = r.sha;
-    const bytes = Uint8Array.from(atob(r.content.replace(/\s/g,'')), c => c.charCodeAt(0));
-    let html = new TextDecoder('utf-8').decode(bytes);
-
-    const nameH = escH(name), locH = escH(location || '');
-    const infoBlock = cat === 'custom'
-      ? `\n        <div class="project-card-info"><h3>${nameH}</h3><p>${locH}</p></div>`
-      : '';
-    const cardHtml = `\n\n      <div class="project-card" onclick="openProject('${id}')">
-        <div class="project-card-cover" id="cover-${id}">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">${nameH}</div><div class="ph-location">${locH}</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">${nameH}</div><div class="ph-location">${locH}</div></div>
-        </div>${infoBlock}
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>`;
-
-    const CARD_MARKER = '\n\n    <!-- Sub-galleries -->';
-    if (!html.includes(CARD_MARKER)) throw new Error('Card insertion point not found in ' + pageFile);
-    html = html.replace(CARD_MARKER, cardHtml + CARD_MARKER);
-
-    const subHtml = cat === 'custom'
-      ? `    <div id="sub-${id}" class="sub-gallery">
-      <div class="sub-gallery-back" onclick="closeProject()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg> Back to Projects</div>
-      <div class="sub-gallery-title"><h2 id="sub-title-${id}">${nameH}</h2><p id="sub-location-${id}">${locH}</p></div>
-      <div class="materials-bar" id="sub-materials-${id}" style="display:none; margin: 0 -80px; width: calc(100% + 160px);"></div>
-      <div class="photo-grid" id="grid-${id}"><div class="photo-placeholder">Photos Coming Soon</div></div>
-    </div>`
-      : `    <div id="sub-${id}" class="sub-gallery">
-      <div class="photo-grid" id="grid-${id}"><div class="photo-placeholder">Photos Coming Soon</div></div>
-    </div>`;
-
-    const SUB_MARKER = '\n  </div>\n\n  <!-- Lightbox -->';
-    if (!html.includes(SUB_MARKER)) throw new Error('Sub-gallery insertion point not found in ' + pageFile);
-    html = html.replace(SUB_MARKER, '\n' + subHtml + SUB_MARKER);
-
-    html = html.replace(/(var gridMap\s*=\s*\{)([\s\S]*?)(\s*\};)/, (_, open, content, close) => {
-      if (content.includes(`'${cat}/${id}'`)) return _;
-      return open + content.trimEnd() + `,\n      '${cat}/${id}': 'grid-${id}'` + close;
-    });
-    html = html.replace(/(var coverMap\s*=\s*\{)([\s\S]*?)(\s*\};)/, (_, open, content, close) => {
-      if (content.includes(`'${cat}/${id}'`)) return _;
-      return open + content.trimEnd() + `,\n      '${cat}/${id}': 'cover-${id}'` + close;
-    });
-
-    const enc = new TextEncoder();
-    const outBytes = enc.encode(html);
-    let binary = '';
-    outBytes.forEach(b => { binary += String.fromCharCode(b); });
-    await ghApi('PUT', pageFile, { message: `Add ${cat}/${id} tile to ${pageFile}`, content: btoa(binary), sha: pageSha, branch: cfg.branch });
+    // no-op: pages build project cards dynamically from site-config.json
   }
 
   // ── Add project ────────────────────────────────────────────────────────
@@ -1200,17 +1151,7 @@
       contentCat  = cat;
       contentSlug = id;
 
-      if (cat !== 'production') {
-        toast('Creating project & writing page tile…', 'info');
-        try {
-          await writeTileToPage(cat, id, name, location);
-          toast(`Project created — tile added to ${cat}.html`, 'success');
-        } catch(tileErr) {
-          toast('Project created — tile write failed: ' + tileErr.message, 'error');
-        }
-      } else {
-        toast('Project created — now upload photos', 'success');
-      }
+      toast('Project created — now upload photos', 'success');
       renderDetail();
     } catch(e) {
       delete manifest[slug];
@@ -1326,144 +1267,123 @@
   }
 
   // ── Site Settings ──────────────────────────────────────────────────
-  async function showSiteSettings(section) {
+  // All site settings are stored in site-config.json under the "_site" key.
+  // Pages read from this key at load time — no HTML editing needed.
+  function showSiteSettings(section) {
     document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
     const el = document.getElementById('ss-' + section);
     if (el) el.classList.add('active');
     currentSlug = null;
 
-    document.getElementById('admin-main').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    const site = siteConfig._site || {};
 
-    function decodeGhFile(r) {
-      const bytes = Uint8Array.from(atob(r.content.replace(/\s/g,'')), c => c.charCodeAt(0));
-      return new TextDecoder('utf-8').decode(bytes);
-    }
+    if (section === 'company') {
+      const phone    = site.phone    || '3852895872';
+      const phoneFmt = site.phoneFmt || '385-289-5872';
+      const email    = site.email    || 'info@panoramicbuildingllc.com';
+      const area     = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
 
-    try {
-      if (section === 'company') {
-        const r = await ghApi('GET', `index.html?ref=${cfg.branch}`);
-        const html = decodeGhFile(r);
-        const phoneM    = html.match(/href="tel:(\d+)"/);
-        const phoneFmtM = html.match(/&#9990;\s+([\d\-().+\s]+)</);
-        const emailM    = html.match(/href="mailto:([^"]+)"/);
-        const areaM     = html.match(/class="util-bar">([\s\S]*?)&nbsp;\|&nbsp;/);
-        const phone    = phoneM    ? phoneM[1]           : '3852895872';
-        const phoneFmt = phoneFmtM ? phoneFmtM[1].trim() : '385-289-5872';
-        const email    = emailM    ? emailM[1]           : 'info@panoramicbuildingllc.com';
-        const area     = areaM     ? areaM[1].trim()     : 'Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front';
-
-        document.getElementById('admin-main').innerHTML = `
-          <div class="ch"><div class="ch-left">
-            <h2>Company Info</h2>
-            <p>Updates phone, email &amp; service area across all site pages</p>
-          </div></div>
-          <div class="ss-form">
-            <div class="form-grp">
-              <div class="ce-form-row">
-                <div>
-                  <label class="form-lbl">Phone (digits only)</label>
-                  <input class="form-input" id="ss-phone" type="text" value="${escH(phone)}" placeholder="e.g. 3852895872" />
-                </div>
-                <div>
-                  <label class="form-lbl">Phone (display)</label>
-                  <input class="form-input" id="ss-phonefmt" type="text" value="${escH(phoneFmt)}" placeholder="e.g. 385-289-5872" />
-                </div>
+      document.getElementById('admin-main').innerHTML = `
+        <div class="ch"><div class="ch-left">
+          <h2>Company Info</h2>
+          <p>Updates phone, email &amp; service area across all site pages instantly</p>
+        </div></div>
+        <div class="ss-form">
+          <div class="form-grp">
+            <div class="ce-form-row">
+              <div>
+                <label class="form-lbl">Phone (digits only)</label>
+                <input class="form-input" id="ss-phone" type="text" value="${escH(phone)}" placeholder="e.g. 3852895872" />
+              </div>
+              <div>
+                <label class="form-lbl">Phone (display)</label>
+                <input class="form-input" id="ss-phonefmt" type="text" value="${escH(phoneFmt)}" placeholder="e.g. 385-289-5872" />
               </div>
             </div>
-            <div class="form-grp">
-              <label class="form-lbl">Email Address</label>
-              <input class="form-input" id="ss-email" type="text" value="${escH(email)}" />
-            </div>
-            <div class="form-grp">
-              <label class="form-lbl">Service Area Tagline (HTML allowed)</label>
-              <input class="form-input" id="ss-area" type="text" value="${escH(area)}" />
-              <p style="font-size:11px;color:#A2A092;margin-top:6px;">Use &amp;nbsp;&amp;middot;&amp;nbsp; for centered dots.</p>
-            </div>
-            <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
-              <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('company')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Save to All Pages
-              </button>
-            </div>
-          </div>`;
+          </div>
+          <div class="form-grp">
+            <label class="form-lbl">Email Address</label>
+            <input class="form-input" id="ss-email" type="text" value="${escH(email)}" />
+          </div>
+          <div class="form-grp">
+            <label class="form-lbl">Service Area Tagline (HTML allowed)</label>
+            <input class="form-input" id="ss-area" type="text" value="${escH(area)}" />
+            <p style="font-size:11px;color:#A2A092;margin-top:6px;">Use &amp;nbsp;&amp;middot;&amp;nbsp; for centered dots. Changes go live on all pages immediately.</p>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
+            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('company')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save
+            </button>
+          </div>
+        </div>`;
 
-      } else if (section === 'hero') {
-        const r = await ghApi('GET', `index.html?ref=${cfg.branch}`);
-        const html = decodeGhFile(r);
-        const eyebrowM = html.match(/class="hero-eyebrow">([\s\S]*?)<\/p>/);
-        const h1M      = html.match(/class="hero-h1">([\s\S]*?)<\/h1>/);
-        const subM     = html.match(/class="hero-sub">([\s\S]*?)<\/p>/);
+    } else if (section === 'hero') {
+      const hero = site.hero || {};
+      const eyebrow = hero.eyebrow || '';
+      const h1      = hero.h1      || '';
+      const sub     = hero.sub     || '';
 
-        document.getElementById('admin-main').innerHTML = `
-          <div class="ch"><div class="ch-left">
-            <h2>Homepage Hero</h2>
-            <p>Edit the hero section on index.html</p>
-          </div></div>
-          <div class="ss-form">
-            <div class="form-grp">
-              <label class="form-lbl">Eyebrow Text</label>
-              <input class="form-input" id="ss-eyebrow" type="text" value="${escH((eyebrowM ? eyebrowM[1] : '').trim())}" />
-              <p style="font-size:11px;color:#A2A092;margin-top:6px;">HTML allowed (e.g. &amp;nbsp;&amp;middot;&amp;nbsp; for dots)</p>
-            </div>
-            <div class="form-grp">
-              <label class="form-lbl">Heading (&lt;br&gt; for line break)</label>
-              <input class="form-input" id="ss-h1" type="text" value="${escH((h1M ? h1M[1] : '').trim())}" />
-            </div>
-            <div class="form-grp">
-              <label class="form-lbl">Sub-headline</label>
-              <textarea class="ce-textarea" id="ss-sub">${escH((subM ? subM[1] : '').trim())}</textarea>
-            </div>
-            <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
-              <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('hero')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Save Hero
-              </button>
-            </div>
-          </div>`;
+      document.getElementById('admin-main').innerHTML = `
+        <div class="ch"><div class="ch-left">
+          <h2>Homepage Hero</h2>
+          <p>Edit the hero headline on the home page</p>
+        </div></div>
+        <div class="ss-form">
+          <div class="form-grp">
+            <label class="form-lbl">Eyebrow Text</label>
+            <input class="form-input" id="ss-eyebrow" type="text" value="${escH(eyebrow)}" />
+            <p style="font-size:11px;color:#A2A092;margin-top:6px;">HTML allowed (e.g. &amp;nbsp;&amp;middot;&amp;nbsp; for dots)</p>
+          </div>
+          <div class="form-grp">
+            <label class="form-lbl">Heading (&lt;br&gt; for line break)</label>
+            <input class="form-input" id="ss-h1" type="text" value="${escH(h1)}" />
+          </div>
+          <div class="form-grp">
+            <label class="form-lbl">Sub-headline</label>
+            <textarea class="ce-textarea" id="ss-sub">${escH(sub)}</textarea>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
+            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('hero')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Hero
+            </button>
+          </div>
+        </div>`;
 
-      } else if (section === 'seo') {
-        const pages = ['index','multifamily','reserve','custom','production'];
-        const pageData = await Promise.all(pages.map(async pg => {
-          try {
-            const r = await ghApi('GET', `${pg}.html?ref=${cfg.branch}`);
-            const bytes = Uint8Array.from(atob(r.content.replace(/\s/g,'')), c => c.charCodeAt(0));
-            const html = new TextDecoder('utf-8').decode(bytes);
-            const titleM = html.match(/<title>([\s\S]*?)<\/title>/);
-            const descM  = html.match(/<meta name="description" content="([^"]*)"/);
-            return { pg, title: titleM ? titleM[1] : '', desc: descM ? descM[1] : '' };
-          } catch(e) { return { pg, title:'', desc:'' }; }
-        }));
-
-        const fields = pageData.map(({pg, title, desc}) => `
+    } else if (section === 'seo') {
+      const seo   = site.seo || {};
+      const pages = ['index','multifamily','reserve','custom','production'];
+      const fields = pages.map(pg => {
+        const s = seo[pg] || {};
+        return `
           <div style="margin-bottom:28px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1F3971;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0efe9;">${pg}.html</div>
             <div class="form-grp">
               <label class="form-lbl">Page Title</label>
-              <input class="form-input" id="seo-title-${pg}" type="text" value="${escH(title)}" />
+              <input class="form-input" id="seo-title-${pg}" type="text" value="${escH(s.title || '')}" />
             </div>
             <div class="form-grp" style="margin-bottom:0;">
               <label class="form-lbl">Meta Description</label>
-              <textarea class="ce-textarea" id="seo-desc-${pg}" style="min-height:52px;">${escH(desc)}</textarea>
-            </div>
-          </div>`).join('');
-
-        document.getElementById('admin-main').innerHTML = `
-          <div class="ch"><div class="ch-left">
-            <h2>SEO / Meta</h2>
-            <p>Page titles and meta descriptions for search engines</p>
-          </div></div>
-          <div class="ss-form">
-            ${fields}
-            <div style="display:flex;gap:12px;padding-top:20px;border-top:1px solid #e8e7e3;">
-              <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('seo')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Save All Pages
-              </button>
+              <textarea class="ce-textarea" id="seo-desc-${pg}" style="min-height:52px;">${escH(s.desc || '')}</textarea>
             </div>
           </div>`;
-      }
-    } catch(err) {
-      document.getElementById('admin-main').innerHTML = `<div style="color:#c0392b;padding:40px;font-size:13px;">${escH(err.message)}</div>`;
+      }).join('');
+
+      document.getElementById('admin-main').innerHTML = `
+        <div class="ch"><div class="ch-left">
+          <h2>SEO / Meta</h2>
+          <p>Page titles and meta descriptions — applied dynamically on every page load</p>
+        </div></div>
+        <div class="ss-form">
+          ${fields}
+          <div style="display:flex;gap:12px;padding-top:20px;border-top:1px solid #e8e7e3;">
+            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('seo')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save All
+            </button>
+          </div>
+        </div>`;
     }
   }
 
@@ -1471,60 +1391,35 @@
     const btn = document.getElementById('ss-save-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
 
-    function encodeHtml(html) {
-      const enc = new TextEncoder();
-      const bytes = enc.encode(html);
-      let bin = '';
-      bytes.forEach(b => { bin += String.fromCharCode(b); });
-      return btoa(bin);
-    }
-    function decodeGhFile(r) {
-      const bytes = Uint8Array.from(atob(r.content.replace(/\s/g,'')), c => c.charCodeAt(0));
-      return new TextDecoder('utf-8').decode(bytes);
-    }
-
     try {
+      if (!siteConfig._site) siteConfig._site = {};
+
       if (section === 'company') {
-        const phone    = document.getElementById('ss-phone').value.trim();
-        const phoneFmt = document.getElementById('ss-phonefmt').value.trim();
-        const email    = document.getElementById('ss-email').value.trim();
-        const area     = document.getElementById('ss-area').value.trim();
-        const pages = ['index','multifamily','reserve','custom','production'];
-        await Promise.all(pages.map(async pg => {
-          const r = await ghApi('GET', `${pg}.html?ref=${cfg.branch}`);
-          let html = decodeGhFile(r);
-          html = html.replace(
-            /(class="util-bar">)([\s\S]*?)(<\/div>)/,
-            (_, o, _c, cl) => o + area + ' &nbsp;|&nbsp; <a href="tel:' + phone + '">&#9990; ' + phoneFmt + '</a> &nbsp;·&nbsp; <a href="mailto:' + email + '">&#9993; ' + email + '</a>' + cl
-          );
-          await ghApi('PUT', `${pg}.html`, { message: `Update company info in ${pg}.html`, content: encodeHtml(html), sha: r.sha, branch: cfg.branch });
-        }));
-        toast('Company info saved to all pages', 'success');
+        siteConfig._site.phone      = document.getElementById('ss-phone').value.trim();
+        siteConfig._site.phoneFmt   = document.getElementById('ss-phonefmt').value.trim();
+        siteConfig._site.email      = document.getElementById('ss-email').value.trim();
+        siteConfig._site.serviceArea = document.getElementById('ss-area').value.trim();
+        await saveSiteConfig('Update company info');
+        toast('Company info saved — changes go live on all pages', 'success');
 
       } else if (section === 'hero') {
-        const eyebrow = document.getElementById('ss-eyebrow').value;
-        const h1Text  = document.getElementById('ss-h1').value;
-        const subText = document.getElementById('ss-sub').value;
-        const r = await ghApi('GET', `index.html?ref=${cfg.branch}`);
-        let html = decodeGhFile(r);
-        html = html.replace(/(<p class="hero-eyebrow">)([\s\S]*?)(<\/p>)/, (_, o, _c, cl) => o + eyebrow + cl);
-        html = html.replace(/(<h1 class="hero-h1">)([\s\S]*?)(<\/h1>)/,    (_, o, _c, cl) => o + h1Text  + cl);
-        html = html.replace(/(<p class="hero-sub">)([\s\S]*?)(<\/p>)/,     (_, o, _c, cl) => o + subText  + cl);
-        await ghApi('PUT', 'index.html', { message: 'Update hero content', content: encodeHtml(html), sha: r.sha, branch: cfg.branch });
+        if (!siteConfig._site.hero) siteConfig._site.hero = {};
+        siteConfig._site.hero.eyebrow = document.getElementById('ss-eyebrow').value;
+        siteConfig._site.hero.h1      = document.getElementById('ss-h1').value;
+        siteConfig._site.hero.sub     = document.getElementById('ss-sub').value;
+        await saveSiteConfig('Update homepage hero');
         toast('Hero saved', 'success');
 
       } else if (section === 'seo') {
-        const pages = ['index','multifamily','reserve','custom','production'];
-        await Promise.all(pages.map(async pg => {
-          const newTitle = (document.getElementById('seo-title-' + pg) || {}).value || '';
-          const newDesc  = (document.getElementById('seo-desc-'  + pg) || {}).value || '';
-          const r = await ghApi('GET', `${pg}.html?ref=${cfg.branch}`);
-          let html = decodeGhFile(r);
-          html = html.replace(/(<title>)([\s\S]*?)(<\/title>)/,                 (_, o, _c, cl) => o + newTitle + cl);
-          html = html.replace(/(<meta name="description" content=")[^"]*(")/,   (_, o, cl)     => o + newDesc  + cl);
-          await ghApi('PUT', `${pg}.html`, { message: `Update SEO for ${pg}.html`, content: encodeHtml(html), sha: r.sha, branch: cfg.branch });
-        }));
-        toast('SEO saved to all pages', 'success');
+        if (!siteConfig._site.seo) siteConfig._site.seo = {};
+        ['index','multifamily','reserve','custom','production'].forEach(pg => {
+          siteConfig._site.seo[pg] = {
+            title: (document.getElementById('seo-title-' + pg) || {}).value || '',
+            desc:  (document.getElementById('seo-desc-'  + pg) || {}).value || ''
+          };
+        });
+        await saveSiteConfig('Update SEO meta');
+        toast('SEO saved', 'success');
       }
 
       if (btn) {

@@ -279,24 +279,10 @@
     <div class="section-accent"></div>
 
     <div id="custom-projects" class="project-grid">
-
-      <div class="project-card" onclick="openProject('blacktail')">
-        <div class="project-card-cover" id="cover-blacktail">
-          <div class="project-card-cover-placeholder"><div class="ph-line"></div><div class="ph-name">Blacktail</div><div class="ph-location">Garden City, UT</div></div>
-          <div class="project-card-cover-overlay" style="display:none;"><div class="ph-name">Blacktail</div><div class="ph-location">Garden City, UT</div></div>
-        </div>
-        <div class="project-card-info"><h3>Blacktail</h3><p>Garden City, UT</p></div>
-        <div class="project-card-arrow"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
-      </div>
-
+      <!-- project cards built dynamically from site-config.json + gallery-manifest.json -->
     </div>
-
-    <!-- Sub-galleries -->
-    <div id="sub-blacktail" class="sub-gallery">
-      <div class="sub-gallery-back" onclick="closeProject()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg> Back to Projects</div>
-      <div class="sub-gallery-title"><h2 id="sub-title-blacktail">Blacktail</h2><p id="sub-location-blacktail">Garden City, UT</p></div>
-      <div class="materials-bar" id="sub-materials-blacktail" style="display:none; margin: 0 -80px; width: calc(100% + 160px);"></div>
-      <div class="photo-grid" id="grid-blacktail"><div class="photo-placeholder">Photos Coming Soon</div></div>
+    <div id="cu-subs">
+      <!-- sub-galleries built dynamically -->
     </div>
   </div>
 
@@ -331,24 +317,131 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
-    var gridMap  = { 'custom/blacktail': 'grid-blacktail' };
-    var coverMap = { 'custom/blacktail': 'cover-blacktail' };
+    var gridMap  = {};
+    var coverMap = {};
 
     var projectMeta      = {};
     var projectMaterials = {};
+
+    function applyUtilBar(site) {
+      var areaEl  = document.querySelector('.util-bar span:first-child');
+      var phoneEl = document.querySelector('.util-bar .util-right a:first-child');
+      var emailEl = document.querySelector('.util-bar .util-right a:last-child');
+      if (areaEl  && site.serviceArea) areaEl.innerHTML  = site.serviceArea;
+      if (phoneEl && site.phone)       { phoneEl.href = 'tel:' + site.phone; phoneEl.innerHTML = '&#9990; ' + (site.phoneFmt || site.phone); }
+      if (emailEl && site.email)       { emailEl.href = 'mailto:' + site.email; emailEl.innerHTML = '&#9993; ' + site.email; }
+    }
+
+    function buildProjectGrid(manifest, cfg) {
+      var cat  = 'custom';
+      var data = cfg[cat] || {};
+      var grid = document.getElementById('custom-projects');
+      var subs = document.getElementById('cu-subs');
+      if (!grid || !subs) return;
+      grid.innerHTML = '';
+      subs.innerHTML = '';
+      Object.keys(data).forEach(function(id) {
+        var key    = cat + '/' + id;
+        var entry  = manifest[key] || { photos: [], cover: null };
+        var meta   = data[id] || {};
+        var name   = meta.name || id;
+        var loc    = meta.location || '';
+        var cover  = entry.cover || null;
+        var photos = Array.isArray(entry.photos) ? entry.photos : [];
+
+        gridMap[key]  = 'grid-'  + id;
+        coverMap[key] = 'cover-' + id;
+        projectMeta[id]      = { name: name, location: loc, description: meta.description || '' };
+        projectMaterials[id] = meta.materials || [];
+
+        // Build card (custom style has project-card-info block)
+        var card = document.createElement('div');
+        card.className = 'project-card';
+        card.onclick = (function(pid) { return function() { openProject(pid); }; })(id);
+        var coverDiv = document.createElement('div');
+        coverDiv.className = 'project-card-cover';
+        coverDiv.id = 'cover-' + id;
+        if (cover) {
+          coverDiv.style.backgroundImage = "url('" + cover + "')";
+          coverDiv.style.backgroundSize  = 'cover';
+          coverDiv.style.backgroundPosition = 'center';
+          var ov = document.createElement('div');
+          ov.className = 'project-card-cover-overlay';
+          ov.innerHTML = '<div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ov);
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 'project-card-cover-placeholder';
+          ph.innerHTML = '<div class="ph-line"></div><div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ph);
+          var ov2 = document.createElement('div');
+          ov2.className = 'project-card-cover-overlay';
+          ov2.style.display = 'none';
+          ov2.innerHTML = '<div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
+          coverDiv.appendChild(ov2);
+        }
+        var info = document.createElement('div');
+        info.className = 'project-card-info';
+        info.innerHTML = '<h3>' + name + '</h3><p>' + loc + '</p>';
+        var arrow = document.createElement('div');
+        arrow.className = 'project-card-arrow';
+        arrow.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+        card.appendChild(coverDiv);
+        card.appendChild(info);
+        card.appendChild(arrow);
+        grid.appendChild(card);
+
+        // Build sub-gallery (custom style has back button + title + materials)
+        var sub = document.createElement('div');
+        sub.id = 'sub-' + id;
+        sub.className = 'sub-gallery';
+        var backBtn = document.createElement('div');
+        backBtn.className = 'sub-gallery-back';
+        backBtn.onclick = closeProject;
+        backBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg> Back to Projects';
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'sub-gallery-title';
+        titleDiv.innerHTML = '<h2 id="sub-title-' + id + '">' + name + '</h2><p id="sub-location-' + id + '">' + loc + '</p>';
+        var matsBar = document.createElement('div');
+        matsBar.className = 'materials-bar';
+        matsBar.id = 'sub-materials-' + id;
+        matsBar.style.cssText = 'display:none; margin: 0 -80px; width: calc(100% + 160px);';
+        var photoGrid = document.createElement('div');
+        photoGrid.className = 'photo-grid';
+        photoGrid.id = 'grid-' + id;
+        if (!photos.length && !cover) {
+          photoGrid.innerHTML = '<div class="photo-placeholder">Photos Coming Soon</div>';
+        }
+        sub.appendChild(backBtn);
+        sub.appendChild(titleDiv);
+        sub.appendChild(matsBar);
+        sub.appendChild(photoGrid);
+        subs.appendChild(sub);
+
+        var allPhotos = (cover && photos.indexOf(cover) === -1) ? [cover].concat(photos) : photos;
+        if (allPhotos.length) populateGrid('grid-' + id, allPhotos);
+      });
+    }
 
     function applyConfig(cfg) {
       var cu = cfg.custom || {};
       Object.keys(cu).forEach(function(id) {
         var p = cu[id];
+        // projectMeta and projectMaterials are set in buildProjectGrid, but refresh here for safety
         projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
         projectMaterials[id] = p.materials || [];
-        // Update static placeholder text in sub-gallery if elements exist
         var titleEl    = document.getElementById('sub-title-' + id);
         var locationEl = document.getElementById('sub-location-' + id);
         if (titleEl)    titleEl.textContent    = p.name || id;
         if (locationEl) locationEl.textContent = p.location || '';
       });
+      // SEO
+      var seo = (cfg._site || {}).seo || {};
+      if (seo.custom) {
+        if (seo.custom.title) document.title = seo.custom.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc && seo.custom.desc) metaDesc.setAttribute('content', seo.custom.desc);
+      }
     }
 
     function populateGrid(gridId, photos) {
@@ -381,14 +474,13 @@
     ]).then(function(results) {
       var manifest = results[0];
       var cfg      = results[1];
+      buildProjectGrid(manifest, cfg);
       applyConfig(cfg);
-      Object.keys(gridMap).forEach(function(key) {
-        var entry = manifest[key]; if (!entry) return;
-        var photos = Array.isArray(entry) ? entry : entry.photos;
-        var cover  = Array.isArray(entry) ? null : entry.cover;
-        populateGrid(gridMap[key], photos);
-        if (coverMap[key]) setCoverImage(coverMap[key], cover);
-      });
+      applyUtilBar(cfg._site || {});
+      var hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById('sub-' + hash)) {
+        setTimeout(function() { openProject(hash); }, 50);
+      }
     }).catch(function(e) { console.warn('config/manifest error', e); });
 
     function openProject(id) {

@@ -1,4 +1,37 @@
 {
+  "_site": {
+    "phone": "3852895872",
+    "phoneFmt": "385-289-5872",
+    "email": "info@panoramicbuildingllc.com",
+    "serviceArea": "Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front",
+    "hero": {
+      "eyebrow": "New Construction Specialists &nbsp;·&nbsp; Logan, Utah",
+      "h1": "Turn-Key Exteriors<br>Built for Builders.",
+      "sub": "Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package — siding, gutters, trim, soffit, and fascia under one contract, on your schedule."
+    },
+    "seo": {
+      "index": {
+        "title": "Panoramic Building LLC | New Construction Exterior Specialists | Logan, Utah",
+        "desc": "Panoramic Building LLC specializes in new construction exterior finishing — siding, gutters, trim, soffit, and fascia. Serving Northern Utah, Southern Idaho, and the Wasatch Front. Based in Logan, UT."
+      },
+      "multifamily": {
+        "title": "Multifamily Exterior Contractor | Panoramic Building LLC | Utah & Idaho",
+        "desc": "Panoramic Building LLC delivers complete turn-key exterior packages for multifamily apartment and condo projects — siding, masonry, stucco, soffit, fascia, gutters & paint. Northern Utah & Southern Idaho."
+      },
+      "reserve": {
+        "title": "Panoramic Reserve Homes | Premium Exterior Specialist",
+        "desc": "For homes that call for something different. We work with specialty materials most crews never touch — natural wood, Sàgiper, Châm Clad, full-bed stone — installed correctly from day one."
+      },
+      "custom": {
+        "title": "Custom Home Exteriors | Panoramic Building LLC",
+        "desc": "Custom exterior finishing for one-of-a-kind homes. Precision craftsmanship for every material, from hardboard to natural wood."
+      },
+      "production": {
+        "title": "Production Home Exteriors | Panoramic Building LLC",
+        "desc": "Turn-key siding, trim, gutters, and exterior packages for production home builders in Northern Utah and Southern Idaho."
+      }
+    }
+  },
   "multifamily": {
     "orchard-grove": {
       "name": "Orchard Grove",
