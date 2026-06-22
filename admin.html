@@ -538,10 +538,17 @@
   }
 
   // ── Manifest ───────────────────────────────────────────────────────
+  function b64ToUtf8(b64) {
+    // atob gives raw bytes as Latin-1 chars; TextDecoder converts them to proper Unicode
+    const binary = atob(b64.replace(/\s/g, ''));
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
   async function loadManifest() {
     const r = await ghApi('GET', `${MANIFEST_PATH}?ref=${cfg.branch}`);
     manifestSha = r.sha;
-    manifest = JSON.parse(atob(r.content.replace(/\s/g,'')));
+    manifest = JSON.parse(b64ToUtf8(r.content));
   }
 
   async function saveManifest(msg) {
@@ -1241,7 +1248,7 @@
     try {
       const r = await ghApi('GET', `${CONFIG_PATH}?ref=${cfg.branch}`);
       siteConfigSha = r.sha;
-      siteConfig = JSON.parse(atob(r.content.replace(/\s/g,'')));
+      siteConfig = JSON.parse(b64ToUtf8(r.content));
     } catch(e) {
       siteConfig = { multifamily:{}, reserve:{}, custom:{}, production:{ description:'', materials:[] } };
       siteConfigSha = null;
@@ -1543,15 +1550,4 @@
       setTimeout(() => {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
-        }
-      }, 2500);
-    } catch(e) {
-      toast('Save failed: ' + e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = 'Save Changes';
-    }
-  }
-</script>
-</body>
-</html>
+          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7
