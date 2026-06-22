@@ -1,26 +1,26 @@
 {
   "_site": {
     "phone": "3852895872",
-    "phoneFmt": "385-289-5872",
+    "phoneFmt": "801-208-435",
     "email": "info@panoramicbuildingllc.com",
-    "serviceArea": "Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front",
+    "serviceArea": "Serving Northern Utah &nbsp;Â·&nbsp; Southern Idaho &nbsp;Â·&nbsp; Wasatch Front",
     "hero": {
-      "eyebrow": "New Construction Specialists &nbsp;·&nbsp; Logan, Utah",
+      "eyebrow": "New Construction Specialists &nbsp;Â·&nbsp; Logan, Utah",
       "h1": "Turn-Key Exteriors<br>Built for Builders.",
-      "sub": "Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package — siding, gutters, trim, soffit, and fascia under one contract, on your schedule."
+      "sub": "Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package â siding, gutters, trim, soffit, and fascia under one contract, on your schedule."
     },
     "seo": {
       "index": {
         "title": "Panoramic Building LLC | New Construction Exterior Specialists | Logan, Utah",
-        "desc": "Panoramic Building LLC specializes in new construction exterior finishing — siding, gutters, trim, soffit, and fascia. Serving Northern Utah, Southern Idaho, and the Wasatch Front. Based in Logan, UT."
+        "desc": "Panoramic Building LLC specializes in new construction exterior finishing â siding, gutters, trim, soffit, and fascia. Serving Northern Utah, Southern Idaho, and the Wasatch Front. Based in Logan, UT."
       },
       "multifamily": {
         "title": "Multifamily Exterior Contractor | Panoramic Building LLC | Utah & Idaho",
-        "desc": "Panoramic Building LLC delivers complete turn-key exterior packages for multifamily apartment and condo projects — siding, masonry, stucco, soffit, fascia, gutters & paint. Northern Utah & Southern Idaho."
+        "desc": "Panoramic Building LLC delivers complete turn-key exterior packages for multifamily apartment and condo projects â siding, masonry, stucco, soffit, fascia, gutters & paint. Northern Utah & Southern Idaho."
       },
       "reserve": {
         "title": "Panoramic Reserve Homes | Premium Exterior Specialist",
-        "desc": "For homes that call for something different. We work with specialty materials most crews never touch — natural wood, Sàgiper, Châm Clad, full-bed stone — installed correctly from day one."
+        "desc": "For homes that call for something different. We work with specialty materials most crews never touch â natural wood, SÃ giper, ChÃ¢m Clad, full-bed stone â installed correctly from day one."
       },
       "custom": {
         "title": "Custom Home Exteriors | Panoramic Building LLC",
@@ -37,55 +37,149 @@
       "name": "Orchard Grove",
       "location": "Idaho Falls, ID",
       "description": "",
-      "stats": { "units": 55, "sqft": 25677, "buildings": 1 },
-      "materials": ["LP 8\" Lap Expert Finish", "LP Panel B&B Expert Finish", "Dryvit Stucco", "Harristone Slate Lueders"]
+      "stats": {
+        "units": 55,
+        "sqft": 25677,
+        "buildings": 1
+      },
+      "materials": [
+        "LP 8\" Lap Expert Finish",
+        "LP Panel B&B Expert Finish",
+        "Dryvit Stucco",
+        "Harristone Slate Lueders"
+      ]
     },
     "parkway": {
       "name": "Parkway Apartments",
       "location": "Idaho Falls, ID",
       "description": "",
-      "stats": { "units": 0, "sqft": 0, "buildings": 0 },
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      },
       "materials": []
     },
     "4th-main": {
       "name": "4th + Main",
       "location": "Bountiful, UT",
       "description": "",
-      "stats": { "units": 24, "sqft": 19530, "buildings": 2 },
+      "stats": {
+        "units": 24,
+        "sqft": 19530,
+        "buildings": 2
+      },
       "materials": []
     },
     "altura": {
       "name": "Altura Apartments",
       "location": "Logan, UT",
       "description": "",
-      "stats": { "units": 168, "sqft": 141369, "buildings": 8 },
+      "stats": {
+        "units": 168,
+        "sqft": 141369,
+        "buildings": 8
+      },
       "materials": []
     },
     "the-crossing": {
       "name": "The Crossing",
       "location": "Woods Cross, UT",
       "description": "",
-      "stats": { "units": 22, "sqft": 34120, "buildings": 5 },
-      "materials": ["LP SmartSide 8\" Lap", "LP NickelGap", "Interstate Smokey Mountain Mod", "Interstate Coal King", "Smooth Hardie Panel"]
+      "stats": {
+        "units": 22,
+        "sqft": 34120,
+        "buildings": 5
+      },
+      "materials": [
+        "LP SmartSide 8\" Lap",
+        "LP NickelGap",
+        "Interstate Smokey Mountain Mod",
+        "Interstate Coal King",
+        "Smooth Hardie Panel"
+      ]
     },
     "hyde-park-gateway": {
       "name": "Hyde Park Gateway",
       "location": "Hyde Park, UT",
       "description": "",
-      "stats": { "units": 0, "sqft": 0, "buildings": 0 },
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      },
       "materials": []
     }
   },
   "reserve": {
-    "lowell":   { "name": "Lowell",   "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
-    "blacktail":{ "name": "Blacktail","location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
-    "watson":   { "name": "Watson",   "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
-    "goble":    { "name": "Goble",    "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
-    "roberts":  { "name": "Roberts",  "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] },
-    "baker":    { "name": "Baker",    "location": "", "description": "", "stats": { "sqft": 0, "buildings": 0 }, "materials": [] }
+    "lowell": {
+      "name": "Lowell",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "blacktail": {
+      "name": "Blacktail",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "watson": {
+      "name": "Watson",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "goble": {
+      "name": "Goble",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "roberts": {
+      "name": "Roberts",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "baker": {
+      "name": "Baker",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    }
   },
   "custom": {
-    "blacktail": { "name": "Blacktail", "location": "Garden City, UT", "description": "", "materials": [] }
+    "blacktail": {
+      "name": "Blacktail",
+      "location": "Garden City, UT",
+      "description": "",
+      "materials": []
+    }
   },
   "production": {
     "description": "",
