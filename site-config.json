@@ -139,7 +139,9 @@
       "name": "Blacktail",
       "location": "Garden City, UT",
       "description": "",
-      "materials": [],
+      "materials": [
+        "Tresselwood"
+      ],
       "year": 2025,
       "featured": false
     },
