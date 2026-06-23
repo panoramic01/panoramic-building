@@ -205,13 +205,17 @@
     "location": ""
   },
   "custom/job-name-3": {
-    "cover": null,
-    "photos": [],
-    "location": ""
-  },
-  "multifamily/job-name-3": {
-    "cover": null,
-    "photos": [],
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245855/panoramic-building/aidan-217-2.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245855/panoramic-building/aidan-217-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245855/panoramic-building/aidan-218-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245856/panoramic-building/aidan-215-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245857/panoramic-building/aidan-216-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245859/panoramic-building/aidan-214-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245860/panoramic-building/aidan-213-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245860/panoramic-building/aidan-212-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245854/panoramic-building/aidan-211-2.jpg"
+    ],
     "location": ""
   }
 }
