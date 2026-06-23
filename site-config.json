@@ -219,10 +219,11 @@
       "featured": false
     },
     "job-name-5": {
-      "name": "Job Name 5",
+      "name": "HC08",
       "location": "",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-6": {
       "name": "Job Name 6",
