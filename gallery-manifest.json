@@ -263,8 +263,15 @@
     "location": ""
   },
   "custom/job-name-6": {
-    "cover": null,
-    "photos": [],
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246194/panoramic-building/aidan-258-2.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246194/panoramic-building/aidan-258-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246195/panoramic-building/aidan-259-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246195/panoramic-building/aidan-255-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246196/panoramic-building/aidan-257-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246197/panoramic-building/aidan-256-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782246198/panoramic-building/aidan-254-2.jpg"
+    ],
     "location": ""
   }
 }
