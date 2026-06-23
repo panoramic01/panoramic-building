@@ -175,6 +175,12 @@
       "description": "",
       "materials": [],
       "featured": false
+    },
+    "lasswell": {
+      "name": "Lasswell",
+      "location": "Ovid, ID",
+      "description": "",
+      "materials": []
     }
   },
   "custom": {
