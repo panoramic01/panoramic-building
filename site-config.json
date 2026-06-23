@@ -173,7 +173,14 @@
       "materials": []
     }
   },
-  "custom": {},
+  "custom": {
+    "pena-lloyd": {
+      "name": "Pena Lloyd",
+      "location": "Logan, UT",
+      "description": "",
+      "materials": []
+    }
+  },
   "production": {
     "description": "",
     "materials": []
