@@ -1,0 +1,4 @@
+# Data files are managed exclusively by the admin panel via the GitHub API.
+# Code commits should never modify these files.
+# During a rebase (push.bat workflow), these files are always taken from origin/main
+# because our code commits 
