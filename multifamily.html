@@ -26,8 +26,8 @@
   <meta name="twitter:image" content="https://www.panoramicbuildingllc.com/assets/multifamily/orchard-grove/cover.jpg" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2E2E2E; background: #fff; line-height: 1.6; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2E2E2E; background: #fff; line-height: 1.6; overflow-x: hidden; }
     img { display: block; max-width: 100%; }
     a { text-decoration: none; color: inherit; }
 
@@ -210,8 +210,11 @@
       .project-page-header { padding: 32px 20px 24px; }
       .project-page-header h1 { font-size: 22px; letter-spacing: 1px; }
       .sub-gallery.active { padding: 0 20px 48px; }
-      .mf-stats-bar { padding: 18px 20px; flex-wrap: wrap; gap: 16px; }
-      .mf-stat { padding: 0 16px; }
+      .mf-stats-bar { padding: 12px 20px; flex-direction: column; gap: 0; }
+      .mf-stat { width: 100%; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+      .mf-stat:last-of-type { border-bottom: none; }
+      .mf-stat-num { font-size: 22px; }
+      .mf-stat-label { font-size: 9px; letter-spacing: 1.5px; }
       .mf-stat-divider { display: none; }
       .footer { flex-direction: column; height: auto; padding: 20px 24px; gap: 12px; align-items: flex-start; }
       .footer-contact-info { flex-direction: column; align-items: flex-start; gap: 12px; }
