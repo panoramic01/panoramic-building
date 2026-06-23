@@ -35,8 +35,10 @@
     ]
   },
   "reserve/blacktail": {
-    "cover": null,
-    "photos": []
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg"
+    ]
   },
   "reserve/watson": {
     "cover": null,
