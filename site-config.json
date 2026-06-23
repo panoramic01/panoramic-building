@@ -169,13 +169,10 @@
     },
     "baker": {
       "name": "Baker",
-      "location": "",
+      "location": "Laketown, UT",
       "description": "",
-      "stats": {
-        "sqft": 0,
-        "buildings": 0
-      },
-      "materials": []
+      "materials": [],
+      "featured": false
     }
   },
   "custom": {
