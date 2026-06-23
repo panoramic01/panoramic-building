@@ -154,8 +154,18 @@
     "location": "Logan, UT"
   },
   "custom/job-name-1": {
-    "cover": null,
-    "photos": [],
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245412/panoramic-building/aidan-44-2.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245412/panoramic-building/aidan-44-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245413/panoramic-building/aidan-45-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245414/panoramic-building/aidan-46-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245415/panoramic-building/aidan-43-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245417/panoramic-building/aidan-42-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245418/panoramic-building/aidan-41-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245419/panoramic-building/aidan-40-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245420/panoramic-building/aidan-39-2.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782245421/panoramic-building/aidan-38-2.jpg"
+    ],
     "location": ""
   }
 }
