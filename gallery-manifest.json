@@ -152,5 +152,10 @@
       "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782222077/panoramic-building/custom/pena-lloyd/aidan-293.jpg"
     ],
     "location": "Logan, UT"
+  },
+  "custom/job-name-1": {
+    "cover": null,
+    "photos": [],
+    "location": ""
   }
 }
