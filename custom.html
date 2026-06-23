@@ -127,7 +127,7 @@
 
     /* Sub-gallery */
     .sub-gallery { display: none; }
-    .sub-gallery.active { display: block; }
+    .sub-gallery.active { display: block; padding: 0 80px 72px; }
     .sub-gallery-back { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; color: #1F3971; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; cursor: pointer; width: fit-content; }
     .sub-gallery-back:hover { color: #163060; }
     .sub-gallery-back svg { width: 16px; height: 16px; }
@@ -188,6 +188,8 @@
       .projects-section { padding: 40px 20px; }
       .project-grid { grid-template-columns: 1fr; }
       .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .sub-gallery.active { padding: 0 20px 48px; }
+      .sub-gallery-title h2 { font-size: 17px; }
       .search-results-dropdown { width: calc(100vw - 40px); right: 0; left: auto; }
       .nav-search-input.open { width: 160px; }
       .footer { flex-direction: column; height: auto; padding: 20px 24px; gap: 12px; align-items: flex-start; }

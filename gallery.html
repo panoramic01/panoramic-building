@@ -389,7 +389,9 @@
       .nav-links .btn-nav { margin: 16px 24px 8px; padding: 12px 24px; text-align: center; }
       .nav-toggle { display: flex; }
       .page-header { padding: 40px 24px 32px; }
-      .tab-btn { padding: 14px 16px; font-size: 10px; letter-spacing: 1px; }
+      .tab-bar { justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tab-bar::-webkit-scrollbar { display: none; }
+      .tab-btn { padding: 14px 16px; font-size: 10px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
       .tab-panel { padding: 40px 20px; }
       .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .project-grid { grid-template-columns: 1fr; }
