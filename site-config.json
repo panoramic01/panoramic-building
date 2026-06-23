@@ -69,17 +69,6 @@
       "year": 2026,
       "featured": false
     },
-    "4th-main": {
-      "name": "4th + Main",
-      "location": "Bountiful, UT",
-      "description": "",
-      "stats": {
-        "units": 24,
-        "sqft": 19530,
-        "buildings": 2
-      },
-      "materials": []
-    },
     "altura": {
       "name": "Altura Apartments",
       "location": "Logan, UT",
@@ -97,6 +86,17 @@
         "Dryvit Stucco"
       ],
       "featured": false
+    },
+    "4th-main": {
+      "name": "4th + Main",
+      "location": "Bountiful, UT",
+      "description": "",
+      "stats": {
+        "units": 24,
+        "sqft": 19530,
+        "buildings": 2
+      },
+      "materials": []
     },
     "the-crossing": {
       "name": "The Crossing",
