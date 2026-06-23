@@ -58,7 +58,14 @@
         "sqft": 276060,
         "buildings": 17
       },
-      "materials": [],
+      "materials": [
+        "LP 8\" Lap Expert Finish",
+        "LP Panel B&B Expert Finish",
+        "LP SmartSide 8\" Lap",
+        "Dutch Quality Weather Ledge Winter Point",
+        "Mastic Dark Bronze Soffit",
+        "Mastic Dark Bronze Fascia"
+      ],
       "year": 2026,
       "featured": false
     },
