@@ -29,8 +29,10 @@
     ]
   },
   "reserve/lowell": {
-    "cover": null,
-    "photos": []
+    "cover": "assets/reserve/lowell/aidan-low.jpg",
+    "photos": [
+      "assets/reserve/lowell/aidan-low.jpg"
+    ]
   },
   "reserve/blacktail": {
     "cover": null,
