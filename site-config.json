@@ -191,10 +191,11 @@
       "materials": []
     },
     "job-name-1": {
-      "name": "Job Name 1",
-      "location": "",
+      "name": "Spencer",
+      "location": "Smithfield, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-2": {
       "name": "Job Name 2",
