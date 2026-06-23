@@ -141,8 +141,10 @@
     ]
   },
   "custom/pena-lloyd": {
-    "cover": null,
-    "photos": [],
+    "cover": "assets/custom/pena-lloyd/aidan-293.jpg",
+    "photos": [
+      "assets/custom/pena-lloyd/aidan-293.jpg"
+    ],
     "location": "Logan, UT"
   }
 }
