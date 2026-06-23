@@ -185,6 +185,12 @@
       "location": "",
       "description": "",
       "materials": []
+    },
+    "job-name-2": {
+      "name": "Job Name 2",
+      "location": "",
+      "description": "",
+      "materials": []
     }
   },
   "production": {
