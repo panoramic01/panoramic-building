@@ -171,6 +171,12 @@
         "buildings": 0
       },
       "materials": []
+    },
+    "job-name": {
+      "name": "Job Name",
+      "location": "Logan, UT",
+      "description": "",
+      "materials": []
     }
   },
   "custom": {
