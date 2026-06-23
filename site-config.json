@@ -69,23 +69,6 @@
       "year": 2026,
       "featured": false
     },
-    "the-crossing": {
-      "name": "The Crossing",
-      "location": "Woods Cross, UT",
-      "description": "",
-      "stats": {
-        "units": 22,
-        "sqft": 34120,
-        "buildings": 5
-      },
-      "materials": [
-        "LP SmartSide 8\" Lap",
-        "LP NickelGap",
-        "Interstate Smokey Mountain Mod",
-        "Interstate Coal King",
-        "Smooth Hardie Panel"
-      ]
-    },
     "altura": {
       "name": "Altura Apartments",
       "location": "Logan, UT",
@@ -103,6 +86,23 @@
         "Dryvit Stucco"
       ],
       "featured": false
+    },
+    "the-crossing": {
+      "name": "The Crossing",
+      "location": "Woods Cross, UT",
+      "description": "",
+      "stats": {
+        "units": 22,
+        "sqft": 34120,
+        "buildings": 5
+      },
+      "materials": [
+        "LP SmartSide 8\" Lap",
+        "LP NickelGap",
+        "Interstate Smokey Mountain Mod",
+        "Interstate Coal King",
+        "Smooth Hardie Panel"
+      ]
     },
     "4th-main": {
       "name": "4th + Main",
