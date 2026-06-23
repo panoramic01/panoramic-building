@@ -67,8 +67,10 @@
     ]
   },
   "reserve/baker": {
-    "cover": null,
-    "photos": []
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg"
+    ]
   },
   "multifamily/orchard-grove": {
     "cover": "assets/multifamily/orchard-grove/cover.jpg",
