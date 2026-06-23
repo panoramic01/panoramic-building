@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panoramic Reserve | Premium Custom Home Exteriors | Utah & Idaho</title>
   <meta name="description" content="Panoramic Reserve is Panoramic Building LLC's premium custom home exterior program. Architectural siding, masonry, stucco, and full exterior packages for high-end custom builds in Northern Utah & Southern Idaho." />
@@ -736,50 +737,4 @@
     var _ENC = [
       { label: 'PO Manager',            d: 'SE1UgOiUGCv5ak/7NgxpAwut2BZXWzzFSegUIdVGDN+2WFBUZsEHvrzsyBHNwgvt1v1gBUN70EOYlhu5v7SI6b4v/Eon' },
       { label: 'Material Request',      d: 'GZ+uaXVLA15n7Yiu7zet5ttJjXC5GL7sM0NH23uSB5AtAozDaubJsQ5tQpqEJN7Xb63f1lsbT2K3eEHq89ztBqQJspBRVgfuQCWvyCWsp6NXYm6qFWduXcENvGIn0S0=' },
-      { label: 'Job Clean Up',          d: 'Up1RhMnYlCcy184eH8/x3izaSlz0ikdNxA60KPESy6KRccbxGglx5siFSF0sxuwox+loLTJsEJlaRre9o6M75uKa41rslYuhZJBVPxCPWYTZ5SR9KbqiISbtmz8CdDw=' },
-      { label: 'New Exterior Project',  d: 'RVJvw3YkPB8jN/zogiKvQtidsHH0/sHBBWuVR8sGypD3z+1qqYExsfZXqxIfU6BbjNVK2zn2aXeklcaCRhB49dhcsij14FoAMekVxLyzMWEdz37cgFUC0TEVgFQ046g=' },
-      { label: 'Site Admin',             d: 'gAiHw0xn6yDNvHc69f4E0mns+SuZXhoBBew2uUZ1f7l5Z3Xd4aE=' }
-    ];
-    async function _dec(b64, keyHex) {
-      var raw = Uint8Array.from(atob(b64), function(c){return c.charCodeAt(0);});
-      var iv = raw.slice(0,12), body = raw.slice(12);
-      var kb = Uint8Array.from(keyHex.match(/.{2}/g).map(function(b){return parseInt(b,16);}));
-      var k = await crypto.subtle.importKey('raw', kb, {name:'AES-GCM'}, false, ['decrypt']);
-      var dec = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, k, body);
-      return new TextDecoder().decode(dec);
-    }
-    function toggleAdminPanel() {
-      var dd = document.getElementById('admin-dropdown');
-      var btn = document.getElementById('nav-admin-btn');
-      var isOpen = dd.style.display !== 'none';
-      if (isOpen) { dd.style.display = 'none'; btn.classList.remove('active'); }
-      else { dd.style.display = 'block'; btn.classList.add('active'); renderAdminDropdown(); setTimeout(function(){ var i=document.getElementById('admin-pw-input'); if(i)i.focus(); }, 60); }
-    }
-    function renderAdminDropdown() {
-      var dd = document.getElementById('admin-dropdown');
-      if (sessionStorage.getItem('pb_admin') === '1') {
-        dd.innerHTML = '<div class="admin-dropdown-header"><span class="admin-dropdown-title">Team</span><button class="admin-logout" onclick="adminLogout()">Log out</button></div><div class="admin-links" id="admin-links-inner"><div class="admin-no-links">Loading…</div></div><div class="admin-tip">📱 To add to home screen: open on phone → tap ⋮ → <strong>Add to Home Screen</strong></div>';
-        var stored = sessionStorage.getItem('pb_links');
-        if (stored) { document.getElementById('admin-links-inner').innerHTML = stored; return; }
-        var keyHex = sessionStorage.getItem('pb_k');
-        if (!keyHex) return;
-        Promise.all(_ENC.map(function(item){ return _dec(item.d, keyHex).then(function(url){ return '<a class="admin-link-item" href="'+url+'" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 12h8M8 8h5M8 16h4"/></svg>'+item.label+'</a>'; }); })).then(function(items){ var html=items.join(''); document.getElementById('admin-links-inner').innerHTML=html; sessionStorage.setItem('pb_links',html); });
-      } else {
-        dd.innerHTML = '<div class="admin-password-form"><span class="admin-password-label">Team Login</span><input class="admin-password-input" id="admin-pw-input" type="password" placeholder="Password" onkeydown="if(event.key===\'Enter\')checkAdminPw()" /><button class="admin-password-btn" onclick="checkAdminPw()">Enter</button><div class="admin-password-error" id="admin-pw-error">Incorrect password</div></div>';
-      }
-    }
-    async function checkAdminPw() {
-      var v = document.getElementById('admin-pw-input').value;
-      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
-      var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-      if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k',hash); renderAdminDropdown(); }
-      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
-    }
-    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    document.addEventListener('click', function(e) {
-      var w = document.getElementById('nav-admin-wrap');
-      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    });
-  </script>
-</body>
-</html>
+      { label: 'Job Clean Up',          d: 'Up1RhMnYlCcy184eH8/x3izaSl

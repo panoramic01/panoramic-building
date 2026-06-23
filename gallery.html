@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gallery | Panoramic Building LLC</title>
   <meta name="description" content="Project gallery for Panoramic Building LLC — multifamily, custom homes, production homes, and detail work across Northern Utah and Southern Idaho." />
@@ -876,20 +877,38 @@
       if (overlay) overlay.style.display = 'flex';
     }
 
-    fetch('gallery-manifest.json')
-      .then(function(r) { return r.json(); })
-      .then(function(manifest) {
-        Object.keys(gridMap).forEach(function(key) {
-          var entry = manifest[key];
-          if (!entry) return;
-          // Support both old format (array) and new format ({cover, photos})
-          var photos = Array.isArray(entry) ? entry : entry.photos;
-          var cover = Array.isArray(entry) ? null : entry.cover;
-          populateGrid(gridMap[key], photos);
-          if (coverMap[key]) setCoverImage(coverMap[key], cover);
-        });
-      })
-      .catch(function(e) { console.warn('Could not load gallery manifest', e); });
+    Promise.all([
+      fetch('gallery-manifest.json?v=' + Date.now()).then(function(r) { return r.json(); }),
+      fetch('site-config.json?v=' + Date.now()).then(function(r) { return r.json(); })
+    ]).then(function(results) {
+      var manifest = results[0];
+      var cfg      = results[1];
+      // Populate grids from manifest
+      Object.keys(gridMap).forEach(function(key) {
+        var entry = manifest[key];
+        if (!entry) return;
+        var photos = Array.isArray(entry) ? entry : entry.photos;
+        var cover  = Array.isArray(entry) ? null : entry.cover;
+        populateGrid(gridMap[key], photos);
+        if (coverMap[key]) setCoverImage(coverMap[key], cover);
+      });
+      // Update util-bar from site-config
+      var site = cfg._site || {};
+      var bar  = document.querySelector('.util-bar');
+      if (bar && site) {
+        var p  = site.phone    || '3852895872';
+        var pf = site.phoneFmt || p;
+        var e  = site.email    || 'info@panoramicbuildingllc.com';
+        var a  = site.serviceArea || 'Serving Northern Utah &nbsp;&#183;&nbsp; Southern Idaho &nbsp;&#183;&nbsp; Wasatch Front';
+        bar.innerHTML =
+          '<span>' + a + '</span>' +
+          '<span class="util-right">' +
+            '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
+            ' &nbsp;&nbsp; ' +
+            '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
+          '</span>';
+      }
+    }).catch(function(e) { console.warn('Could not load gallery manifest', e); });
 
     // ── Lightbox ──
     let lightboxImages = [];
@@ -1044,29 +1063,4 @@
       }
     });
 
-    // Reset touch zoom when changing images or closing
-    var origResetZoom = resetZoom;
-    resetZoom = function() {
-      origResetZoom();
-      currentScale = 1;
-      touchPanX = 0;
-      touchPanY = 0;
-    };
-    function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('open');
-      document.body.style.overflow = '';
-      resetZoom();
-    }
-    function closeLightboxOutside(e) {
-      if (e.target === document.getElementById('lightbox')) closeLightbox();
-    }
-    document.addEventListener('keydown', function(e) {
-      if (!document.getElementById('lightbox').classList.contains('open')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') { resetZoom(); lightboxNav(-1); }
-      if (e.key === 'ArrowRight') { resetZoom(); lightboxNav(1); }
-    });
-  </script>
-
-</body>
-</html>
+    // Reset tou
