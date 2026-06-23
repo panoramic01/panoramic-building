@@ -103,6 +103,15 @@
     .proj-add svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
     .proj-add span { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
 
+    /* ── Drag reorder ─────────────────────────────────────────────── */
+    .proj-card { position: relative; }
+    .proj-drag-handle { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; background: rgba(0,0,0,0.48); border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: grab; opacity: 0; transition: opacity 0.15s; z-index: 5; }
+    .proj-drag-handle:active { cursor: grabbing; }
+    .proj-card:hover .proj-drag-handle { opacity: 1; }
+    .proj-card.dragging { opacity: 0.3; box-shadow: none; }
+    .proj-card.drag-over { box-shadow: inset 0 0 0 2px #1F3971 !important; }
+    .drag-hint { font-size: 11px; color: #A2A092; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+
     /* ── Project detail ───────────────────────────────────────────── */
     .back-btn { background: none; border: none; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; color: #1F3971; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; padding: 0; margin-bottom: 22px; }
     .back-btn:hover { color: #163060; }
@@ -781,12 +790,16 @@
     const filtered = currentCat === 'all' ? slugs : slugs.filter(s=>catOf(s)===currentCat);
     const label = currentCat === 'all' ? 'All Projects' : CAT_LABELS[currentCat];
 
+    const canReorder = currentCat !== 'all' && filtered.length > 1;
+    const DRAG_DOTS = `<svg viewBox="0 0 10 14" width="10" height="14" fill="rgba(255,255,255,0.9)"><circle cx="3" cy="2" r="1.2"/><circle cx="7" cy="2" r="1.2"/><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="3" cy="12" r="1.2"/><circle cx="7" cy="12" r="1.2"/></svg>`;
+
     let cards = filtered.map(slug => {
       const e = manifest[slug] || {};
       const photos = e.photos || [];
       const cover = e.cover;
       const cat = catOf(slug);
-      return `<div class="proj-card" onclick="openProject('${escH(slug)}')">
+      return `<div class="proj-card" data-slug="${escH(slug)}"${canReorder ? '' : ` onclick="openProject('${escH(slug)}')"`}>
+        ${canReorder ? `<div class="proj-drag-handle" title="Drag to reorder">${DRAG_DOTS}</div>` : ''}
         <div class="proj-cover">${cover
           ? `<img src="${escH(cover)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=proj-cover-ph>No Cover</div>'" />`
           : '<div class="proj-cover-ph">No Cover</div>'}</div>
@@ -811,6 +824,7 @@
           Add Project
         </button>
       </div>
+      ${canReorder ? `<div class="drag-hint">${DRAG_DOTS.replace('rgba(255,255,255,0.9)','#A2A092').replace('width="10" height="14"','width="8" height="11"')} Drag the grid icon on any card to reorder</div>` : ''}
       <div class="project-grid">
         ${cards}
         <div class="proj-add" onclick="openAddModal()">
@@ -818,6 +832,101 @@
           <span>New Project</span>
         </div>
       </div>`;
+
+    if (canReorder) setupProjectDragDrop(document.querySelector('.project-grid'));
+  }
+
+  // ── Drag-to-reorder ────────────────────────────────────────────────
+  function setupProjectDragDrop(grid) {
+    let dragSrc = null;
+    let clickBlocked = false;
+
+    grid.querySelectorAll('.proj-card[data-slug]').forEach(card => {
+      const handle = card.querySelector('.proj-drag-handle');
+
+      // Click handler — open project unless a drag just happened
+      card.addEventListener('click', () => {
+        if (!clickBlocked) openProject(card.dataset.slug);
+      });
+
+      // Only allow drag to start from the handle
+      handle.addEventListener('mousedown', () => card.setAttribute('draggable', 'true'));
+      card.addEventListener('mouseup',    () => card.setAttribute('draggable', 'false'));
+
+      card.addEventListener('dragstart', e => {
+        if (card.getAttribute('draggable') !== 'true') { e.preventDefault(); return; }
+        dragSrc = card;
+        clickBlocked = true;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', card.dataset.slug);
+        setTimeout(() => card.classList.add('dragging'), 0);
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        card.setAttribute('draggable', 'false');
+        grid.querySelectorAll('.proj-card').forEach(c => c.classList.remove('drag-over'));
+        setTimeout(() => { clickBlocked = false; }, 80);
+      });
+
+      card.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (card !== dragSrc) {
+          grid.querySelectorAll('.proj-card[data-slug]').forEach(c => c.classList.remove('drag-over'));
+          card.classList.add('drag-over');
+        }
+      });
+
+      card.addEventListener('dragleave', e => {
+        if (!card.contains(e.relatedTarget)) card.classList.remove('drag-over');
+      });
+
+      card.addEventListener('drop', e => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        if (!dragSrc || dragSrc === card) return;
+        const allCards = [...grid.querySelectorAll('.proj-card[data-slug]')];
+        const srcIdx  = allCards.indexOf(dragSrc);
+        const tgtIdx  = allCards.indexOf(card);
+        if (srcIdx < tgtIdx) card.after(dragSrc); else card.before(dragSrc);
+        saveProjectOrder(grid);
+      });
+    });
+  }
+
+  async function saveProjectOrder(grid) {
+    const newSlugs = [...grid.querySelectorAll('.proj-card[data-slug]')].map(c => c.dataset.slug);
+    if (!newSlugs.length) return;
+    const cat = catOf(newSlugs[0]);
+
+    // Rebuild manifest: preserve non-cat entries in their original order, then place cat entries in new order
+    const oldManifest = { ...manifest };
+    const newManifest = {};
+    Object.keys(oldManifest).forEach(s => { if (catOf(s) !== cat) newManifest[s] = oldManifest[s]; });
+    newSlugs.forEach(s => { newManifest[s] = oldManifest[s]; });
+    manifest = newManifest;
+
+    // Rebuild siteConfig category with new key order
+    if (cat !== 'production') {
+      const oldCat = { ...siteConfig[cat] };
+      const newCat = {};
+      newSlugs.forEach(s => {
+        const id = s.split('/').slice(1).join('/') || s;
+        if (id in oldCat) newCat[id] = oldCat[id];
+      });
+      // Safety: keep any entries not covered by newSlugs
+      Object.keys(oldCat).forEach(id => { if (!(id in newCat)) newCat[id] = oldCat[id]; });
+      siteConfig[cat] = newCat;
+    }
+
+    try {
+      toast('Saving order…');
+      await Promise.all([saveManifest('Reorder projects'), saveSiteConfig('Reorder projects')]);
+      toast('Order saved!');
+    } catch(e) {
+      toast('Save failed: ' + e.message, 'error');
+    }
   }
 
   // ── Project detail ─────────────────────────────────────────────────
