@@ -201,11 +201,20 @@
     .mat-chip { display: inline-flex; align-items: center; gap: 6px; background: #eef2fb; color: #1F3971; font-size: 11px; letter-spacing: 0.5px; padding: 4px 10px; }
     .mat-chip-del { background: none; border: none; cursor: pointer; color: #1F3971; font-size: 16px; line-height: 1; padding: 0; display: flex; align-items: center; opacity: 0.6; }
     .mat-chip-del:hover { opacity: 1; }
-    .mat-add-row { display: flex; gap: 8px; }
-    .mat-add-input { flex: 1; border: 1px solid #D1D0CB; padding: 8px 12px; font-size: 12px; font-family: inherit; color: #2E2E2E; outline: none; }
+    .mat-add-row { display: flex; gap: 8px; position: relative; }
+    .mat-add-wrap { flex: 1; position: relative; }
+    .mat-add-input { width: 100%; border: 1px solid #D1D0CB; padding: 8px 12px; font-size: 12px; font-family: inherit; color: #2E2E2E; outline: none; }
     .mat-add-input:focus { border-color: #1F3971; }
     .mat-add-btn { background: #1F3971; color: #fff; border: none; padding: 8px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: background 0.2s; white-space: nowrap; }
     .mat-add-btn:hover { background: #163060; }
+    .mat-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #D1D0CB; border-top: 2px solid #1F3971; z-index: 50; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .mat-dropdown.open { display: block; }
+    .mat-dropdown-item { padding: 8px 12px; font-size: 12px; color: #2E2E2E; cursor: pointer; border-bottom: 1px solid #f0efe9; display: flex; align-items: center; gap: 8px; }
+    .mat-dropdown-item:last-child { border-bottom: none; }
+    .mat-dropdown-item:hover, .mat-dropdown-item.focused { background: #f0f4ff; color: #1F3971; }
+    .mat-dropdown-item svg { flex-shrink: 0; opacity: 0.4; }
+    .mat-dropdown-empty { padding: 10px 12px; font-size: 11px; color: #A2A092; letter-spacing: 0.5px; }
+    .mat-dropdown-hint { padding: 6px 12px 8px; font-size: 10px; color: #A2A092; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #f0efe9; }
 
     /* ── Drag-to-reorder ─────────────────────────────────────────── */
     .photo-card[draggable="true"] { cursor: grab; }
@@ -911,7 +920,10 @@
             <label class="form-lbl">Materials</label>
             <div class="mat-chips" id="mat-chips">${chipHtml}</div>
             <div class="mat-add-row">
-              <input class="mat-add-input" id="mat-add-input" type="text" placeholder='e.g. LP SmartSide 8" Lap' />
+              <div class="mat-add-wrap">
+                <input class="mat-add-input" id="mat-add-input" type="text" placeholder='Type or pick from existing…' autocomplete="off" />
+                <div class="mat-dropdown" id="mat-dropdown"></div>
+              </div>
               <button class="mat-add-btn" onclick="addMaterial()">Add</button>
             </div>
           </div>
@@ -931,8 +943,7 @@
     if (activeTab === 'photos') {
       setupDrop();
     } else {
-      const matInput = document.getElementById('mat-add-input');
-      if (matInput) matInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); addMaterial(); } });
+      setupMatInput();
     }
     document.getElementById('file-input').value = '';
   }
@@ -947,8 +958,7 @@
     if (name === 'photos') {
       setupDrop();
     } else {
-      const matInput = document.getElementById('mat-add-input');
-      if (matInput) matInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addMaterial(); } });
+      setupMatInput();
     }
   }
 
@@ -1552,13 +1562,92 @@
     }
   }
 
+  // ── Materials library ──────────────────────────────────────────────
+  function getAllMaterials() {
+    const seen = new Set();
+    const mats = [];
+    function scan(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      if (Array.isArray(obj.materials)) {
+        obj.materials.forEach(m => { if (m && !seen.has(m)) { seen.add(m); mats.push(m); } });
+      }
+      Object.values(obj).forEach(v => { if (v && typeof v === 'object' && !Array.isArray(v)) scan(v); });
+    }
+    if (siteConfig) scan(siteConfig);
+    return mats.sort((a, b) => a.localeCompare(b));
+  }
+
+  let matDropdownFocusIdx = -1;
+
+  function setupMatInput() {
+    const input = document.getElementById('mat-add-input');
+    const drop  = document.getElementById('mat-dropdown');
+    if (!input || !drop) return;
+
+    input.addEventListener('keydown', e => {
+      const items = drop.querySelectorAll('.mat-dropdown-item');
+      if (e.key === 'Enter')  { e.preventDefault(); if (matDropdownFocusIdx >= 0 && items[matDropdownFocusIdx]) { pickMaterial(items[matDropdownFocusIdx].dataset.val); } else { addMaterial(); } return; }
+      if (e.key === 'Escape') { hideMatDropdown(); return; }
+      if (e.key === 'ArrowDown')  { e.preventDefault(); matDropdownFocusIdx = Math.min(matDropdownFocusIdx + 1, items.length - 1); highlightDropItem(items); return; }
+      if (e.key === 'ArrowUp')    { e.preventDefault(); matDropdownFocusIdx = Math.max(matDropdownFocusIdx - 1, -1); highlightDropItem(items); return; }
+    });
+
+    input.addEventListener('input', () => { matDropdownFocusIdx = -1; renderMatDropdown(input.value.trim()); });
+    input.addEventListener('focus', () => { matDropdownFocusIdx = -1; renderMatDropdown(input.value.trim()); });
+    input.addEventListener('blur',  () => { setTimeout(hideMatDropdown, 150); });
+  }
+
+  function highlightDropItem(items) {
+    items.forEach((el, i) => el.classList.toggle('focused', i === matDropdownFocusIdx));
+    if (matDropdownFocusIdx >= 0 && items[matDropdownFocusIdx]) items[matDropdownFocusIdx].scrollIntoView({ block: 'nearest' });
+  }
+
+  function renderMatDropdown(query) {
+    const drop = document.getElementById('mat-dropdown');
+    if (!drop) return;
+    const all = getAllMaterials().filter(m => !contentMaterials.includes(m));
+    const filtered = query ? all.filter(m => m.toLowerCase().includes(query.toLowerCase())) : all;
+
+    if (!filtered.length) {
+      drop.innerHTML = all.length
+        ? `<div class="mat-dropdown-empty">No match — press Add to create "${escH(query)}"</div>`
+        : `<div class="mat-dropdown-empty">No materials used yet — type one and press Add</div>`;
+    } else {
+      const hintHtml = `<div class="mat-dropdown-hint">Previously used</div>`;
+      const itemsHtml = filtered.map(m =>
+        `<div class="mat-dropdown-item" data-val="${escH(m)}" onmousedown="pickMaterial('${escH(m.replace(/'/g,"\\'"))}')">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 8 6 12 14 4"/></svg>
+          ${escH(m)}
+        </div>`
+      ).join('');
+      drop.innerHTML = hintHtml + itemsHtml;
+    }
+    drop.classList.add('open');
+  }
+
+  function hideMatDropdown() {
+    const drop = document.getElementById('mat-dropdown');
+    if (drop) { drop.classList.remove('open'); drop.innerHTML = ''; }
+    matDropdownFocusIdx = -1;
+  }
+
+  function pickMaterial(val) {
+    if (!val || contentMaterials.includes(val)) return;
+    contentMaterials.push(val);
+    const input = document.getElementById('mat-add-input');
+    if (input) { input.value = ''; input.focus(); }
+    hideMatDropdown();
+    refreshChips();
+  }
+
   function addMaterial() {
     const input = document.getElementById('mat-add-input');
     if (!input) return;
     const val = input.value.trim();
-    if (!val) return;
+    if (!val || contentMaterials.includes(val)) { if (!val) return; input.value = ''; return; }
     contentMaterials.push(val);
     input.value = '';
+    hideMatDropdown();
     refreshChips();
     input.focus();
   }
