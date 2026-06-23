@@ -82,7 +82,14 @@
         "sqft": 141369,
         "buildings": 8
       },
-      "materials": []
+      "materials": [
+        "LP Panel B&B Expert Finish",
+        "LP 8\" Lap Expert Finish",
+        "LP SmartSide 8\" Lap",
+        "Eldorado Loire Valley Rough Cut",
+        "Dryvit Stucco"
+      ],
+      "featured": false
     },
     "the-crossing": {
       "name": "The Crossing",
