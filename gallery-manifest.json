@@ -45,8 +45,10 @@
     "photos": []
   },
   "reserve/roberts": {
-    "cover": null,
-    "photos": []
+    "cover": "assets/reserve/roberts/aidan-rob.jpg",
+    "photos": [
+      "assets/reserve/roberts/aidan-rob.jpg"
+    ]
   },
   "reserve/baker": {
     "cover": null,
