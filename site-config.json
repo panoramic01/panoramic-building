@@ -233,34 +233,39 @@
       "featured": false
     },
     "job-name-7": {
-      "name": "Job Name 7",
-      "location": "",
+      "name": "Twitchell",
+      "location": "Cove, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-8": {
-      "name": "Job Name 8",
-      "location": "",
+      "name": "Anderson",
+      "location": "Providence, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-9": {
-      "name": "Job Name 9",
-      "location": "",
+      "name": "Heath",
+      "location": "Smithfield, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-10": {
-      "name": "Job Name 10",
-      "location": "",
+      "name": "Anderson",
+      "location": "Hyrum, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-11": {
-      "name": "Job Name 11",
-      "location": "",
+      "name": "ME42",
+      "location": "North Logan, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     }
   },
   "production": {
