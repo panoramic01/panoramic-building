@@ -982,19 +982,19 @@
 
       try {
         fill(id, 20);
-        const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-        const base = slugify(file.name.replace(/\.[^.]+$/,''));
-        const filename = base + '.' + ext;
-        const repoPath = `assets/${currentSlug}/${filename}`;
-        const content  = await fileToBase64(file);
-        fill(id, 55);
-        const sha = await getFileSha(repoPath);
-        const body = { message: `Upload ${filename} to ${currentSlug}`, content, branch: cfg.branch };
-        if (sha) body.sha = sha;
-        await ghApi('PUT', repoPath, body);
+        // Upload directly to Cloudinary
+        const folder   = 'panoramic-building/' + currentSlug;
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'panoramic_unsigned');
+        formData.append('folder', folder);
+        fill(id, 50);
+        const res  = await fetch('https://api.cloudinary.com/v1_1/ddbkmw2g0/image/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error?.message || 'Cloudinary upload failed');
         fill(id, 100);
         setStatus(id, 'Done', 'done');
-        uploaded.push(repoPath);
+        uploaded.push(data.secure_url);
       } catch(e) {
         setStatus(id, 'Failed', 'error');
         toast(`Failed: ${file.name} — ${e.message}`, 'error');
