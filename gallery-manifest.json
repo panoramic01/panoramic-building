@@ -139,5 +139,10 @@
       "assets/multifamily/altura-apartments/aidan_ALT-11.jpg",
       "assets/multifamily/altura-apartments/aidan_ALT-12.jpg"
     ]
+  },
+  "custom/pena-lloyd": {
+    "cover": null,
+    "photos": [],
+    "location": "Logan, UT"
   }
 }
