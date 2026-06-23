@@ -54,11 +54,13 @@
       "location": "Idaho Falls, ID",
       "description": "",
       "stats": {
-        "units": 0,
-        "sqft": 0,
-        "buildings": 0
+        "units": 336,
+        "sqft": 276060,
+        "buildings": 17
       },
-      "materials": []
+      "materials": [],
+      "year": 2026,
+      "featured": false
     },
     "4th-main": {
       "name": "4th + Main",
