@@ -162,13 +162,10 @@
     },
     "roberts": {
       "name": "Roberts",
-      "location": "",
+      "location": "St Charles, ID",
       "description": "",
-      "stats": {
-        "sqft": 0,
-        "buildings": 0
-      },
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "baker": {
       "name": "Baker",
