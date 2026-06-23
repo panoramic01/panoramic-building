@@ -595,7 +595,7 @@
       manifestSha = r.content.sha;
     } catch(e) {
       // SHA mismatch — someone edited the file externally. Re-fetch SHA and retry once.
-      if (e.message && (e.message.includes('does not match') || e.message.includes('409') || e.message.includes('conflict'))) {
+      if (e.message && (e.message.includes('does not match') || e.message.includes('409') || e.message.includes('conflict') || e.message.includes('is at') || e.message.includes('but expected'))) {
         const fresh = await ghApi('GET', `${MANIFEST_PATH}?ref=${cfg.branch}`);
         manifestSha = fresh.sha;
         const r2 = await ghApi('PUT', MANIFEST_PATH, { message: msg, content: encoded, sha: manifestSha, branch: cfg.branch });
@@ -868,10 +868,13 @@
             </div>
           </div>
           ${yearFeaturedHtml}
-          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
+          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;align-items:center;justify-content:space-between;">
             <button class="btn-primary" id="ce-save-btn" onclick="saveContentProject()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Save Changes
+            </button>
+            <button onclick="deleteProject()" style="background:none;border:1px solid #e0b4b4;color:#c0392b;padding:8px 16px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='#fdf0f0'" onmouseout="this.style.background='none'">
+              Delete Project
             </button>
           </div>
         </div>
@@ -1317,7 +1320,7 @@
       const r = await ghApi('PUT', CONFIG_PATH, body);
       siteConfigSha = r.content.sha;
     } catch(e) {
-      if (e.message && (e.message.includes('does not match') || e.message.includes('409') || e.message.includes('conflict'))) {
+      if (e.message && (e.message.includes('does not match') || e.message.includes('409') || e.message.includes('conflict') || e.message.includes('is at') || e.message.includes('but expected'))) {
         const fresh = await ghApi('GET', `${CONFIG_PATH}?ref=${cfg.branch}`);
         siteConfigSha = fresh.sha;
         body.sha = siteConfigSha;
@@ -1521,104 +1524,4 @@
     const el = document.getElementById('mat-chips');
     if (!el) return;
     el.innerHTML = contentMaterials.map((m, i) =>
-      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMaterial(${i})" title="Remove">×</button></div>`
-    ).join('');
-  }
-
-  async function saveContentProject() {
-    const btn = document.getElementById('ce-save-btn');
-    if (!btn) return;
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
-
-    const oldCat       = contentCat;
-    const isProduction = oldCat === 'production';
-    const id           = contentSlug;
-
-    try {
-      if (isProduction) {
-        if (!siteConfig.production) siteConfig.production = {};
-        const descEl = document.getElementById('ce-description');
-        siteConfig.production.description = descEl ? descEl.value.trim() : '';
-        siteConfig.production.materials   = [...contentMaterials];
-        await saveSiteConfig('Update production content');
-
-      } else {
-        const catEl      = document.getElementById('ce-category');
-        const nameEl     = document.getElementById('ce-name');
-        const locationEl = document.getElementById('ce-location');
-        const descEl     = document.getElementById('ce-description');
-        const newCat     = catEl ? catEl.value : oldCat;
-
-        const proj = Object.assign({}, (siteConfig[oldCat] || {})[id] || {});
-        if (nameEl)     proj.name        = nameEl.value.trim();
-        if (locationEl) proj.location    = locationEl.value.trim();
-        if (descEl)     proj.description = descEl.value.trim();
-        proj.materials = [...contentMaterials];
-
-        const yearEl     = document.getElementById('ce-year');
-        const featuredEl = document.getElementById('ce-featured');
-        const yearVal    = yearEl ? parseInt(yearEl.value) : 0;
-        if (yearVal >= 2000 && yearVal <= 2099) proj.year = yearVal;
-        else delete proj.year;
-        proj.featured = featuredEl ? featuredEl.checked : false;
-
-        if (newCat === 'multifamily') {
-          const unitsEl     = document.getElementById('ce-units');
-          const sqftEl      = document.getElementById('ce-sqft');
-          const buildingsEl = document.getElementById('ce-buildings');
-          proj.stats = {
-            units:     parseInt(unitsEl     ? unitsEl.value     : 0) || 0,
-            sqft:      parseInt(sqftEl      ? sqftEl.value      : 0) || 0,
-            buildings: parseInt(buildingsEl ? buildingsEl.value : 0) || 0
-          };
-        } else {
-          delete proj.stats;
-        }
-
-        const catChanged = newCat !== oldCat;
-
-        if (catChanged) {
-          if (siteConfig[oldCat]) delete siteConfig[oldCat][id];
-          if (!siteConfig[newCat]) siteConfig[newCat] = {};
-          siteConfig[newCat][id] = proj;
-
-          const oldManifestKey = oldCat + '/' + id;
-          const newManifestKey = newCat + '/' + id;
-          if (manifest[oldManifestKey] !== undefined) {
-            manifest[newManifestKey] = manifest[oldManifestKey];
-            delete manifest[oldManifestKey];
-          }
-
-          await Promise.all([
-            saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`),
-            saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
-          ]);
-
-          contentCat  = newCat;
-          currentSlug = newManifestKey;
-
-        } else {
-          if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
-          siteConfig[oldCat][id] = proj;
-          await saveSiteConfig(`Update content: ${oldCat}/${id}`);
-        }
-      }
-
-      toast('Saved', 'success');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
-      setTimeout(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
-        }
-      }, 2500);
-    } catch(e) {
-      toast('Save failed: ' + e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = 'Save Changes';
-    }
-  }
-</script>
-</body>
-</html>
+      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMateria
