@@ -240,9 +240,11 @@
     <div class="bid-form-wrap">
       <p class="required-note"><span>*</span> Required fields</p>
 
-      <form name="bid-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="bid-form">
-        <input type="hidden" name="form-name" value="bid-request" />
-        <p style="display:none;"><input name="bot-field" /></p>
+      <form id="bid-form">
+        <input type="hidden" name="access_key" value="5e312c0e-30f8-4dba-9477-3ef210cca6ec" />
+        <input type="hidden" name="subject" value="New Bid Request — Panoramic Building LLC" />
+        <input type="hidden" name="from_name" value="Panoramic Building Website" />
+        <input type="checkbox" name="botcheck" style="display:none;" />
 
         <div class="form-row">
           <div class="form-group">
@@ -395,14 +397,34 @@
       btn.setAttribute('aria-expanded', isOpen);
     }
 
-    // Show success message on submit (Netlify handles the actual POST)
     document.getElementById('bid-form').addEventListener('submit', function(e) {
-      var form = this;
-      // Let Netlify handle real submissions; show inline success for JS-enhanced experience
-      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') return;
       e.preventDefault();
-      form.style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+      var form = this;
+      var btn  = form.querySelector('.btn-submit');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      var data = new FormData(form);
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: data
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(result) {
+        if (result.success) {
+          form.style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          btn.textContent = 'Submit Bid Request';
+          btn.disabled = false;
+          alert('Something went wrong. Please try again or call us directly at 385-289-5872.');
+        }
+      })
+      .catch(function() {
+        btn.textContent = 'Submit Bid Request';
+        btn.disabled = false;
+        alert('Something went wrong. Please try again or call us directly at 385-289-5872.');
+      });
     });
   </script>
   <script>
