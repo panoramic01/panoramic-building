@@ -205,10 +205,11 @@
       "featured": false
     },
     "job-name-3": {
-      "name": "Job Name 3",
-      "location": "",
+      "name": "The Boat House",
+      "location": "Petersboro, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-4": {
       "name": "Job Name 4",
