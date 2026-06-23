@@ -238,7 +238,7 @@
 </head>
 <body>
   <div class="accent-top"></div>
-  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:435801208">&#9990; 435-801-208</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
+  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
   <nav class="nav" role="navigation">
     <a class="nav-logo" href="index.html" aria-label="Panoramic Building LLC home">
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -736,11 +736,4 @@
         for (var i = 0; i < _ENC.length; i++) {
           try {
             var url = await _dec(_ENC[i].d, keyHex);
-            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 12h8M8 8h5M8 16h4"/></svg>' + _ENC[i].label + '</a>';
-          } catch(e) {}
-        }
-        var html = '<div class="admin-dropdown-header"><span class="admin-dropdown-title">Team</span><button class="admin-logout" onclick="adminLogout()">Log out</button></div><div class="admin-links">' + linksHtml + '</div><div class="admin-tip">&#128241; To add to home screen: open on phone &#x2192; tap &#x22EE; &#x2192; <strong>Add to Home Screen</strong></div>';
-        dd.innerHTML = html;
-        sessionStorage.setItem('pb_links', html);
-      } else {
-        dd.innerHTML = '<div class="admin-password-form"><span class="admin-password-label">Team Lo
+            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank

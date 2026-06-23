@@ -707,7 +707,7 @@
   <div class="accent-top"></div>
 
   <!-- Utility Bar -->
-  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:435801208">&#9990; 435-801-208</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
+  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
 
   <!-- Navigation -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
@@ -1137,25 +1137,4 @@
     }
     function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
     document.addEventListener('click', function(e) {
-      var w = document.getElementById('nav-admin-wrap');
-      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    });
-  </script>
-  <script>
-    // Load site settings from site-config.json (no coding needed to update)
-    fetch('site-config.json?v=' + Date.now()).then(function(r) { return r.json(); }).then(function(cfg) {
-      var site = cfg._site || {};
-      // Util bar
-      // Rebuild util-bar from scratch so it works even if HTML structure was corrupted
-      var bar = document.querySelector('.util-bar');
-      if (bar) {
-        var p  = site.phone       || '3852895872';
-        var pf = site.phoneFmt    || p;
-        var e  = site.email       || 'info@panoramicbuildingllc.com';
-        var a  = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
-        bar.innerHTML =
-          '<span>' + a + '</span>' +
-          '<span class="util-right">' +
-            '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
-            ' &nbsp;&nbsp; ' +
-            '<a href="mailto:'
+      var w = document.g

@@ -211,7 +211,7 @@
 </head>
 <body>
   <div class="accent-top"></div>
-  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:435801208">&#9990; 435-801-208</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
+  <div class="util-bar">Serving Northern Utah &nbsp;&middot;&nbsp; Southern Idaho &nbsp;&middot;&nbsp; Wasatch Front &nbsp;|&nbsp; <a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;·&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></div>
   <nav class="nav" role="navigation">
     <a class="nav-logo" href="index.html" aria-label="Panoramic Building LLC home">
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -577,14 +577,4 @@
       if (isOpen) { dd.style.display = 'none'; btn.classList.remove('active'); }
       else { dd.style.display = 'block'; btn.classList.add('active'); renderAdminDropdown(); setTimeout(function(){ var i=document.getElementById('admin-pw-input'); if(i)i.focus(); }, 60); }
     }
-    async function renderAdminDropdown() {
-      var dd = document.getElementById('admin-dropdown');
-      if (sessionStorage.getItem('pb_admin') === '1') {
-        var cached = sessionStorage.getItem('pb_links');
-        if (cached) { dd.innerHTML = cached; return; }
-        var keyHex = sessionStorage.getItem('pb_k');
-        var linksHtml = '';
-        for (var i = 0; i < _ENC.length; i++) {
-          try {
-            var url = await _dec(_ENC[i].d, keyHex);
-            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y=
+    async funct
