@@ -236,6 +236,74 @@
 
     /* ── Site Settings ────────────────────────────────────────────── */
     .ss-form { background: #fff; border: 1px solid #e8e7e3; padding: 28px; }
+
+    /* ── Stats Panel ──────────────────────────────────────────────── */
+    .stats-connect-banner { background: #fff; border: 1px solid #e8e7e3; border-top: 3px solid #1F3971; padding: 28px 32px; margin-bottom: 28px; display: flex; align-items: flex-start; gap: 20px; }
+    .stats-connect-icon { width: 44px; height: 44px; background: #eef2fb; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stats-connect-icon svg { color: #1F3971; }
+    .stats-connect-title { font-size: 14px; font-weight: 700; color: #2E2E2E; margin-bottom: 4px; }
+    .stats-connect-sub { font-size: 12px; color: #8A887E; line-height: 1.6; margin-bottom: 14px; }
+    .stats-connect-btn { background: #1F3971; color: #fff; border: none; padding: 9px 20px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: not-allowed; font-family: inherit; opacity: 0.5; display: inline-flex; align-items: center; gap: 8px; }
+    .stats-connect-ids { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .stats-connect-id-field { display: flex; flex-direction: column; gap: 4px; }
+    .stats-connect-id-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #A2A092; }
+    .stats-connect-id-val { font-size: 11px; color: #8A887E; font-family: monospace; background: #f4f3ef; padding: 4px 10px; border: 1px dashed #D1D0CB; }
+
+    .stats-range-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .stats-range-bar h2 { font-size: 15px; font-weight: 700; color: #2E2E2E; letter-spacing: 0.5px; }
+    .stats-range-tabs { display: flex; gap: 0; border: 1px solid #D1D0CB; }
+    .stats-range-tab { background: #fff; border: none; padding: 6px 14px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: inherit; color: #8A887E; border-right: 1px solid #D1D0CB; transition: all 0.15s; }
+    .stats-range-tab:last-child { border-right: none; }
+    .stats-range-tab.active { background: #1F3971; color: #fff; }
+
+    .stats-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stats-kpi { background: #fff; border: 1px solid #e8e7e3; padding: 18px 20px; }
+    .stats-kpi-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; margin-bottom: 8px; }
+    .stats-kpi-val { font-size: 28px; font-weight: 700; color: #2E2E2E; line-height: 1; margin-bottom: 6px; }
+    .stats-kpi-delta { font-size: 11px; color: #27ae60; display: flex; align-items: center; gap: 4px; }
+    .stats-kpi-delta.down { color: #e74c3c; }
+    .stats-kpi-delta.neutral { color: #A2A092; }
+
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .stats-row.single { grid-template-columns: 1fr; }
+    .stats-card { background: #fff; border: 1px solid #e8e7e3; padding: 20px 24px; }
+    .stats-card-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A2A092; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .stats-card-title span { font-size: 9px; color: #D1D0CB; letter-spacing: 1px; }
+    .stats-bar-list { display: flex; flex-direction: column; gap: 10px; }
+    .stats-bar-item { display: flex; flex-direction: column; gap: 4px; }
+    .stats-bar-item-top { display: flex; justify-content: space-between; align-items: center; }
+    .stats-bar-item-label { font-size: 12px; color: #2E2E2E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+    .stats-bar-item-val { font-size: 11px; font-weight: 600; color: #2E2E2E; }
+    .stats-bar-track { height: 4px; background: #f0efe9; border-radius: 2px; }
+    .stats-bar-fill { height: 4px; background: #1F3971; border-radius: 2px; transition: width 0.6s ease; }
+
+    .stats-source-list { display: flex; flex-direction: column; gap: 8px; }
+    .stats-source-item { display: flex; align-items: center; gap: 10px; }
+    .stats-source-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .stats-source-name { font-size: 12px; color: #2E2E2E; flex: 1; }
+    .stats-source-pct { font-size: 11px; font-weight: 600; color: #2E2E2E; }
+    .stats-source-bar-track { flex: 2; height: 4px; background: #f0efe9; border-radius: 2px; }
+    .stats-source-bar-fill { height: 4px; border-radius: 2px; }
+
+    .stats-device-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .stats-donut-wrap { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+    .stats-donut-wrap svg { transform: rotate(-90deg); }
+    .stats-donut-legend { display: flex; flex-direction: column; gap: 8px; }
+    .stats-device-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #2E2E2E; }
+    .stats-device-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .stats-query-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .stats-query-table th { text-align: left; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #A2A092; padding: 0 0 10px; border-bottom: 1px solid #e8e7e3; font-weight: 600; }
+    .stats-query-table th:not(:first-child) { text-align: right; }
+    .stats-query-table td { padding: 9px 0; border-bottom: 1px solid #f4f3ef; color: #2E2E2E; vertical-align: middle; }
+    .stats-query-table td:not(:first-child) { text-align: right; color: #6B6960; }
+    .stats-query-table tr:last-child td { border-bottom: none; }
+    .stats-position-pill { display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 600; border-radius: 10px; }
+    .stats-position-pill.good { background: #e8f8f0; color: #27ae60; }
+    .stats-position-pill.mid  { background: #fef9e7; color: #e67e22; }
+    .stats-position-pill.low  { background: #f8f4f4; color: #A2A092; }
+
+    .stats-not-connected { opacity: 0.35; pointer-events: none; user-select: none; filter: blur(1.5px); }
   </style>
 </head>
 <body>
@@ -310,6 +378,13 @@
         </div>
         <div class="sidebar-item" id="cat-production" onclick="setCategory('production')">
           <span>Production</span><span class="sidebar-badge" id="cnt-production">—</span>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-sec">
+        <div class="sidebar-sec-label">Analytics</div>
+        <div class="sidebar-item" id="nav-stats" onclick="showStats()">
+          <span>Stats &amp; SEO</span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -1386,6 +1461,212 @@
         siteConfigSha = r2.content.sha;
       } else { throw e; }
     }
+  }
+
+  // ── Stats & Analytics ──────────────────────────────────────────────
+  const GA_MEASUREMENT_ID = '';   // e.g. 'G-XXXXXXXXXX'  — fill in when ready
+  const GA_PROPERTY_ID    = '';   // e.g. '123456789'      — fill in when ready
+  const GA_CLIENT_ID      = '';   // e.g. 'XXXXX.apps.googleusercontent.com' — fill in when ready
+  const GA_CONNECTED      = false; // flip to true once credentials are in
+
+  let statsRange = '7';
+
+  function showStats() {
+    setSidebarActive('nav-stats');
+    const connected = GA_CONNECTED;
+
+    // Placeholder data — replaced by real GA4 API data once connected
+    const data = {
+      '7':  { sessions: 142, users: 98,  pageviews: 312, avgDuration: '2:14', sessionsDelta: '+12%', usersDelta: '+8%', pageviewsDelta: '+15%', durationDelta: '+0:18' },
+      '30': { sessions: 587, users: 391, pageviews: 1248, avgDuration: '2:31', sessionsDelta: '+22%', usersDelta: '+18%', pageviewsDelta: '+29%', durationDelta: '+0:22' },
+      '90': { sessions: 1843, users: 1102, pageviews: 3891, avgDuration: '2:28', sessionsDelta: '+41%', usersDelta: '+35%', pageviewsDelta: '+48%', durationDelta: '+0:14' },
+    };
+    const topPages = [
+      { page: '/index.html',        label: 'Home',        views: 498 },
+      { page: '/multifamily.html',  label: 'Multifamily', views: 312 },
+      { page: '/reserve.html',      label: 'Reserve',     views: 201 },
+      { page: '/contact.html',      label: 'Get a Bid',   views: 187 },
+      { page: '/custom.html',       label: 'Custom',      views: 156 },
+    ];
+    const sources = [
+      { name: 'Organic Search', pct: 48, color: '#1F3971' },
+      { name: 'Direct',         pct: 31, color: '#4a7fc1' },
+      { name: 'Referral',       pct: 13, color: '#8eb4e3' },
+      { name: 'Social',         pct:  8, color: '#c6d9f1' },
+    ];
+    const devices = [
+      { name: 'Mobile',  pct: 61, color: '#1F3971' },
+      { name: 'Desktop', pct: 33, color: '#4a7fc1' },
+      { name: 'Tablet',  pct:  6, color: '#8eb4e3' },
+    ];
+    const queries = [
+      { query: 'panoramic building',               clicks: 48, impressions: 312, position: 2.1  },
+      { query: 'exterior contractor utah',          clicks: 31, impressions: 820, position: 6.4  },
+      { query: 'siding contractor northern utah',   clicks: 22, impressions: 541, position: 5.1  },
+      { query: 'multifamily exterior contractor',   clicks: 18, impressions: 634, position: 8.3  },
+      { query: 'panoramic reserve homes utah',      clicks: 14, impressions: 198, position: 3.7  },
+      { query: 'custom home exterior logan ut',     clicks: 11, impressions: 287, position: 9.2  },
+    ];
+
+    const d = data[statsRange];
+    const maxViews = topPages[0].views;
+
+    function kpiDeltaHtml(delta) {
+      const down = delta.startsWith('-');
+      return `<div class="stats-kpi-delta ${down ? 'down' : ''}">
+        <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="${down ? 'M6 2v8M2 6l4 4 4-4' : 'M6 10V2M2 6l4-4 4 4'}"/>
+        </svg>${delta} vs prev period</div>`;
+    }
+
+    function positionPill(pos) {
+      const cls = pos <= 5 ? 'good' : pos <= 10 ? 'mid' : 'low';
+      return `<span class="stats-position-pill ${cls}">#${pos.toFixed(1)}</span>`;
+    }
+
+    // Donut chart SVG for device split
+    let offset = 0;
+    const r = 30, circ = 2 * Math.PI * r;
+    const donutPaths = devices.map(d => {
+      const dash = (d.pct / 100) * circ;
+      const svg = `<circle cx="40" cy="40" r="${r}" fill="none" stroke="${d.color}" stroke-width="10" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${-offset}" />`;
+      offset += dash;
+      return svg;
+    }).join('');
+
+    const blurClass = connected ? '' : 'stats-not-connected';
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="stats-connect-banner">
+        <div class="stats-connect-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
+        </div>
+        <div>
+          <div class="stats-connect-title">${connected ? 'Connected to Google Analytics' : 'Google Analytics — Not Connected Yet'}</div>
+          <div class="stats-connect-sub">${connected
+            ? 'Live data is being pulled from your GA4 property and Google Search Console.'
+            : 'Stats below are sample data showing what this panel will look like. Once your domain is set up, add your Measurement ID, Property ID, and OAuth Client ID to activate live data.'
+          }</div>
+          ${connected
+            ? `<div class="stats-connect-ids">
+                <div class="stats-connect-id-field"><div class="stats-connect-id-label">Measurement ID</div><div class="stats-connect-id-val">${GA_MEASUREMENT_ID}</div></div>
+                <div class="stats-connect-id-field"><div class="stats-connect-id-label">Property ID</div><div class="stats-connect-id-val">${GA_PROPERTY_ID}</div></div>
+              </div>`
+            : `<button class="stats-connect-btn" disabled>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Connect Google — Set Up Domain First
+              </button>`
+          }
+        </div>
+      </div>
+
+      <div class="${blurClass}">
+        <div class="stats-range-bar">
+          <h2>Site Analytics</h2>
+          <div class="stats-range-tabs">
+            <button class="stats-range-tab ${statsRange==='7'?'active':''}"  onclick="setStatsRange('7')">7 Days</button>
+            <button class="stats-range-tab ${statsRange==='30'?'active':''}" onclick="setStatsRange('30')">30 Days</button>
+            <button class="stats-range-tab ${statsRange==='90'?'active':''}" onclick="setStatsRange('90')">90 Days</button>
+          </div>
+        </div>
+
+        <div class="stats-kpi-row">
+          <div class="stats-kpi">
+            <div class="stats-kpi-label">Sessions</div>
+            <div class="stats-kpi-val">${d.sessions.toLocaleString()}</div>
+            ${kpiDeltaHtml(d.sessionsDelta)}
+          </div>
+          <div class="stats-kpi">
+            <div class="stats-kpi-label">Unique Visitors</div>
+            <div class="stats-kpi-val">${d.users.toLocaleString()}</div>
+            ${kpiDeltaHtml(d.usersDelta)}
+          </div>
+          <div class="stats-kpi">
+            <div class="stats-kpi-label">Page Views</div>
+            <div class="stats-kpi-val">${d.pageviews.toLocaleString()}</div>
+            ${kpiDeltaHtml(d.pageviewsDelta)}
+          </div>
+          <div class="stats-kpi">
+            <div class="stats-kpi-label">Avg. Time on Site</div>
+            <div class="stats-kpi-val">${d.avgDuration}</div>
+            ${kpiDeltaHtml(d.durationDelta)}
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stats-card">
+            <div class="stats-card-title">Top Pages <span>By views</span></div>
+            <div class="stats-bar-list">
+              ${topPages.map(p => `
+                <div class="stats-bar-item">
+                  <div class="stats-bar-item-top">
+                    <div class="stats-bar-item-label">${escH(p.label)}</div>
+                    <div class="stats-bar-item-val">${p.views.toLocaleString()}</div>
+                  </div>
+                  <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(p.views/maxViews*100)}%"></div></div>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-title">Traffic Sources</div>
+            <div class="stats-source-list">
+              ${sources.map(s => `
+                <div class="stats-source-item">
+                  <div class="stats-source-dot" style="background:${s.color}"></div>
+                  <div class="stats-source-name">${escH(s.name)}</div>
+                  <div class="stats-source-bar-track"><div class="stats-source-bar-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
+                  <div class="stats-source-pct">${s.pct}%</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stats-card">
+            <div class="stats-card-title">Device Breakdown</div>
+            <div class="stats-device-row">
+              <div class="stats-donut-wrap">
+                <svg viewBox="0 0 80 80" width="80" height="80">${donutPaths}</svg>
+              </div>
+              <div class="stats-donut-legend">
+                ${devices.map(d => `
+                  <div class="stats-device-item">
+                    <div class="stats-device-dot" style="background:${d.color}"></div>
+                    <span>${d.name}</span>
+                    <strong>${d.pct}%</strong>
+                  </div>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-title">Google Search Console <span>SEO Rankings</span></div>
+            <table class="stats-query-table">
+              <thead><tr><th>Search Query</th><th>Clicks</th><th>Impr.</th><th>Position</th></tr></thead>
+              <tbody>
+                ${queries.map(q => `<tr>
+                  <td>${escH(q.query)}</td>
+                  <td>${q.clicks}</td>
+                  <td>${q.impressions.toLocaleString()}</td>
+                  <td>${positionPill(q.position)}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function setStatsRange(range) {
+    statsRange = range;
+    showStats();
+  }
+
+  function setSidebarActive(id) {
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
   }
 
   // ── Site Settings ──────────────────────────────────────────────────

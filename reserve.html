@@ -427,6 +427,9 @@
         var cover  = entry.cover || null;
         var photos = Array.isArray(entry.photos) ? entry.photos : [];
 
+        // Skip projects with no photos — don't show empty cards publicly
+        if (!photos.length && !cover) return;
+
         gridMap[key]  = 'grid-'  + id;
         coverMap[key] = 'cover-' + id;
 

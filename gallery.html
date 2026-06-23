@@ -892,6 +892,19 @@
         if (!entry) return;
         var photos = Array.isArray(entry) ? entry : entry.photos;
         var cover  = Array.isArray(entry) ? null : entry.cover;
+
+        // Hide the project card if there are no photos
+        if ((!photos || !photos.length) && !cover) {
+          if (coverMap[key]) {
+            var coverEl = document.getElementById(coverMap[key]);
+            if (coverEl) {
+              var card = coverEl.closest('.project-card');
+              if (card) card.style.display = 'none';
+            }
+          }
+          return;
+        }
+
         populateGrid(gridMap[key], photos);
         if (coverMap[key]) setCoverImage(coverMap[key], cover);
       });
