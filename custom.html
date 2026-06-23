@@ -739,4 +739,28 @@
         for (var i = 0; i < _ENC.length; i++) {
           try {
             var url = await _dec(_ENC[i].d, keyHex);
-            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank
+            linksHtml += '<a class="admin-link-item" href="' + url + '" target="_blank"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 12h8M8 8h5M8 16h4"/></svg>' + _ENC[i].label + '</a>';
+          } catch(e) {}
+        }
+        var html = '<div class="admin-dropdown-header"><span class="admin-dropdown-title">Team</span><button class="admin-logout" onclick="adminLogout()">Log out</button></div><div class="admin-links">' + linksHtml + '</div><div class="admin-tip">&#128241; To add to home screen: open on phone &#x2192; tap &#x22EE; &#x2192; <strong>Add to Home Screen</strong></div>';
+        dd.innerHTML = html;
+        sessionStorage.setItem('pb_links', html);
+      } else {
+        dd.innerHTML = '<div class="admin-password-form"><span class="admin-password-label">Team Login</span><input class="admin-password-input" id="admin-pw-input" type="password" placeholder="Password" onkeydown="if(event.key===\'Enter\')checkAdminPw()" /><button class="admin-password-btn" onclick="checkAdminPw()">Enter</button><div class="admin-password-error" id="admin-pw-error">Incorrect password</div></div>';
+      }
+    }
+    async function checkAdminPw() {
+      var v = document.getElementById('admin-pw-input').value;
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+      var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+      if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k', hash); renderAdminDropdown(); }
+      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
+    }
+    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    document.addEventListener('click', function(e) {
+      var w = document.getElementById('nav-admin-wrap');
+      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
+    });
+  </script>
+</body>
+</html>
