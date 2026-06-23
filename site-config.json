@@ -130,13 +130,10 @@
   "reserve": {
     "lowell": {
       "name": "Lowell",
-      "location": "",
+      "location": "Fish Haven, ID",
       "description": "",
-      "stats": {
-        "sqft": 0,
-        "buildings": 0
-      },
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "blacktail": {
       "name": "Blacktail",
