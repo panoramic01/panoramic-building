@@ -335,7 +335,7 @@
 <div id="setup-screen">
   <div class="setup-box">
     <div class="setup-title">GitHub Setup</div>
-    <div class="setup-sub">Connect your GitHub repository. The admin panel will read and write directly to your repo — uploading photos and updating the manifest automatically. You only need to do this once per browser.</div>
+    <div class="setup-sub">Connect your GitHub repository. The admin panel will read and write directly to your repo, uploading photos and updating the manifest automatically. You only need to do this once per browser.</div>
 
     <label class="setup-label">Personal Access Token</label>
     <div class="setup-hint">Go to <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> → Generate new token (Classic) → check the <strong>repo</strong> scope. Paste it here. Stored only in this browser.</div>
@@ -374,19 +374,19 @@
       <div class="sidebar-sec">
         <div class="sidebar-sec-label">Projects</div>
         <div class="sidebar-item active" id="cat-all" onclick="setCategory('all')">
-          <span>All</span><span class="sidebar-badge" id="cnt-all">—</span>
+          <span>All</span><span class="sidebar-badge" id="cnt-all"></span>
         </div>
         <div class="sidebar-item" id="cat-multifamily" onclick="setCategory('multifamily')">
-          <span>Multifamily</span><span class="sidebar-badge" id="cnt-multifamily">—</span>
+          <span>Multifamily</span><span class="sidebar-badge" id="cnt-multifamily"></span>
         </div>
         <div class="sidebar-item" id="cat-reserve" onclick="setCategory('reserve')">
-          <span>Reserve</span><span class="sidebar-badge" id="cnt-reserve">—</span>
+          <span>Reserve</span><span class="sidebar-badge" id="cnt-reserve"></span>
         </div>
         <div class="sidebar-item" id="cat-custom" onclick="setCategory('custom')">
-          <span>Custom</span><span class="sidebar-badge" id="cnt-custom">—</span>
+          <span>Custom</span><span class="sidebar-badge" id="cnt-custom"></span>
         </div>
         <div class="sidebar-item" id="cat-production" onclick="setCategory('production')">
-          <span>Production</span><span class="sidebar-badge" id="cnt-production">—</span>
+          <span>Production</span><span class="sidebar-badge" id="cnt-production"></span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -701,9 +701,9 @@
       .replace(/Â·/g, '&#183;')                 // single corruption
       .replace(/·/g, '&#183;')                        // bare Unicode middle-dot
       // Em-dash corruptions (U+2014 → â€" → Ã¢ÂÂ control chars)
-      .replace(/Ã¢ÂÂ/g, '&mdash;')  // double-corrupted —
-      .replace(/â/g, '&mdash;')                      // single-corrupted —
-      .replace(/—/g, '&mdash;')                                   // bare Unicode —
+      .replace(/Ã¢ÂÂ/g, ' - ')  // double-corrupted em-dash
+      .replace(/â/g, ' - ')      // single-corrupted em-dash
+      .replace(/—/g, ' - ')     // bare Unicode em-dash
       // Curly quotes
       .replace(/â/g, '&rsquo;')
       .replace(/’/g, '&rsquo;')
@@ -971,7 +971,7 @@
           <button class="photo-btn del-photo" onclick="askDelete('${escH(p)}',event)">Delete</button>
         </div>
       </div>`;
-    }).join('') || '<div class="empty-state">No photos yet — upload some above</div>';
+    }).join('') || '<div class="empty-state">No photos yet. Upload some above.</div>';
 
     // ── Content form data ────────────────────────────────────────────
     const isProduction = cat === 'production';
@@ -1191,7 +1191,7 @@
         uploaded.push(data.secure_url);
       } catch(e) {
         setStatus(id, 'Failed', 'error');
-        toast(`Failed: ${file.name} — ${e.message}`, 'error');
+        toast(`Failed: ${file.name}: ${e.message}`, 'error');
       }
     }
 
@@ -1357,7 +1357,7 @@
           if (entry.cover === path) entry.cover = entry.photos[0] || null;
         }
         deleted++;
-      } catch(err) { toast('Failed: ' + path.split('/').pop() + ' — ' + err.message, 'error'); }
+      } catch(err) { toast('Failed: ' + path.split('/').pop() + ': ' + err.message, 'error'); }
     }
     if (deleted) {
       await saveManifest(`Bulk delete ${deleted} photos from ${currentSlug}`);
@@ -1440,7 +1440,7 @@
       contentCat  = cat;
       contentSlug = id;
 
-      toast('Project created — now upload photos', 'success');
+      toast('Project created. Now upload photos.', 'success');
       renderDetail();
     } catch(e) {
       delete manifest[slug];
@@ -1486,7 +1486,7 @@
         banner.style.background = '#e8f5e9';
         banner.style.borderLeftColor = '#27ae60';
         banner.style.color = '#1b5e20';
-        banner.textContent = `All ${repoFiles.length} repo images are already in the manifest — nothing to add.`;
+        banner.textContent = `All ${repoFiles.length} repo images are already in the manifest. Nothing to add.`;
         btn.disabled = false;
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Scan Repo';
         return;
@@ -1651,7 +1651,7 @@
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
         </div>
         <div>
-          <div class="stats-connect-title">${connected ? 'Connected to Google Analytics' : 'Google Analytics — Not Connected Yet'}</div>
+          <div class="stats-connect-title">${connected ? 'Connected to Google Analytics' : 'Google Analytics: Not Connected Yet'}</div>
           <div class="stats-connect-sub">${connected
             ? 'Live data is being pulled from your GA4 property and Google Search Console.'
             : 'Stats below are sample data showing what this panel will look like. Once your domain is set up, add your Measurement ID, Property ID, and OAuth Client ID to activate live data.'
@@ -1663,7 +1663,7 @@
               </div>`
             : `<button class="stats-connect-btn" disabled>
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Connect Google — Set Up Domain First
+                Connect Google: Set Up Domain First
               </button>`
           }
         </div>
@@ -1891,7 +1891,7 @@
       document.getElementById('admin-main').innerHTML = `
         <div class="ch"><div class="ch-left">
           <h2>SEO / Meta</h2>
-          <p>Page titles and meta descriptions — applied dynamically on every page load</p>
+          <p>Page titles and meta descriptions, applied dynamically on every page load</p>
         </div></div>
         <div class="ss-form">
           ${fields}
@@ -1918,7 +1918,7 @@
         siteConfig._site.email      = document.getElementById('ss-email').value.trim();
         siteConfig._site.serviceArea = document.getElementById('ss-area').value.trim();
         await saveSiteConfig('Update company info');
-        toast('Company info saved — changes go live on all pages', 'success');
+        toast('Company info saved. Changes go live on all pages.', 'success');
 
       } else if (section === 'hero') {
         if (!siteConfig._site.hero) siteConfig._site.hero = {};
@@ -2000,8 +2000,8 @@
 
     if (!filtered.length) {
       drop.innerHTML = all.length
-        ? `<div class="mat-dropdown-empty">No match — press Add to create "${escH(query)}"</div>`
-        : `<div class="mat-dropdown-empty">No materials used yet — type one and press Add</div>`;
+        ? `<div class="mat-dropdown-empty">No match. Press Add to create "${escH(query)}"</div>`
+        : `<div class="mat-dropdown-empty">No materials used yet. Type one and press Add.</div>`;
     } else {
       const hintHtml = `<div class="mat-dropdown-hint">Previously used</div>`;
       const itemsHtml = filtered.map(m =>
