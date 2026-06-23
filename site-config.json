@@ -109,17 +109,6 @@
         "buildings": 0
       },
       "materials": []
-    },
-    "test": {
-      "name": "Test",
-      "location": "Logan, UT",
-      "description": "",
-      "materials": [],
-      "stats": {
-        "units": 0,
-        "sqft": 0,
-        "buildings": 0
-      }
     }
   },
   "reserve": {
@@ -181,12 +170,6 @@
         "sqft": 0,
         "buildings": 0
       },
-      "materials": []
-    },
-    "job-name": {
-      "name": "Job Name",
-      "location": "Logan, UT",
-      "description": "",
       "materials": []
     }
   },

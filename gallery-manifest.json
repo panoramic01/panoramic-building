@@ -133,15 +133,5 @@
       "assets/multifamily/altura-apartments/aidan_ALT-11.jpg",
       "assets/multifamily/altura-apartments/aidan_ALT-12.jpg"
     ]
-  },
-  "reserve/job-name": {
-    "cover": null,
-    "photos": [],
-    "location": "Logan, UT"
-  },
-  "multifamily/test": {
-    "cover": null,
-    "photos": [],
-    "location": "Logan, UT"
   }
 }
