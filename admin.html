@@ -1514,4 +1514,196 @@
 
       if (section === 'company') {
         siteConfig._site.phone      = document.getElementById('ss-phone').value.trim();
-   
+        siteConfig._site.phoneFmt   = document.getElementById('ss-phonefmt').value.trim();
+        siteConfig._site.email      = document.getElementById('ss-email').value.trim();
+        siteConfig._site.serviceArea = document.getElementById('ss-area').value.trim();
+        await saveSiteConfig('Update company info');
+        toast('Company info saved — changes go live on all pages', 'success');
+
+      } else if (section === 'hero') {
+        if (!siteConfig._site.hero) siteConfig._site.hero = {};
+        siteConfig._site.hero.eyebrow = document.getElementById('ss-eyebrow').value;
+        siteConfig._site.hero.h1      = document.getElementById('ss-h1').value;
+        siteConfig._site.hero.sub     = document.getElementById('ss-sub').value;
+        await saveSiteConfig('Update homepage hero');
+        toast('Hero saved', 'success');
+
+      } else if (section === 'seo') {
+        if (!siteConfig._site.seo) siteConfig._site.seo = {};
+        ['index','multifamily','reserve','custom','production'].forEach(pg => {
+          siteConfig._site.seo[pg] = {
+            title: (document.getElementById('seo-title-' + pg) || {}).value || '',
+            desc:  (document.getElementById('seo-desc-'  + pg) || {}).value || ''
+          };
+        });
+        await saveSiteConfig('Update SEO meta');
+        toast('SEO saved', 'success');
+      }
+
+      if (btn) {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
+        setTimeout(() => {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save'; }
+        }, 2500);
+      }
+    } catch(err) {
+      toast('Save failed: ' + err.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+    }
+  }
+
+  function addMaterial() {
+    const input = document.getElementById('mat-add-input');
+    if (!input) return;
+    const val = input.value.trim();
+    if (!val) return;
+    contentMaterials.push(val);
+    input.value = '';
+    refreshChips();
+    input.focus();
+  }
+
+  function removeMaterial(idx) {
+    contentMaterials.splice(idx, 1);
+    refreshChips();
+  }
+
+  function refreshChips() {
+    const el = document.getElementById('mat-chips');
+    if (!el) return;
+    el.innerHTML = contentMaterials.map((m, i) =>
+      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMaterial(${i})" title="Remove">×</button></div>`
+    ).join('');
+  }
+
+  async function deleteProject() {
+    const slug = currentSlug;
+    if (!slug) return;
+    const name = (manifest[slug] && manifest[slug].name) ||
+                 (siteConfig[contentCat] && siteConfig[contentCat][contentSlug] && siteConfig[contentCat][contentSlug].name) ||
+                 slug;
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+    // Remove from in-memory data
+    const manifestBackup    = JSON.parse(JSON.stringify(manifest));
+    const siteConfigBackup  = JSON.parse(JSON.stringify(siteConfig));
+    delete manifest[slug];
+    if (siteConfig[contentCat] && siteConfig[contentCat][contentSlug]) {
+      delete siteConfig[contentCat][contentSlug];
+    }
+
+    try {
+      await Promise.all([
+        saveManifest(`Delete project: ${slug}`),
+        saveSiteConfig(`Delete project: ${slug}`)
+      ]);
+      toast(`"${name}" deleted`, 'success');
+      currentSlug = null;
+      contentCat  = null;
+      contentSlug = null;
+      renderProjects();
+    } catch(e) {
+      // Restore on failure
+      Object.assign(manifest, manifestBackup);
+      Object.assign(siteConfig, siteConfigBackup);
+      toast('Delete failed: ' + e.message, 'error');
+    }
+  }
+
+  async function saveContentProject() {
+    const btn = document.getElementById('ce-save-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const oldCat       = contentCat;
+    const isProduction = oldCat === 'production';
+    const id           = contentSlug;
+
+    try {
+      if (isProduction) {
+        if (!siteConfig.production) siteConfig.production = {};
+        const descEl = document.getElementById('ce-description');
+        siteConfig.production.description = descEl ? descEl.value.trim() : '';
+        siteConfig.production.materials   = [...contentMaterials];
+        await saveSiteConfig('Update production content');
+
+      } else {
+        const catEl      = document.getElementById('ce-category');
+        const nameEl     = document.getElementById('ce-name');
+        const locationEl = document.getElementById('ce-location');
+        const descEl     = document.getElementById('ce-description');
+        const newCat     = catEl ? catEl.value : oldCat;
+
+        const proj = Object.assign({}, (siteConfig[oldCat] || {})[id] || {});
+        if (nameEl)     proj.name        = nameEl.value.trim();
+        if (locationEl) proj.location    = locationEl.value.trim();
+        if (descEl)     proj.description = descEl.value.trim();
+        proj.materials = [...contentMaterials];
+
+        const yearEl     = document.getElementById('ce-year');
+        const featuredEl = document.getElementById('ce-featured');
+        const yearVal    = yearEl ? parseInt(yearEl.value) : 0;
+        if (yearVal >= 2000 && yearVal <= 2099) proj.year = yearVal;
+        else delete proj.year;
+        proj.featured = featuredEl ? featuredEl.checked : false;
+
+        if (newCat === 'multifamily') {
+          const unitsEl     = document.getElementById('ce-units');
+          const sqftEl      = document.getElementById('ce-sqft');
+          const buildingsEl = document.getElementById('ce-buildings');
+          proj.stats = {
+            units:     parseInt(unitsEl     ? unitsEl.value     : 0) || 0,
+            sqft:      parseInt(sqftEl      ? sqftEl.value      : 0) || 0,
+            buildings: parseInt(buildingsEl ? buildingsEl.value : 0) || 0
+          };
+        } else {
+          delete proj.stats;
+        }
+
+        const catChanged = newCat !== oldCat;
+
+        if (catChanged) {
+          if (siteConfig[oldCat]) delete siteConfig[oldCat][id];
+          if (!siteConfig[newCat]) siteConfig[newCat] = {};
+          siteConfig[newCat][id] = proj;
+
+          const oldManifestKey = oldCat + '/' + id;
+          const newManifestKey = newCat + '/' + id;
+          if (manifest[oldManifestKey] !== undefined) {
+            manifest[newManifestKey] = manifest[oldManifestKey];
+            delete manifest[oldManifestKey];
+          }
+
+          await Promise.all([
+            saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`),
+            saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
+          ]);
+
+          contentCat  = newCat;
+          currentSlug = newManifestKey;
+
+        } else {
+          if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
+          siteConfig[oldCat][id] = proj;
+          await saveSiteConfig(`Update content: ${oldCat}/${id}`);
+        }
+      }
+
+      toast('Saved', 'success');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
+      setTimeout(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
+        }
+      }, 2500);
+    } catch(e) {
+      toast('Save failed: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Save Changes';
+    }
+  }
+</script>
+</body>
+</html>
