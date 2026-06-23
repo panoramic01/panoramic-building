@@ -158,13 +158,10 @@
     },
     "goble": {
       "name": "Goble",
-      "location": "",
+      "location": "North Logan, UT",
       "description": "",
-      "stats": {
-        "sqft": 0,
-        "buildings": 0
-      },
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "roberts": {
       "name": "Roberts",
