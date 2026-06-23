@@ -124,13 +124,11 @@
     },
     "blacktail": {
       "name": "Blacktail",
-      "location": "",
+      "location": "Garden City, UT",
       "description": "",
-      "stats": {
-        "sqft": 0,
-        "buildings": 0
-      },
-      "materials": []
+      "materials": [],
+      "year": 2025,
+      "featured": false
     },
     "watson": {
       "name": "Watson",
