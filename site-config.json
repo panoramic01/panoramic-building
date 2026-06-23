@@ -173,7 +173,14 @@
       "materials": []
     }
   },
-  "custom": {},
+  "custom": {
+    "blacktail": {
+      "name": "Blacktail",
+      "location": "Garden City, UT",
+      "description": "",
+      "materials": []
+    }
+  },
   "production": {
     "description": "",
     "materials": []

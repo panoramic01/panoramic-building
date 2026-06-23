@@ -1,6 +1,6 @@
 {
   "production": {
-    "cover": "assets/production/aidan-293.jpg",
+    "cover": null,
     "photos": [
       "assets/production/aidan-102-2.jpg",
       "assets/production/aidan-106-2.jpg",
@@ -27,6 +27,10 @@
       "assets/production/aidan-79-2.jpg",
       "assets/production/aidan-81-2.jpg"
     ]
+  },
+  "custom/blacktail": {
+    "cover": null,
+    "photos": []
   },
   "reserve": {
     "cover": null,
