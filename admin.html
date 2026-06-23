@@ -322,6 +322,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
           View Site
         </button>
+        <button class="sidebar-link" id="backup-btn" onclick="backupData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Backup Data
+        </button>
         <button class="sidebar-link" onclick="openSetup()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           GitHub Settings
@@ -495,6 +499,40 @@
 
   function logout() { sessionStorage.removeItem('pb_admin'); location.reload(); }
   function goToSite() { window.open('index.html', '_blank'); }
+
+  // ── Backup ─────────────────────────────────────────────────────────
+  async function backupData() {
+    const btn = document.getElementById('backup-btn');
+    if (btn) { btn.style.color = '#1F3971'; btn.style.pointerEvents = 'none'; btn.childNodes[btn.childNodes.length-1].textContent = ' Backing up…'; }
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const ts  = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+    const encodeFile = obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj, null, 2))));
+
+    try {
+      // Check for existing backup files to get their SHAs (needed for overwrite)
+      async function putBackup(path, content) {
+        let sha;
+        try { const r = await ghApi('GET', `${path}?ref=${cfg.branch}`); sha = r.sha; } catch(e) { /* new file */ }
+        const body = { message: `Backup ${ts}`, content, branch: cfg.branch };
+        if (sha) body.sha = sha;
+        return ghApi('PUT', path, body);
+      }
+
+      await Promise.all([
+        putBackup(`backups/${ts}-site-config.json`,    encodeFile(siteConfig)),
+        putBackup(`backups/${ts}-gallery-manifest.json`, encodeFile(manifest)),
+      ]);
+
+      toast(`Backup saved: backups/${ts}-*.json`, 'success');
+    } catch(e) {
+      toast('Backup failed: ' + e.message, 'error');
+    } finally {
+      if (btn) { btn.style.color = ''; btn.style.pointerEvents = ''; btn.childNodes[btn.childNodes.length-1].textContent = ' Backup Data'; }
+    }
+  }
 
   // ── Setup ──────────────────────────────────────────────────────────
   function saveSetup() {
