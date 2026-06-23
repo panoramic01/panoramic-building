@@ -330,5 +330,10 @@
   "multifamily/the-crossing": {
     "cover": null,
     "photos": []
+  },
+  "reserve/lasswell": {
+    "cover": null,
+    "photos": [],
+    "location": "Ovid, ID"
   }
 }
