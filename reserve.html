@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSCV6NHWLK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KSCV6NHWLK');
+  </script>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -780,17 +788,4 @@
         if (e.key==='ArrowDown'){ e.preventDefault(); searchFocusIndex=Math.min(searchFocusIndex+1,items.length-1); updFocus(items); }
         else if (e.key==='ArrowUp'){ e.preventDefault(); searchFocusIndex=Math.max(searchFocusIndex-1,0); updFocus(items); }
         else if (e.key==='Enter' && searchFocusIndex>=0 && items[searchFocusIndex]){ items[searchFocusIndex].click(); }
-        else if (e.key==='Escape'){ clearSiteSearch(); }
-      });
-    });
-    function updFocus(items) {
-      items.forEach(function(el,i){ el.classList.toggle('focused', i===searchFocusIndex); });
-      if (items[searchFocusIndex]) items[searchFocusIndex].scrollIntoView({block:'nearest'});
-    }
-  </script>
-  <script>
-    var _APH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
-    var _ENC = [
-      { label: 'PO Manager',            d: 'SE1UgOiUGCv5ak/7NgxpAwut2BZXWzzFSegUIdVGDN+2WFBUZsEHvrzsyBHNwgvt1v1gBUN70EOYlhu5v7SI6b4v/Eon' },
-      { label: 'Material Request',      d: 'GZ+uaXVLA15n7Yiu7zet5ttJjXC5GL7sM0NH23uSB5AtAozDaubJsQ5tQpqEJN7Xb63f1lsbT2K3eEHq89ztBqQJspBRVgfuQCWvyCWsp6NXYm6qFWduXcENvGIn0S0=' },
-      { label: 'Job Clean Up',          d: 'Up1RhMnYlCcy184eH8/x3izaSl
+        else if (e.key==='Esc
