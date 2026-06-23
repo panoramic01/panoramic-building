@@ -199,9 +199,10 @@
     },
     "job-name-2": {
       "name": "Job Name 2",
-      "location": "",
+      "location": "Mendon, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-3": {
       "name": "Job Name 3",
