@@ -390,14 +390,10 @@
           ov2.innerHTML = '<div class="ph-name">' + name + '</div><div class="ph-location">' + loc + '</div>';
           coverDiv.appendChild(ov2);
         }
-        var info = document.createElement('div');
-        info.className = 'project-card-info';
-        info.innerHTML = '<h3>' + name + '</h3><p>' + loc + '</p>';
         var arrow = document.createElement('div');
         arrow.className = 'project-card-arrow';
         arrow.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
         card.appendChild(coverDiv);
-        card.appendChild(info);
         card.appendChild(arrow);
         grid.appendChild(card);
 
