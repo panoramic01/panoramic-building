@@ -433,13 +433,16 @@
       var cu = cfg.custom || {};
       Object.keys(cu).forEach(function(id) {
         var p = cu[id];
-        // projectMeta and projectMaterials are set in buildProjectGrid, but refresh here for safety
         projectMeta[id]      = { name: p.name || id, location: p.location || '', description: p.description || '' };
         projectMaterials[id] = p.materials || [];
+        // Update sub-gallery title
         var titleEl    = document.getElementById('sub-title-' + id);
         var locationEl = document.getElementById('sub-location-' + id);
         if (titleEl)    titleEl.textContent    = p.name || id;
         if (locationEl) locationEl.textContent = p.location || '';
+        // Update card cover overlay / placeholder names
+        document.querySelectorAll('#cover-' + id + ' .ph-name').forEach(function(el) { el.textContent = p.name || id; });
+        document.querySelectorAll('#cover-' + id + ' .ph-location').forEach(function(el) { el.textContent = p.location || ''; });
       });
       // SEO
       var seo = (cfg._site || {}).seo || {};

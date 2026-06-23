@@ -764,7 +764,15 @@
   // ── Helpers ────────────────────────────────────────────────────────
   function slugify(s) { return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
   function catOf(slug) { return slug.split('/')[0]; }
-  function nameOf(slug) { return slug.split('/').slice(1).join('/').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
+  function nameOf(slug) {
+    const cat = catOf(slug);
+    const id  = slug.split('/').slice(1).join('/');
+    // Prefer the saved name from siteConfig over the slug-derived fallback
+    if (cat !== 'production' && siteConfig && siteConfig[cat] && siteConfig[cat][id] && siteConfig[cat][id].name) {
+      return siteConfig[cat][id].name;
+    }
+    return id.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  }
   function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ── Categories ─────────────────────────────────────────────────────
