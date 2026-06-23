@@ -261,10 +261,11 @@
       "featured": false
     },
     "job-name-11": {
-      "name": "Job Name 11",
-      "location": "",
+      "name": "ME42",
+      "location": "North Logan, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     }
   },
   "production": {
