@@ -226,10 +226,11 @@
       "featured": false
     },
     "job-name-6": {
-      "name": "Job Name 6",
-      "location": "",
+      "name": "Williams",
+      "location": "Providence, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false
     },
     "job-name-7": {
       "name": "Job Name 7",
