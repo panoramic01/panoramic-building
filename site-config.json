@@ -140,4 +140,49 @@
         "sqft": 0,
         "buildings": 0
       },
-      "mate
+      "materials": []
+    },
+    "goble": {
+      "name": "Goble",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "roberts": {
+      "name": "Roberts",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "baker": {
+      "name": "Baker",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    }
+  },
+  "custom": {
+    "blacktail": {
+      "name": "Blacktail",
+      "location": "Garden City, UT",
+      "description": "",
+      "materials": []
+    }
+  },
+  "production": {
+    "description": "",
+    "materials": []
+  }
+}
