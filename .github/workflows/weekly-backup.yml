@@ -1,0 +1,35 @@
+name: Weekly Data Backup
+
+on:
+  schedule:
+    - cron: '0 8 * * 0'   # Every Sunday at 8am UTC (midnight MT)
+  workflow_dispatch:        # Also allows a manual "Run workflow" button on GitHub
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Copy data files to backups/
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          mkdir -p backups
+          cp site-config.json    "backups/${DATE}-site-config.json"
+          cp gallery-manifest.json "backups/${DATE}-gallery-manifest.json"
+          echo "Backed up as backups/${DATE}-*.json"
+
+      - name: Commit backup
+        run: |
+          git config user.name  "Panoramic Backup Bot"
+          git config user.email "backup@panoramicbuildingllc.com"
+          git add backups/
+          # Only commit if something actually changed
+          git diff --staged --quiet && echo "No changes to back up" || \
+            git commit -m "Auto-backup $(date +%Y-%m-%d)"
+
+      - name: Push
+        run: git push
