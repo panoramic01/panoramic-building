@@ -138,5 +138,10 @@
     "cover": null,
     "photos": [],
     "location": "Logan, UT"
+  },
+  "multifamily/test": {
+    "cover": null,
+    "photos": [],
+    "location": "Logan, UT"
   }
 }
