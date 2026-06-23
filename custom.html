@@ -490,6 +490,7 @@
       if (hash && document.getElementById('sub-' + hash)) {
         setTimeout(function() { openProject(hash); }, 50);
       }
+      buildSearchIndex(cfg);
     }).catch(function(e) { console.warn('config/manifest error', e); });
 
     function openProject(id) {
@@ -580,33 +581,48 @@
     document.querySelector('.lightbox-inner').addEventListener('touchmove',function(e){if(e.touches.length===2){e.preventDefault();currentScale=Math.min(Math.max(touchStartScale*(getTouchDist(e.touches)/touchStartDist),1),6);var m={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};touchPanX=touchStartPanX+(m.x-lastTouchMidX);touchPanY=touchStartPanY+(m.y-lastTouchMidY);applyTransform();}else if(e.touches.length===1&&currentScale>1){e.preventDefault();touchPanX=touchStartPanX+(e.touches[0].clientX-lastTouchMidX);touchPanY=touchStartPanY+(e.touches[0].clientY-lastTouchMidY);applyTransform();}},{passive:false});
   </script>
   <script>
-    var searchIndex = [
-      { type:'page',     title:'Home',                       sub:'panoramicbuildingllc.com',               url:'index.html',        keywords:'home exterior contractor utah idaho panoramic building turn-key siding masonry stucco' },
-      { type:'page',     title:'Multifamily',                sub:'Apartment & condo exterior packages',    url:'multifamily.html',  keywords:'multifamily apartment condo units buildings exterior' },
-      { type:'page',     title:'Panoramic Reserve',          sub:'Premium custom home exteriors',          url:'reserve.html',      keywords:'reserve premium luxury custom home exterior architectural' },
-      { type:'page',     title:'Custom Homes',               sub:'Custom home exterior packages',          url:'custom.html',       keywords:'custom home exterior single family residential' },
-      { type:'page',     title:'Production',                 sub:'High-volume production builder packages', url:'production.html',  keywords:'production builder volume subdivision new construction' },
-      { type:'page',     title:'Get a Bid',                  sub:'Request a project estimate',             url:'contact.html',      keywords:'bid quote estimate contact request' },
-      { type:'service',  title:'LP SmartSide Siding',        sub:'Engineered wood lap & panel siding',     url:'multifamily.html',  keywords:'lp smartside engineered wood siding lap panel' },
-      { type:'service',  title:'Hardie Board / Fiber Cement', sub:'James Hardie fiber cement products',    url:'multifamily.html',  keywords:'hardie board james hardie fiber cement smooth panel plank' },
-      { type:'service',  title:'Masonry & Stone',            sub:'Cultured stone and masonry veneer',      url:'index.html',        keywords:'masonry stone veneer cultured stone interstate' },
-      { type:'service',  title:'Stucco',                     sub:'Three-coat and synthetic stucco systems', url:'index.html',       keywords:'stucco synthetic three coat finish exterior' },
-      { type:'service',  title:'Soffit & Fascia',            sub:'Aluminum and composite soffit/fascia',   url:'index.html',        keywords:'soffit fascia aluminum composite trim' },
-      { type:'service',  title:'Gutters',                    sub:'Seamless gutter systems',                url:'index.html',        keywords:'gutters seamless gutter downspout' },
-      { type:'service',  title:'Exterior Paint',             sub:'Full exterior coating packages',         url:'index.html',        keywords:'paint exterior coating color finish' },
-      { type:'project',  title:'Orchard Grove',              sub:'Idaho Falls, ID · 55 units · 25,677 sq ft', url:'multifamily.html#orchard-grove', keywords:'orchard grove idaho falls idaho 55 units multifamily' },
-      { type:'project',  title:'4th + Main',                 sub:'Bountiful, UT · 24 units · 19,530 sq ft',  url:'multifamily.html#4th-main', keywords:'4th main bountiful utah 24 units multifamily' },
-      { type:'project',  title:'The Crossing',               sub:'Woods Cross, UT · 22 units · 34,120 sq ft', url:'multifamily.html#the-crossing', keywords:'the crossing woods cross utah 22 units lp smartside hardie nickelgap interstate smokey mountain coal king' },
-      { type:'project',  title:'Parkway',                    sub:'Idaho Falls, ID · Coming Soon',     url:'multifamily.html',  keywords:'parkway idaho falls idaho multifamily' },
-      { type:'project',  title:'Altura',                     sub:'Logan, UT · Coming Soon',           url:'multifamily.html',  keywords:'altura logan utah multifamily' },
-      { type:'project',  title:'Hyde Park Gateway',          sub:'Hyde Park, UT · Coming Soon',       url:'multifamily.html',  keywords:'hyde park gateway utah multifamily' },
-      { type:'project',  title:'Blacktail (Custom)',         sub:'Custom home project',                    url:'custom.html',       keywords:'blacktail custom home exterior' },
-      { type:'material', title:'LP SmartSide 8" Lap',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp smartside 8 lap siding engineered wood' },
-      { type:'material', title:'LP NickelGap',               sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'lp nickelgap shiplap panel nickel gap' },
-      { type:'material', title:'Smooth Hardie Panel',        sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'smooth hardie panel fiber cement james hardie' },
-      { type:'material', title:'Interstate Smokey Mountain Mod', sub:'Used on: The Crossing',              url:'multifamily.html',  keywords:'interstate smokey mountain mod stone veneer masonry' },
-      { type:'material', title:'Interstate Coal King',       sub:'Used on: The Crossing',                  url:'multifamily.html',  keywords:'interstate coal king stone veneer masonry dark' },
+    var searchIndex = [];
+    var BASE_SEARCH_ENTRIES = [
+      { type:'page',    title:'Home',                        sub:'panoramicbuildingllc.com',                url:'index.html',       keywords:'home exterior contractor utah idaho panoramic building turn-key siding masonry stucco' },
+      { type:'page',    title:'Multifamily',                 sub:'Apartment & condo exterior packages',     url:'multifamily.html', keywords:'multifamily apartment condo units buildings exterior' },
+      { type:'page',    title:'Panoramic Reserve',           sub:'Premium custom home exteriors',           url:'reserve.html',     keywords:'reserve premium luxury custom home exterior architectural' },
+      { type:'page',    title:'Custom Homes',                sub:'Custom home exterior packages',           url:'custom.html',      keywords:'custom home exterior single family residential' },
+      { type:'page',    title:'Production',                  sub:'High-volume production builder packages', url:'production.html',  keywords:'production builder volume subdivision new construction' },
+      { type:'page',    title:'Get a Bid',                   sub:'Request a project estimate',              url:'contact.html',     keywords:'bid quote estimate contact request' },
+      { type:'service', title:'LP SmartSide Siding',         sub:'Engineered wood lap & panel siding',      url:'multifamily.html', keywords:'lp smartside engineered wood siding lap panel' },
+      { type:'service', title:'Hardie Board / Fiber Cement', sub:'James Hardie fiber cement products',      url:'multifamily.html', keywords:'hardie board james hardie fiber cement smooth panel plank' },
+      { type:'service', title:'Masonry & Stone',             sub:'Cultured stone and masonry veneer',       url:'index.html',       keywords:'masonry stone veneer cultured stone interstate' },
+      { type:'service', title:'Stucco',                      sub:'Three-coat and synthetic stucco systems', url:'index.html',       keywords:'stucco synthetic three coat finish exterior' },
+      { type:'service', title:'Soffit & Fascia',             sub:'Aluminum and composite soffit/fascia',    url:'index.html',       keywords:'soffit fascia aluminum composite trim' },
+      { type:'service', title:'Gutters',                     sub:'Seamless gutter systems',                 url:'index.html',       keywords:'gutters seamless gutter downspout' },
+      { type:'service', title:'Exterior Paint',              sub:'Full exterior coating packages',          url:'index.html',       keywords:'paint exterior coating color finish' },
     ];
+    function buildSearchIndex(cfg) {
+      searchIndex = BASE_SEARCH_ENTRIES.slice();
+      var catPages = { multifamily: 'multifamily.html', reserve: 'reserve.html', custom: 'custom.html' };
+      ['multifamily', 'reserve', 'custom'].forEach(function(cat) {
+        var catData = (cfg && cfg[cat]) || {};
+        Object.keys(catData).forEach(function(id) {
+          var p    = catData[id];
+          var name = (p && p.name) || id.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+          var loc  = (p && p.location) || '';
+          var mats = (p && Array.isArray(p.materials)) ? p.materials : [];
+          var url  = catPages[cat] + '#' + id;
+          searchIndex.push({ type: 'project', title: name, sub: loc, url: url,
+            keywords: [name, loc, cat, id.replace(/-/g, ' '), mats.join(' ')].join(' ').toLowerCase() });
+          mats.forEach(function(mat) {
+            searchIndex.push({ type: 'material', title: mat, sub: 'Used on: ' + name, url: url,
+              keywords: mat.toLowerCase() + ' ' + name.toLowerCase() + ' ' + loc.toLowerCase() });
+          });
+        });
+      });
+      var prod = (cfg && cfg.production) || {};
+      var prodMats = (prod && Array.isArray(prod.materials)) ? prod.materials : [];
+      prodMats.forEach(function(mat) {
+        searchIndex.push({ type: 'material', title: mat, sub: 'Used on: Production projects', url: 'production.html',
+          keywords: mat.toLowerCase() + ' production builder' });
+      });
+    }
     var ICONS = {
       page:    '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
       project: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>',
