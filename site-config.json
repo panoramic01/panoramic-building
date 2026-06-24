@@ -102,7 +102,9 @@
         "Interstate Smokey Mountain Mod",
         "Interstate Coal King",
         "Smooth Hardie Panel"
-      ]
+      ],
+      "featured": false,
+      "needsPhotos": true
     },
     "4th-main": {
       "name": "4th + Main",
