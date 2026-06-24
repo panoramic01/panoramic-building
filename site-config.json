@@ -184,6 +184,13 @@
     }
   },
   "custom": {
+    "job-name-10": {
+      "name": "Anderson",
+      "location": "Hyrum, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
     "pena-lloyd": {
       "name": "Pena Lloyd",
       "location": "Logan, UT",
@@ -249,13 +256,6 @@
     "job-name-9": {
       "name": "Heath",
       "location": "Smithfield, UT",
-      "description": "",
-      "materials": [],
-      "featured": false
-    },
-    "job-name-10": {
-      "name": "Anderson",
-      "location": "Hyrum, UT",
       "description": "",
       "materials": [],
       "featured": false
