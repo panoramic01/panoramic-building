@@ -182,7 +182,9 @@
       "name": "Lasswell",
       "location": "Ovid, ID",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
     }
   },
   "custom": {
