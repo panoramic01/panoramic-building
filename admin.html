@@ -402,7 +402,7 @@
       <div class="sidebar-sec">
         <div class="sidebar-sec-label">Workflow</div>
         <div class="sidebar-item" id="nav-photo-queue" onclick="showPhotoQueue()">
-          <span>📷 Photo Queue</span><span class="sidebar-badge" id="cnt-photo-queue" style="background:#e74c3c;color:#fff;"></span>
+          <span>Photo Queue</span><span class="sidebar-badge" id="cnt-photo-queue" style="background:#e74c3c;color:#fff;"></span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -1077,7 +1077,7 @@
         </div>
       </div>
       <div class="form-grp" style="background:#fffbf0;border:1px solid #f0d080;padding:14px 16px;">
-        <label class="form-lbl" style="color:#a07800;">📷 Photo Status</label>
+        <label class="form-lbl" style="color:#a07800;">Photo Status</label>
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 0;">
           <input type="checkbox" id="ce-needs-photos" ${data.needsPhotos ? 'checked' : ''} style="width:16px;height:16px;accent-color:#e67e22;cursor:pointer;" />
           <span style="font-size:12px;color:#6B6960;">Needs professional photos</span>
@@ -1925,8 +1925,7 @@
     let groupsHtml = '';
     if (queue.length === 0) {
       groupsHtml = `<div style="text-align:center;padding:60px 20px;color:#A2A092;">
-        <div style="font-size:36px;margin-bottom:12px;">✅</div>
-        <div style="font-size:14px;font-weight:600;color:#2E2E2E;margin-bottom:6px;">All caught up!</div>
+        <div style="font-size:14px;font-weight:600;color:#2E2E2E;margin-bottom:6px;">All caught up</div>
         <div style="font-size:12px;">No projects are marked as needing professional photos.</div>
       </div>`;
     } else {
@@ -1941,7 +1940,7 @@
               const coverUrl   = manifest[p.slug] && manifest[p.slug].cover;
               return `<div onclick="openProject('${escH(p.cat)}','${escH(p.id)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;padding:14px 18px;margin-bottom:8px;cursor:pointer;border-left:3px solid #e67e22;transition:background 0.15s;" onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background='#fff'">
                 <div style="width:52px;height:52px;background:#f0efe9;flex-shrink:0;overflow:hidden;">
-                  ${coverUrl ? `<img src="${escH(coverUrl)}" style="width:100%;height:100%;object-fit:cover;" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#D1D0CB;font-size:20px;">📷</div>'}
+                  ${coverUrl ? `<img src="${escH(coverUrl)}" style="width:100%;height:100%;object-fit:cover;" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#D1D0CB;font-size:11px;letter-spacing:1px;">NO PHOTO</div>'}
                 </div>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:13px;font-weight:600;color:#2E2E2E;">${escH(p.name)}</div>
@@ -1960,7 +1959,7 @@
     document.getElementById('admin-main').innerHTML = `
       <div class="ch">
         <div class="ch-left">
-          <h2>📷 Photo Queue</h2>
+          <h2>Photo Queue</h2>
           <p>${queue.length} project${queue.length !== 1 ? 's' : ''} need${queue.length === 1 ? 's' : ''} professional photos</p>
         </div>
       </div>
