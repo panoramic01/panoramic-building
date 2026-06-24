@@ -758,9 +758,9 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <div class="hero-card">
-        <p class="hero-eyebrow">New Construction Specialists &nbsp;·&nbsp; Logan, Utah</p>
-        <h1 class="hero-h1">Turn-Key Exteriors<br>Built for Builders.</h1>
-        <p class="hero-sub">Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package: siding, gutters, trim, soffit, and fascia under one contract, on your schedule.</p>
+        <p class="hero-eyebrow" id="hero-eyebrow">New Construction Specialists &nbsp;·&nbsp; Logan, Utah</p>
+        <h1 class="hero-h1" id="hero-h1">Turn-Key Exteriors<br>Built for Builders.</h1>
+        <p class="hero-sub" id="hero-sub">Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package: siding, gutters, trim, soffit, and fascia under one contract, on your schedule.</p>
         <a href="contact.html" class="btn-primary">Request a Bid</a>
         <p class="hero-phone">Or call &nbsp;<a href="tel:3852895872">385-289-5872</a></p>
       </div>
@@ -1074,6 +1074,20 @@
     }
     function handleSearchResult(url) { if (url) { clearSiteSearch(); window.location.href = url; } }
     function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    // Load site-config and apply hero content
+    fetch('site-config.json?v=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(cfg) {
+        buildSearchIndex(cfg);
+        var hero = cfg && cfg._site && cfg._site.hero;
+        if (hero) {
+          if (hero.eyebrow) document.getElementById('hero-eyebrow').innerHTML = hero.eyebrow;
+          if (hero.h1)      document.getElementById('hero-h1').innerHTML      = hero.h1;
+          if (hero.sub)     document.getElementById('hero-sub').innerHTML     = hero.sub;
+        }
+      })
+      .catch(function(){});
+
     document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById('site-search-input');
       input.addEventListener('input', function(){ runSiteSearch(this.value); });

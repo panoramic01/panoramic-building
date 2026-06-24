@@ -7,7 +7,6 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Site Admin | Panoramic Building</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f3ef; color: #2E2E2E; }
@@ -401,10 +400,12 @@
       </div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-sec">
+        <!-- Analytics tab hidden until service account is configured
         <div class="sidebar-sec-label">Analytics</div>
         <div class="sidebar-item" id="nav-stats" onclick="showStats()">
           <span>Stats &amp; SEO</span>
         </div>
+        -->
       </div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-sec">
@@ -786,9 +787,6 @@
   // ── Show admin ─────────────────────────────────────────────────────
   async function showAdmin() {
     document.getElementById('admin-ui').classList.add('show');
-    // Init Google auth once admin is loaded (GIS may not have loaded yet on first render)
-    if (window.google) initGoogleAuth();
-    else if (GA_CLIENT_ID) setTimeout(initGoogleAuth, 2000);
     try {
       await Promise.all([loadManifest(), loadSiteConfig()]);
       renderProjects();
@@ -1620,161 +1618,10 @@
   }
 
   // ── Stats & Analytics ──────────────────────────────────────────────
-  const GA_MEASUREMENT_ID = 'G-KSCV6NHWLK';
-  const GA_PROPERTY_ID    = '543000260';
-  const GA_CLIENT_ID      = '3441104480-j19b3tb6r7uqa4vdrqtpjjpprt53j7ms.apps.googleusercontent.com';
-  const SC_SITE_URL       = 'https://panoramicbuildingllc.com/';
+  const GA_MEASUREMENT_ID   = 'G-KSCV6NHWLK';
+  const ANALYTICS_WORKER_URL = ''; // paste Cloudflare Worker URL here after deployment
 
-  let statsRange  = '7';
-  let gaToken     = sessionStorage.getItem('ga_token') || null;
-  let gaTokenClient = null;
-
-  // Called once Google Identity Services script loads
-  function initGoogleAuth() {
-    if (!GA_CLIENT_ID || !window.google) return;
-    gaTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: GA_CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/webmasters.readonly',
-      callback: function(resp) {
-        if (resp.error) { toast('Google sign-in failed: ' + resp.error, 'error'); return; }
-        gaToken = resp.access_token;
-        sessionStorage.setItem('ga_token', gaToken);
-        showStats();
-      }
-    });
-    // If we already have a cached token try to use it; GIS will silently refresh if expired
-    if (!gaToken && gaTokenClient) gaTokenClient.requestAccessToken({ prompt: '' });
-  }
-
-  function connectGoogle() {
-    if (!GA_CLIENT_ID) { toast('OAuth Client ID not configured yet', 'error'); return; }
-    if (!gaTokenClient) { toast('Google Identity Services still loading — try again in a moment', 'error'); return; }
-    gaTokenClient.requestAccessToken({ prompt: gaToken ? '' : 'consent' });
-  }
-
-  // ── GA4 API helpers ────────────────────────────────────────────────
-  async function gaReport(body) {
-    const res = await fetch(
-      `https://analyticsdata.googleapis.com/v1beta/properties/${GA_PROPERTY_ID}:runReport`,
-      { method: 'POST', headers: { 'Authorization': 'Bearer ' + gaToken, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-    );
-    if (res.status === 401) { gaToken = null; sessionStorage.removeItem('ga_token'); throw new Error('token_expired'); }
-    if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error((e && e.error && e.error.message) || 'GA error ' + res.status); }
-    return res.json();
-  }
-
-  function gaDates(range) {
-    const days = range === '7' ? 7 : range === '30' ? 30 : 90;
-    return {
-      cur:  { startDate: days + 'daysAgo', endDate: 'today' },
-      prev: { startDate: (days * 2) + 'daysAgo', endDate: (days + 1) + 'daysAgo' }
-    };
-  }
-
-  function fmtSecs(secs) {
-    const s = Math.round(+secs || 0);
-    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-  }
-
-  function pctDelta(curr, prev) {
-    if (!prev) return { str: '—', down: false };
-    const p = Math.round((curr - prev) / prev * 100);
-    return { str: (p >= 0 ? '+' : '') + p + '%', down: p < 0 };
-  }
-
-  async function fetchKPIs(range) {
-    const { cur, prev } = gaDates(range);
-    const metrics = [
-      { name: 'sessions' }, { name: 'activeUsers' },
-      { name: 'screenPageViews' }, { name: 'averageSessionDuration' }
-    ];
-    const [curR, prevR] = await Promise.all([
-      gaReport({ dateRanges: [cur],  metrics }),
-      gaReport({ dateRanges: [prev], metrics })
-    ]);
-    const cv = (curR.rows  || [{ metricValues: [{value:'0'},{value:'0'},{value:'0'},{value:'0'}] }])[0].metricValues;
-    const pv = (prevR.rows || [{ metricValues: [{value:'0'},{value:'0'},{value:'0'},{value:'0'}] }])[0].metricValues;
-    const sessions  = +cv[0].value, pSessions  = +pv[0].value;
-    const users     = +cv[1].value, pUsers     = +pv[1].value;
-    const pageviews = +cv[2].value, pPageviews = +pv[2].value;
-    const avgDur    = +cv[3].value, pAvgDur    = +pv[3].value;
-    const durDiff   = avgDur - pAvgDur;
-    return {
-      sessions, users, pageviews,
-      avgDuration: fmtSecs(avgDur),
-      sessionsDelta:  pctDelta(sessions,  pSessions),
-      usersDelta:     pctDelta(users,     pUsers),
-      pageviewsDelta: pctDelta(pageviews, pPageviews),
-      durationDelta:  { str: (durDiff >= 0 ? '+' : '-') + fmtSecs(Math.abs(durDiff)), down: durDiff < 0 }
-    };
-  }
-
-  async function fetchTopPages(range) {
-    const { cur } = gaDates(range);
-    const data = await gaReport({
-      dateRanges: [cur],
-      dimensions: [{ name: 'pageTitle' }, { name: 'pagePath' }],
-      metrics: [{ name: 'screenPageViews' }],
-      orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-      limit: 6
-    });
-    return (data.rows || []).map(function(row) {
-      var title = row.dimensionValues[0].value.replace(' | Panoramic Building', '').replace(' | Panoramic Building LLC', '');
-      if (title === '(not set)') title = row.dimensionValues[1].value;
-      return { label: title, page: row.dimensionValues[1].value, views: +row.metricValues[0].value };
-    });
-  }
-
-  async function fetchSources(range) {
-    const { cur } = gaDates(range);
-    const COLORS = ['#1F3971','#4a7fc1','#8eb4e3','#c6d9f1','#a0b8d8','#d4e4f7'];
-    const data = await gaReport({
-      dateRanges: [cur],
-      dimensions: [{ name: 'sessionDefaultChannelGroup' }],
-      metrics: [{ name: 'sessions' }],
-      orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
-      limit: 6
-    });
-    const rows = data.rows || [];
-    const total = rows.reduce(function(s, r) { return s + +r.metricValues[0].value; }, 0) || 1;
-    return rows.map(function(row, i) {
-      return { name: row.dimensionValues[0].value, pct: Math.round(+row.metricValues[0].value / total * 100), color: COLORS[i] || '#ddd' };
-    });
-  }
-
-  async function fetchDevices(range) {
-    const { cur } = gaDates(range);
-    const COLORS = { mobile: '#1F3971', desktop: '#4a7fc1', tablet: '#8eb4e3' };
-    const data = await gaReport({
-      dateRanges: [cur],
-      dimensions: [{ name: 'deviceCategory' }],
-      metrics: [{ name: 'sessions' }],
-      orderBys: [{ metric: { metricName: 'sessions' }, desc: true }]
-    });
-    const rows = data.rows || [];
-    const total = rows.reduce(function(s, r) { return s + +r.metricValues[0].value; }, 0) || 1;
-    return rows.map(function(row) {
-      var cat = row.dimensionValues[0].value.toLowerCase();
-      return { name: cat.charAt(0).toUpperCase() + cat.slice(1), pct: Math.round(+row.metricValues[0].value / total * 100), color: COLORS[cat] || '#c6d9f1' };
-    });
-  }
-
-  async function fetchSearchConsole(range) {
-    const days = range === '7' ? 7 : range === '30' ? 30 : 90;
-    const end  = new Date(); end.setDate(end.getDate() - 3); // SC has ~3-day lag
-    const start = new Date(end); start.setDate(start.getDate() - days);
-    const fmt = function(d) { return d.toISOString().slice(0, 10); };
-    const res = await fetch(
-      'https://searchconsole.googleapis.com/webmasters/v3/sites/' + encodeURIComponent(SC_SITE_URL) + '/searchAnalytics/query',
-      { method: 'POST', headers: { 'Authorization': 'Bearer ' + gaToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ startDate: fmt(start), endDate: fmt(end), dimensions: ['query'], rowLimit: 8 }) }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return (data.rows || []).map(function(row) {
-      return { query: row.keys[0], clicks: row.clicks, impressions: row.impressions, position: row.position };
-    });
-  }
+  let statsRange = '7';
 
   // ── Render helpers ─────────────────────────────────────────────────
   const MOCK_KPI = {
@@ -1921,30 +1768,15 @@
   }
 
   function renderStatsBanner(live) {
-    const configured = !!GA_CLIENT_ID;
-    const title = live ? 'Connected to Google Analytics' : configured ? 'Google Analytics' : 'Google Analytics: Not Connected Yet';
+    const title = live ? 'Live Analytics' : ANALYTICS_WORKER_URL ? 'Connecting…' : 'Analytics Worker Not Configured';
     const sub   = live
-      ? 'Live data is being pulled from your GA4 property and Google Search Console.'
-      : configured
-        ? 'Click the button to sign in with Google and load your live analytics data.'
-        : 'Add your OAuth Client ID to the admin.html constants to enable live data.';
+      ? 'Data pulled live from GA4 · Property ' + GA_MEASUREMENT_ID
+      : ANALYTICS_WORKER_URL
+        ? 'Fetching data from the analytics worker…'
+        : 'Deploy the Cloudflare Worker and paste its URL into ANALYTICS_WORKER_URL in admin.html.';
     const btn = live
-      ? `<div class="stats-connect-ids">
-          <div class="stats-connect-id-field"><div class="stats-connect-id-label">Measurement ID</div><div class="stats-connect-id-val">${GA_MEASUREMENT_ID}</div></div>
-          <div class="stats-connect-id-field"><div class="stats-connect-id-label">Property ID</div><div class="stats-connect-id-val">${GA_PROPERTY_ID}</div></div>
-          <div class="stats-connect-id-field" style="margin-left:auto">
-            <button class="stats-connect-btn-active" onclick="connectGoogle()" style="font-size:9px;padding:7px 14px">↻ Refresh Data</button>
-          </div>
-        </div>`
-      : configured
-        ? `<button class="stats-connect-btn-active" onclick="connectGoogle()">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Sign In with Google
-          </button>`
-        : `<button class="stats-connect-btn" disabled>
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Add OAuth Client ID to Enable
-          </button>`;
+      ? `<button class="stats-connect-btn-active" onclick="showStats()" style="font-size:9px;padding:7px 14px">↻ Refresh</button>`
+      : '';
     return `<div class="stats-connect-banner">
       <div class="stats-connect-icon">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
@@ -1967,47 +1799,67 @@
     </div>`;
   }
 
+  // ── Data parsers (worker response → render format) ─────────────────
+  function fmtSecs(secs) {
+    const s = Math.round(+secs || 0);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function pctDelta(curr, prev) {
+    if (!prev) return { str: '—', down: false };
+    const p = Math.round((curr - prev) / prev * 100);
+    return { str: (p >= 0 ? '+' : '') + p + '%', down: p < 0 };
+  }
+  const SRC_COLORS = ['#1F3971','#4a7fc1','#8eb4e3','#c6d9f1','#a0b8d8','#d4e4f7'];
+  const DEV_COLORS = { mobile: '#1F3971', desktop: '#4a7fc1', tablet: '#8eb4e3' };
+
+  function parseWorkerData(raw) {
+    // KPI
+    const k = raw.kpi || {};
+    const durDiff = (k.avgDuration || 0) - (k.pAvgDuration || 0);
+    const kpi = {
+      sessions: k.sessions || 0, users: k.users || 0,
+      pageviews: k.pageviews || 0, avgDuration: fmtSecs(k.avgDuration || 0),
+      sessionsDelta:  pctDelta(k.sessions  || 0, k.pSessions  || 0),
+      usersDelta:     pctDelta(k.users     || 0, k.pUsers     || 0),
+      pageviewsDelta: pctDelta(k.pageviews || 0, k.pPageviews || 0),
+      durationDelta:  { str: (durDiff >= 0 ? '+' : '-') + fmtSecs(Math.abs(durDiff)), down: durDiff < 0 }
+    };
+    // Pages
+    const pages = (raw.pages || []).map(function(p) { return { label: p.label, views: p.views }; });
+    // Sources
+    const sources = (raw.sources || []).map(function(s, i) {
+      return { name: s.name, pct: s.pct, color: SRC_COLORS[i] || '#ddd' };
+    });
+    // Devices
+    const devices = (raw.devices || []).map(function(d) {
+      var cat = (d.name || '').toLowerCase();
+      return { name: d.name, pct: d.pct, color: DEV_COLORS[cat] || '#c6d9f1' };
+    });
+    // Search
+    const queries = raw.search || null;
+    return { kpi, pages, sources, devices, queries };
+  }
+
   // ── Main entry point ───────────────────────────────────────────────
   async function showStats() {
     setSidebarActive('nav-stats');
-    const live = !!gaToken && !!GA_PROPERTY_ID;
 
-    // Show banner + loading skeleton immediately
-    document.getElementById('admin-main').innerHTML = renderStatsBanner(live) + (live ? renderStatsLoading() : '');
-
-    if (!live) {
-      // No token — show mock data blurred
+    if (!ANALYTICS_WORKER_URL) {
       document.getElementById('admin-main').innerHTML =
         renderStatsBanner(false) + renderStatsContent(MOCK_KPI[statsRange], MOCK_PAGES, MOCK_SOURCES, MOCK_DEVICES, MOCK_QUERIES, 'stats-not-connected');
       return;
     }
 
-    // Fetch real data
+    // Show loading immediately
+    document.getElementById('admin-main').innerHTML = renderStatsBanner(false) + renderStatsLoading();
+
     try {
-      const results = await Promise.allSettled([
-        fetchKPIs(statsRange),
-        fetchTopPages(statsRange),
-        fetchSources(statsRange),
-        fetchDevices(statsRange),
-        fetchSearchConsole(statsRange)
-      ]);
+      const res = await fetch(ANALYTICS_WORKER_URL + '?range=' + statsRange);
+      if (!res.ok) throw new Error('Worker returned ' + res.status);
+      const raw = await res.json();
+      if (raw.error) throw new Error(raw.error);
 
-      // Bubble up token-expired error
-      for (var i = 0; i < results.length; i++) {
-        if (results[i].status === 'rejected' && results[i].reason && results[i].reason.message === 'token_expired') {
-          gaToken = null; sessionStorage.removeItem('ga_token');
-          toast('Google session expired — please sign in again', 'error');
-          document.getElementById('admin-main').innerHTML = renderStatsBanner(false) + renderStatsContent(MOCK_KPI[statsRange], MOCK_PAGES, MOCK_SOURCES, MOCK_DEVICES, MOCK_QUERIES, 'stats-not-connected');
-          return;
-        }
-      }
-
-      const kpi     = results[0].status === 'fulfilled' ? results[0].value : MOCK_KPI[statsRange];
-      const pages   = results[1].status === 'fulfilled' ? results[1].value : MOCK_PAGES;
-      const sources = results[2].status === 'fulfilled' ? results[2].value : MOCK_SOURCES;
-      const devices = results[3].status === 'fulfilled' ? results[3].value : MOCK_DEVICES;
-      const queries = results[4].status === 'fulfilled' ? results[4].value : null;
-
+      const { kpi, pages, sources, devices, queries } = parseWorkerData(raw);
       document.getElementById('admin-main').innerHTML =
         renderStatsBanner(true) + renderStatsContent(kpi, pages, sources, devices, queries, '');
 
