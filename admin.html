@@ -7,6 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Site Admin | Panoramic Building</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f3ef; color: #2E2E2E; }
@@ -313,6 +314,15 @@
     .stats-position-pill.low  { background: #f8f4f4; color: #A2A092; }
 
     .stats-not-connected { opacity: 0.35; pointer-events: none; user-select: none; filter: blur(1.5px); }
+    .stats-connect-btn-active { background: #1F3971; color: #fff; border: none; padding: 9px 20px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; }
+    .stats-connect-btn-active:hover { background: #16305f; }
+    .stats-loading-row { display: flex; gap: 14px; margin-bottom: 24px; }
+    .stats-loading-box { flex: 1; background: #fff; border: 1px solid #e8e7e3; padding: 18px 20px; animation: statsPulse 1.4s ease-in-out infinite; }
+    .stats-loading-bar { height: 10px; background: #f0efe9; border-radius: 3px; margin-bottom: 10px; }
+    .stats-loading-bar.tall { height: 28px; width: 60%; }
+    .stats-loading-bar.short { width: 50%; }
+    @keyframes statsPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .stats-error { background: #fff; border: 1px solid #e8e7e3; padding: 40px; text-align: center; color: #A2A092; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -776,6 +786,9 @@
   // ── Show admin ─────────────────────────────────────────────────────
   async function showAdmin() {
     document.getElementById('admin-ui').classList.add('show');
+    // Init Google auth once admin is loaded (GIS may not have loaded yet on first render)
+    if (window.google) initGoogleAuth();
+    else if (GA_CLIENT_ID) setTimeout(initGoogleAuth, 2000);
     try {
       await Promise.all([loadManifest(), loadSiteConfig()]);
       renderProjects();
@@ -1607,102 +1620,207 @@
   }
 
   // ── Stats & Analytics ──────────────────────────────────────────────
-  const GA_MEASUREMENT_ID = '';   // e.g. 'G-XXXXXXXXXX'  — fill in when ready
-  const GA_PROPERTY_ID    = '';   // e.g. '123456789'      — fill in when ready
-  const GA_CLIENT_ID      = '';   // e.g. 'XXXXX.apps.googleusercontent.com' — fill in when ready
-  const GA_CONNECTED      = false; // flip to true once credentials are in
+  const GA_MEASUREMENT_ID = 'G-KSCV6NHWLK';
+  const GA_PROPERTY_ID    = '543000260';
+  const GA_CLIENT_ID      = '3441104480-j19b3tb6r7uqa4vdrqtpjjpprt53j7ms.apps.googleusercontent.com';
+  const SC_SITE_URL       = 'https://panoramicbuildingllc.com/';
 
-  let statsRange = '7';
+  let statsRange  = '7';
+  let gaToken     = sessionStorage.getItem('ga_token') || null;
+  let gaTokenClient = null;
 
-  function showStats() {
-    setSidebarActive('nav-stats');
-    const connected = GA_CONNECTED;
+  // Called once Google Identity Services script loads
+  function initGoogleAuth() {
+    if (!GA_CLIENT_ID || !window.google) return;
+    gaTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GA_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/webmasters.readonly',
+      callback: function(resp) {
+        if (resp.error) { toast('Google sign-in failed: ' + resp.error, 'error'); return; }
+        gaToken = resp.access_token;
+        sessionStorage.setItem('ga_token', gaToken);
+        showStats();
+      }
+    });
+    // If we already have a cached token try to use it; GIS will silently refresh if expired
+    if (!gaToken && gaTokenClient) gaTokenClient.requestAccessToken({ prompt: '' });
+  }
 
-    // Placeholder data — replaced by real GA4 API data once connected
-    const data = {
-      '7':  { sessions: 142, users: 98,  pageviews: 312, avgDuration: '2:14', sessionsDelta: '+12%', usersDelta: '+8%', pageviewsDelta: '+15%', durationDelta: '+0:18' },
-      '30': { sessions: 587, users: 391, pageviews: 1248, avgDuration: '2:31', sessionsDelta: '+22%', usersDelta: '+18%', pageviewsDelta: '+29%', durationDelta: '+0:22' },
-      '90': { sessions: 1843, users: 1102, pageviews: 3891, avgDuration: '2:28', sessionsDelta: '+41%', usersDelta: '+35%', pageviewsDelta: '+48%', durationDelta: '+0:14' },
+  function connectGoogle() {
+    if (!GA_CLIENT_ID) { toast('OAuth Client ID not configured yet', 'error'); return; }
+    if (!gaTokenClient) { toast('Google Identity Services still loading — try again in a moment', 'error'); return; }
+    gaTokenClient.requestAccessToken({ prompt: gaToken ? '' : 'consent' });
+  }
+
+  // ── GA4 API helpers ────────────────────────────────────────────────
+  async function gaReport(body) {
+    const res = await fetch(
+      `https://analyticsdata.googleapis.com/v1beta/properties/${GA_PROPERTY_ID}:runReport`,
+      { method: 'POST', headers: { 'Authorization': 'Bearer ' + gaToken, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+    );
+    if (res.status === 401) { gaToken = null; sessionStorage.removeItem('ga_token'); throw new Error('token_expired'); }
+    if (!res.ok) { const e = await res.json().catch(()=>{}); throw new Error((e && e.error && e.error.message) || 'GA error ' + res.status); }
+    return res.json();
+  }
+
+  function gaDates(range) {
+    const days = range === '7' ? 7 : range === '30' ? 30 : 90;
+    return {
+      cur:  { startDate: days + 'daysAgo', endDate: 'today' },
+      prev: { startDate: (days * 2) + 'daysAgo', endDate: (days + 1) + 'daysAgo' }
     };
-    const topPages = [
-      { page: '/index.html',        label: 'Home',        views: 498 },
-      { page: '/multifamily.html',  label: 'Multifamily', views: 312 },
-      { page: '/reserve.html',      label: 'Reserve',     views: 201 },
-      { page: '/contact.html',      label: 'Get a Bid',   views: 187 },
-      { page: '/custom.html',       label: 'Custom',      views: 156 },
-    ];
-    const sources = [
-      { name: 'Organic Search', pct: 48, color: '#1F3971' },
-      { name: 'Direct',         pct: 31, color: '#4a7fc1' },
-      { name: 'Referral',       pct: 13, color: '#8eb4e3' },
-      { name: 'Social',         pct:  8, color: '#c6d9f1' },
-    ];
-    const devices = [
-      { name: 'Mobile',  pct: 61, color: '#1F3971' },
-      { name: 'Desktop', pct: 33, color: '#4a7fc1' },
-      { name: 'Tablet',  pct:  6, color: '#8eb4e3' },
-    ];
-    const queries = [
-      { query: 'panoramic building',               clicks: 48, impressions: 312, position: 2.1  },
-      { query: 'exterior contractor utah',          clicks: 31, impressions: 820, position: 6.4  },
-      { query: 'siding contractor northern utah',   clicks: 22, impressions: 541, position: 5.1  },
-      { query: 'multifamily exterior contractor',   clicks: 18, impressions: 634, position: 8.3  },
-      { query: 'panoramic reserve homes utah',      clicks: 14, impressions: 198, position: 3.7  },
-      { query: 'custom home exterior logan ut',     clicks: 11, impressions: 287, position: 9.2  },
-    ];
+  }
 
-    const d = data[statsRange];
-    const maxViews = topPages[0].views;
+  function fmtSecs(secs) {
+    const s = Math.round(+secs || 0);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
 
-    function kpiDeltaHtml(delta) {
-      const down = delta.startsWith('-');
-      return `<div class="stats-kpi-delta ${down ? 'down' : ''}">
-        <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="${down ? 'M6 2v8M2 6l4 4 4-4' : 'M6 10V2M2 6l4-4 4 4'}"/>
-        </svg>${delta} vs prev period</div>`;
-    }
+  function pctDelta(curr, prev) {
+    if (!prev) return { str: '—', down: false };
+    const p = Math.round((curr - prev) / prev * 100);
+    return { str: (p >= 0 ? '+' : '') + p + '%', down: p < 0 };
+  }
 
-    function positionPill(pos) {
-      const cls = pos <= 5 ? 'good' : pos <= 10 ? 'mid' : 'low';
-      return `<span class="stats-position-pill ${cls}">#${pos.toFixed(1)}</span>`;
-    }
+  async function fetchKPIs(range) {
+    const { cur, prev } = gaDates(range);
+    const metrics = [
+      { name: 'sessions' }, { name: 'activeUsers' },
+      { name: 'screenPageViews' }, { name: 'averageSessionDuration' }
+    ];
+    const [curR, prevR] = await Promise.all([
+      gaReport({ dateRanges: [cur],  metrics }),
+      gaReport({ dateRanges: [prev], metrics })
+    ]);
+    const cv = (curR.rows  || [{ metricValues: [{value:'0'},{value:'0'},{value:'0'},{value:'0'}] }])[0].metricValues;
+    const pv = (prevR.rows || [{ metricValues: [{value:'0'},{value:'0'},{value:'0'},{value:'0'}] }])[0].metricValues;
+    const sessions  = +cv[0].value, pSessions  = +pv[0].value;
+    const users     = +cv[1].value, pUsers     = +pv[1].value;
+    const pageviews = +cv[2].value, pPageviews = +pv[2].value;
+    const avgDur    = +cv[3].value, pAvgDur    = +pv[3].value;
+    const durDiff   = avgDur - pAvgDur;
+    return {
+      sessions, users, pageviews,
+      avgDuration: fmtSecs(avgDur),
+      sessionsDelta:  pctDelta(sessions,  pSessions),
+      usersDelta:     pctDelta(users,     pUsers),
+      pageviewsDelta: pctDelta(pageviews, pPageviews),
+      durationDelta:  { str: (durDiff >= 0 ? '+' : '-') + fmtSecs(Math.abs(durDiff)), down: durDiff < 0 }
+    };
+  }
 
-    // Donut chart SVG for device split
+  async function fetchTopPages(range) {
+    const { cur } = gaDates(range);
+    const data = await gaReport({
+      dateRanges: [cur],
+      dimensions: [{ name: 'pageTitle' }, { name: 'pagePath' }],
+      metrics: [{ name: 'screenPageViews' }],
+      orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+      limit: 6
+    });
+    return (data.rows || []).map(function(row) {
+      var title = row.dimensionValues[0].value.replace(' | Panoramic Building', '').replace(' | Panoramic Building LLC', '');
+      if (title === '(not set)') title = row.dimensionValues[1].value;
+      return { label: title, page: row.dimensionValues[1].value, views: +row.metricValues[0].value };
+    });
+  }
+
+  async function fetchSources(range) {
+    const { cur } = gaDates(range);
+    const COLORS = ['#1F3971','#4a7fc1','#8eb4e3','#c6d9f1','#a0b8d8','#d4e4f7'];
+    const data = await gaReport({
+      dateRanges: [cur],
+      dimensions: [{ name: 'sessionDefaultChannelGroup' }],
+      metrics: [{ name: 'sessions' }],
+      orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+      limit: 6
+    });
+    const rows = data.rows || [];
+    const total = rows.reduce(function(s, r) { return s + +r.metricValues[0].value; }, 0) || 1;
+    return rows.map(function(row, i) {
+      return { name: row.dimensionValues[0].value, pct: Math.round(+row.metricValues[0].value / total * 100), color: COLORS[i] || '#ddd' };
+    });
+  }
+
+  async function fetchDevices(range) {
+    const { cur } = gaDates(range);
+    const COLORS = { mobile: '#1F3971', desktop: '#4a7fc1', tablet: '#8eb4e3' };
+    const data = await gaReport({
+      dateRanges: [cur],
+      dimensions: [{ name: 'deviceCategory' }],
+      metrics: [{ name: 'sessions' }],
+      orderBys: [{ metric: { metricName: 'sessions' }, desc: true }]
+    });
+    const rows = data.rows || [];
+    const total = rows.reduce(function(s, r) { return s + +r.metricValues[0].value; }, 0) || 1;
+    return rows.map(function(row) {
+      var cat = row.dimensionValues[0].value.toLowerCase();
+      return { name: cat.charAt(0).toUpperCase() + cat.slice(1), pct: Math.round(+row.metricValues[0].value / total * 100), color: COLORS[cat] || '#c6d9f1' };
+    });
+  }
+
+  async function fetchSearchConsole(range) {
+    const days = range === '7' ? 7 : range === '30' ? 30 : 90;
+    const end  = new Date(); end.setDate(end.getDate() - 3); // SC has ~3-day lag
+    const start = new Date(end); start.setDate(start.getDate() - days);
+    const fmt = function(d) { return d.toISOString().slice(0, 10); };
+    const res = await fetch(
+      'https://searchconsole.googleapis.com/webmasters/v3/sites/' + encodeURIComponent(SC_SITE_URL) + '/searchAnalytics/query',
+      { method: 'POST', headers: { 'Authorization': 'Bearer ' + gaToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: fmt(start), endDate: fmt(end), dimensions: ['query'], rowLimit: 8 }) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.rows || []).map(function(row) {
+      return { query: row.keys[0], clicks: row.clicks, impressions: row.impressions, position: row.position };
+    });
+  }
+
+  // ── Render helpers ─────────────────────────────────────────────────
+  const MOCK_KPI = {
+    '7':  { sessions: 142, users: 98,  pageviews: 312, avgDuration: '2:14', sessionsDelta: {str:'+12%',down:false}, usersDelta:{str:'+8%',down:false}, pageviewsDelta:{str:'+15%',down:false}, durationDelta:{str:'+0:18',down:false} },
+    '30': { sessions: 587, users: 391, pageviews: 1248, avgDuration: '2:31', sessionsDelta:{str:'+22%',down:false}, usersDelta:{str:'+18%',down:false}, pageviewsDelta:{str:'+29%',down:false}, durationDelta:{str:'+0:22',down:false} },
+    '90': { sessions: 1843, users: 1102, pageviews: 3891, avgDuration: '2:28', sessionsDelta:{str:'+41%',down:false}, usersDelta:{str:'+35%',down:false}, pageviewsDelta:{str:'+48%',down:false}, durationDelta:{str:'+0:14',down:false} },
+  };
+  const MOCK_PAGES   = [{label:'Home',views:498},{label:'Multifamily',views:312},{label:'Reserve',views:201},{label:'Get a Bid',views:187},{label:'Custom',views:156}];
+  const MOCK_SOURCES = [{name:'Organic Search',pct:48,color:'#1F3971'},{name:'Direct',pct:31,color:'#4a7fc1'},{name:'Referral',pct:13,color:'#8eb4e3'},{name:'Social',pct:8,color:'#c6d9f1'}];
+  const MOCK_DEVICES = [{name:'Mobile',pct:61,color:'#1F3971'},{name:'Desktop',pct:33,color:'#4a7fc1'},{name:'Tablet',pct:6,color:'#8eb4e3'}];
+  const MOCK_QUERIES = [
+    {query:'panoramic building',clicks:48,impressions:312,position:2.1},
+    {query:'exterior contractor utah',clicks:31,impressions:820,position:6.4},
+    {query:'siding contractor northern utah',clicks:22,impressions:541,position:5.1},
+    {query:'multifamily exterior contractor',clicks:18,impressions:634,position:8.3},
+    {query:'panoramic reserve homes utah',clicks:14,impressions:198,position:3.7},
+    {query:'custom home exterior logan ut',clicks:11,impressions:287,position:9.2},
+  ];
+
+  function kpiDeltaHtml(delta) {
+    if (!delta || delta.str === '—') return '<div class="stats-kpi-delta neutral">— no prev data</div>';
+    return `<div class="stats-kpi-delta ${delta.down ? 'down' : ''}">
+      <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="${delta.down ? 'M6 2v8M2 6l4 4 4-4' : 'M6 10V2M2 6l4-4 4 4'}"/>
+      </svg>${delta.str} vs prev period</div>`;
+  }
+
+  function positionPill(pos) {
+    const cls = pos <= 5 ? 'good' : pos <= 10 ? 'mid' : 'low';
+    return `<span class="stats-position-pill ${cls}">#${(+pos).toFixed(1)}</span>`;
+  }
+
+  function donutSvg(devices) {
     let offset = 0;
     const r = 30, circ = 2 * Math.PI * r;
-    const donutPaths = devices.map(d => {
+    return devices.map(function(d) {
       const dash = (d.pct / 100) * circ;
       const svg = `<circle cx="40" cy="40" r="${r}" fill="none" stroke="${d.color}" stroke-width="10" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${-offset}" />`;
       offset += dash;
       return svg;
     }).join('');
+  }
 
-    const blurClass = connected ? '' : 'stats-not-connected';
-
-    document.getElementById('admin-main').innerHTML = `
-      <div class="stats-connect-banner">
-        <div class="stats-connect-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
-        </div>
-        <div>
-          <div class="stats-connect-title">${connected ? 'Connected to Google Analytics' : 'Google Analytics: Not Connected Yet'}</div>
-          <div class="stats-connect-sub">${connected
-            ? 'Live data is being pulled from your GA4 property and Google Search Console.'
-            : 'Stats below are sample data showing what this panel will look like. Once your domain is set up, add your Measurement ID, Property ID, and OAuth Client ID to activate live data.'
-          }</div>
-          ${connected
-            ? `<div class="stats-connect-ids">
-                <div class="stats-connect-id-field"><div class="stats-connect-id-label">Measurement ID</div><div class="stats-connect-id-val">${GA_MEASUREMENT_ID}</div></div>
-                <div class="stats-connect-id-field"><div class="stats-connect-id-label">Property ID</div><div class="stats-connect-id-val">${GA_PROPERTY_ID}</div></div>
-              </div>`
-            : `<button class="stats-connect-btn" disabled>
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Connect Google: Set Up Domain First
-              </button>`
-          }
-        </div>
-      </div>
-
+  function renderStatsContent(kpi, pages, sources, devices, queries, blurClass) {
+    const maxViews = pages.length ? pages[0].views : 1;
+    return `
       <div class="${blurClass}">
         <div class="stats-range-bar">
           <h2>Site Analytics</h2>
@@ -1716,23 +1834,23 @@
         <div class="stats-kpi-row">
           <div class="stats-kpi">
             <div class="stats-kpi-label">Sessions</div>
-            <div class="stats-kpi-val">${d.sessions.toLocaleString()}</div>
-            ${kpiDeltaHtml(d.sessionsDelta)}
+            <div class="stats-kpi-val">${kpi.sessions.toLocaleString()}</div>
+            ${kpiDeltaHtml(kpi.sessionsDelta)}
           </div>
           <div class="stats-kpi">
             <div class="stats-kpi-label">Unique Visitors</div>
-            <div class="stats-kpi-val">${d.users.toLocaleString()}</div>
-            ${kpiDeltaHtml(d.usersDelta)}
+            <div class="stats-kpi-val">${kpi.users.toLocaleString()}</div>
+            ${kpiDeltaHtml(kpi.usersDelta)}
           </div>
           <div class="stats-kpi">
             <div class="stats-kpi-label">Page Views</div>
-            <div class="stats-kpi-val">${d.pageviews.toLocaleString()}</div>
-            ${kpiDeltaHtml(d.pageviewsDelta)}
+            <div class="stats-kpi-val">${kpi.pageviews.toLocaleString()}</div>
+            ${kpiDeltaHtml(kpi.pageviewsDelta)}
           </div>
           <div class="stats-kpi">
             <div class="stats-kpi-label">Avg. Time on Site</div>
-            <div class="stats-kpi-val">${d.avgDuration}</div>
-            ${kpiDeltaHtml(d.durationDelta)}
+            <div class="stats-kpi-val">${kpi.avgDuration}</div>
+            ${kpiDeltaHtml(kpi.durationDelta)}
           </div>
         </div>
 
@@ -1740,27 +1858,27 @@
           <div class="stats-card">
             <div class="stats-card-title">Top Pages <span>By views</span></div>
             <div class="stats-bar-list">
-              ${topPages.map(p => `
+              ${pages.map(function(p) { return `
                 <div class="stats-bar-item">
                   <div class="stats-bar-item-top">
                     <div class="stats-bar-item-label">${escH(p.label)}</div>
                     <div class="stats-bar-item-val">${p.views.toLocaleString()}</div>
                   </div>
                   <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(p.views/maxViews*100)}%"></div></div>
-                </div>`).join('')}
+                </div>`; }).join('')}
             </div>
           </div>
 
           <div class="stats-card">
             <div class="stats-card-title">Traffic Sources</div>
             <div class="stats-source-list">
-              ${sources.map(s => `
+              ${sources.map(function(s) { return `
                 <div class="stats-source-item">
                   <div class="stats-source-dot" style="background:${s.color}"></div>
                   <div class="stats-source-name">${escH(s.name)}</div>
                   <div class="stats-source-bar-track"><div class="stats-source-bar-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
                   <div class="stats-source-pct">${s.pct}%</div>
-                </div>`).join('')}
+                </div>`; }).join('')}
             </div>
           </div>
         </div>
@@ -1770,35 +1888,134 @@
             <div class="stats-card-title">Device Breakdown</div>
             <div class="stats-device-row">
               <div class="stats-donut-wrap">
-                <svg viewBox="0 0 80 80" width="80" height="80">${donutPaths}</svg>
+                <svg viewBox="0 0 80 80" width="80" height="80">${donutSvg(devices)}</svg>
               </div>
               <div class="stats-donut-legend">
-                ${devices.map(d => `
+                ${devices.map(function(d) { return `
                   <div class="stats-device-item">
                     <div class="stats-device-dot" style="background:${d.color}"></div>
                     <span>${d.name}</span>
                     <strong>${d.pct}%</strong>
-                  </div>`).join('')}
+                  </div>`; }).join('')}
               </div>
             </div>
           </div>
 
           <div class="stats-card">
             <div class="stats-card-title">Google Search Console <span>SEO Rankings</span></div>
+            ${!queries ? '<div style="color:#A2A092;font-size:12px;padding:12px 0">Search Console not yet verified for this domain.</div>' : `
             <table class="stats-query-table">
               <thead><tr><th>Search Query</th><th>Clicks</th><th>Impr.</th><th>Position</th></tr></thead>
               <tbody>
-                ${queries.map(q => `<tr>
+                ${queries.map(function(q) { return `<tr>
                   <td>${escH(q.query)}</td>
                   <td>${q.clicks}</td>
                   <td>${q.impressions.toLocaleString()}</td>
                   <td>${positionPill(q.position)}</td>
-                </tr>`).join('')}
+                </tr>`; }).join('')}
               </tbody>
-            </table>
+            </table>`}
           </div>
         </div>
       </div>`;
+  }
+
+  function renderStatsBanner(live) {
+    const configured = !!GA_CLIENT_ID;
+    const title = live ? 'Connected to Google Analytics' : configured ? 'Google Analytics' : 'Google Analytics: Not Connected Yet';
+    const sub   = live
+      ? 'Live data is being pulled from your GA4 property and Google Search Console.'
+      : configured
+        ? 'Click the button to sign in with Google and load your live analytics data.'
+        : 'Add your OAuth Client ID to the admin.html constants to enable live data.';
+    const btn = live
+      ? `<div class="stats-connect-ids">
+          <div class="stats-connect-id-field"><div class="stats-connect-id-label">Measurement ID</div><div class="stats-connect-id-val">${GA_MEASUREMENT_ID}</div></div>
+          <div class="stats-connect-id-field"><div class="stats-connect-id-label">Property ID</div><div class="stats-connect-id-val">${GA_PROPERTY_ID}</div></div>
+          <div class="stats-connect-id-field" style="margin-left:auto">
+            <button class="stats-connect-btn-active" onclick="connectGoogle()" style="font-size:9px;padding:7px 14px">↻ Refresh Data</button>
+          </div>
+        </div>`
+      : configured
+        ? `<button class="stats-connect-btn-active" onclick="connectGoogle()">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Sign In with Google
+          </button>`
+        : `<button class="stats-connect-btn" disabled>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Add OAuth Client ID to Enable
+          </button>`;
+    return `<div class="stats-connect-banner">
+      <div class="stats-connect-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
+      </div>
+      <div style="flex:1">
+        <div class="stats-connect-title">${title}</div>
+        <div class="stats-connect-sub">${sub}</div>
+        ${btn}
+      </div>
+    </div>`;
+  }
+
+  function renderStatsLoading() {
+    return `<div class="stats-loading-row">
+      ${[0,1,2,3].map(function(){return`<div class="stats-loading-box"><div class="stats-loading-bar short"></div><div class="stats-loading-bar tall"></div><div class="stats-loading-bar short"></div></div>`;}).join('')}
+    </div>
+    <div class="stats-row">
+      <div class="stats-loading-box" style="padding:24px"><div class="stats-loading-bar" style="width:40%;margin-bottom:18px"></div>${[0,1,2,3,4].map(function(){return`<div class="stats-loading-bar" style="margin-bottom:12px"></div>`;}).join('')}</div>
+      <div class="stats-loading-box" style="padding:24px"><div class="stats-loading-bar" style="width:40%;margin-bottom:18px"></div>${[0,1,2,3].map(function(){return`<div class="stats-loading-bar" style="margin-bottom:12px"></div>`;}).join('')}</div>
+    </div>`;
+  }
+
+  // ── Main entry point ───────────────────────────────────────────────
+  async function showStats() {
+    setSidebarActive('nav-stats');
+    const live = !!gaToken && !!GA_PROPERTY_ID;
+
+    // Show banner + loading skeleton immediately
+    document.getElementById('admin-main').innerHTML = renderStatsBanner(live) + (live ? renderStatsLoading() : '');
+
+    if (!live) {
+      // No token — show mock data blurred
+      document.getElementById('admin-main').innerHTML =
+        renderStatsBanner(false) + renderStatsContent(MOCK_KPI[statsRange], MOCK_PAGES, MOCK_SOURCES, MOCK_DEVICES, MOCK_QUERIES, 'stats-not-connected');
+      return;
+    }
+
+    // Fetch real data
+    try {
+      const results = await Promise.allSettled([
+        fetchKPIs(statsRange),
+        fetchTopPages(statsRange),
+        fetchSources(statsRange),
+        fetchDevices(statsRange),
+        fetchSearchConsole(statsRange)
+      ]);
+
+      // Bubble up token-expired error
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].status === 'rejected' && results[i].reason && results[i].reason.message === 'token_expired') {
+          gaToken = null; sessionStorage.removeItem('ga_token');
+          toast('Google session expired — please sign in again', 'error');
+          document.getElementById('admin-main').innerHTML = renderStatsBanner(false) + renderStatsContent(MOCK_KPI[statsRange], MOCK_PAGES, MOCK_SOURCES, MOCK_DEVICES, MOCK_QUERIES, 'stats-not-connected');
+          return;
+        }
+      }
+
+      const kpi     = results[0].status === 'fulfilled' ? results[0].value : MOCK_KPI[statsRange];
+      const pages   = results[1].status === 'fulfilled' ? results[1].value : MOCK_PAGES;
+      const sources = results[2].status === 'fulfilled' ? results[2].value : MOCK_SOURCES;
+      const devices = results[3].status === 'fulfilled' ? results[3].value : MOCK_DEVICES;
+      const queries = results[4].status === 'fulfilled' ? results[4].value : null;
+
+      document.getElementById('admin-main').innerHTML =
+        renderStatsBanner(true) + renderStatsContent(kpi, pages, sources, devices, queries, '');
+
+    } catch(e) {
+      toast('Analytics error: ' + e.message, 'error');
+      document.getElementById('admin-main').innerHTML =
+        renderStatsBanner(false) + renderStatsContent(MOCK_KPI[statsRange], MOCK_PAGES, MOCK_SOURCES, MOCK_DEVICES, MOCK_QUERIES, 'stats-not-connected');
+    }
   }
 
   function setStatsRange(range) {
