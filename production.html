@@ -303,8 +303,8 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872">385-289-5872</a>
-      <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
   </footer>
@@ -360,6 +360,8 @@
         }).join('');
         matsEl.style.display = 'flex';
       }
+      if (site.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (site.phone || site.phoneFmt.replace(/\D/g,'')); fp.textContent = site.phoneFmt; } }
+      if (site.email)    { var fe = document.getElementById('footer-email');  if (fe) { fe.href = 'mailto:' + site.email; fe.textContent = site.email; } }
       buildSearchIndex(cfg);
     }).catch(function(e) { console.warn('site-config error', e); });
 

@@ -310,8 +310,8 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872">385-289-5872</a>
-      <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
   </footer>
@@ -418,7 +418,7 @@
         backBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8H3M7 12l-4-4 4-4"/></svg> Back to Projects';
         var titleDiv = document.createElement('div');
         titleDiv.className = 'sub-gallery-title';
-        titleDiv.innerHTML = '<h2 id="sub-title-' + id + '">' + name + '</h2><p id="sub-location-' + id + '">' + loc + '</p>';
+        titleDiv.innerHTML = '<h2 id="sub-title-' + id + '">' + name + '</h2><p id="sub-location-' + id + '">' + loc + '</p><p id="sub-desc-' + id + '" class="project-page-description"></p>';
         var matsBar = document.createElement('div');
         matsBar.className = 'materials-bar';
         matsBar.id = 'sub-materials-' + id;
@@ -451,6 +451,8 @@
         var locationEl = document.getElementById('sub-location-' + id);
         if (titleEl)    titleEl.textContent    = p.name || id;
         if (locationEl) locationEl.textContent = p.location || '';
+        var descEl = document.getElementById('sub-desc-' + id);
+        if (descEl) descEl.textContent = p.description || '';
         // Update card cover overlay / placeholder names
         document.querySelectorAll('#cover-' + id + ' .ph-name').forEach(function(el) { el.textContent = p.name || id; });
         document.querySelectorAll('#cover-' + id + ' .ph-location').forEach(function(el) { el.textContent = p.location || ''; });
@@ -497,6 +499,9 @@
       buildProjectGrid(manifest, cfg);
       applyConfig(cfg);
       applyUtilBar(cfg._site || {});
+      var s = cfg._site || {};
+      if (s && s.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; } }
+      if (s && s.email)    { var fe = document.getElementById('footer-email');  if (fe) { fe.href = 'mailto:' + s.email; fe.textContent = s.email; } }
       var hash = window.location.hash.replace('#', '');
       if (hash && document.getElementById('sub-' + hash)) {
         setTimeout(function() { openProject(hash); }, 50);

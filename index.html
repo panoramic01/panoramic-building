@@ -708,8 +708,8 @@
 
   <!-- Utility Bar -->
   <div class="util-bar">
-    <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
-    <span class="util-right"><a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></span>
+    <span id="util-service-area">Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
+    <span class="util-right"><a href="tel:3852895872" id="util-phone">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com" id="util-email">&#9993; info@panoramicbuildingllc.com</a></span>
   </div>
 
   <!-- Navigation -->
@@ -923,8 +923,8 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872">385-289-5872</a>
-      <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
   </footer>
@@ -1079,11 +1079,39 @@
       .then(function(r){ return r.json(); })
       .then(function(cfg) {
         buildSearchIndex(cfg);
-        var hero = cfg && cfg._site && cfg._site.hero;
+        var s = cfg && cfg._site;
+        if (!s) return;
+        // Hero
+        var hero = s.hero;
         if (hero) {
           if (hero.eyebrow) document.getElementById('hero-eyebrow').innerHTML = hero.eyebrow;
           if (hero.h1)      document.getElementById('hero-h1').innerHTML      = hero.h1;
           if (hero.sub)     document.getElementById('hero-sub').innerHTML     = hero.sub;
+        }
+        // Util bar
+        if (s.serviceArea) { var sa = document.getElementById('util-service-area'); if (sa) sa.innerHTML = s.serviceArea; }
+        if (s.phoneFmt) {
+          var up = document.getElementById('util-phone');
+          if (up) { up.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); up.textContent = '☎ ' + s.phoneFmt; }
+        }
+        if (s.email) {
+          var ue = document.getElementById('util-email');
+          if (ue) { ue.href = 'mailto:' + s.email; ue.textContent = '✉ ' + s.email; }
+        }
+        // Footer
+        if (s.phoneFmt) {
+          var fp = document.getElementById('footer-phone');
+          if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; }
+        }
+        if (s.email) {
+          var fe = document.getElementById('footer-email');
+          if (fe) { fe.href = 'mailto:' + s.email; fe.textContent = s.email; }
+        }
+        // SEO
+        var seo = s.seo && s.seo.index;
+        if (seo) {
+          if (seo.title) { document.title = seo.title; var el = document.querySelector('meta[property="og:title"]'); if (el) el.setAttribute('content', seo.title); }
+          if (seo.desc)  { var md = document.querySelector('meta[name="description"]'); if (md) md.setAttribute('content', seo.desc); var og = document.querySelector('meta[property="og:description"]'); if (og) og.setAttribute('content', seo.desc); }
         }
       })
       .catch(function(){});

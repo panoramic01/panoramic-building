@@ -198,8 +198,8 @@
 <body>
   <div class="accent-top"></div>
   <div class="util-bar">
-    <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
-    <span class="util-right"><a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></span>
+    <span id="util-service-area">Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
+    <span class="util-right"><a href="tel:3852895872" id="util-phone">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com" id="util-email">&#9993; info@panoramicbuildingllc.com</a></span>
   </div>
   <nav class="nav" role="navigation">
     <a class="nav-logo" href="index.html" aria-label="Panoramic Building LLC home">
@@ -342,13 +342,13 @@
           <div class="sidebar-icon">
             <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.69 11a19.79 19.79 0 01-3.07-8.67A2 2 0 012.6 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.57a16 16 0 006.29 6.29l.96-.96a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
           </div>
-          <a href="tel:3852895872">385-289-5872</a>
+          <a href="tel:3852895872" id="contact-phone">385-289-5872</a>
         </div>
         <div class="sidebar-contact-item">
           <div class="sidebar-icon">
             <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </div>
-          <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+          <a href="mailto:info@panoramicbuildingllc.com" id="contact-email">info@panoramicbuildingllc.com</a>
         </div>
       </div>
 
@@ -387,8 +387,8 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872">385-289-5872</a>
-      <a href="mailto:info@panoramicbuildingllc.com">info@panoramicbuildingllc.com</a>
+      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
   </footer>
@@ -478,7 +478,26 @@
           keywords: mat.toLowerCase() + ' production builder' });
       });
     }
-    fetch('site-config.json?v=' + Date.now()).then(function(r) { return r.json(); }).then(function(cfg) { buildSearchIndex(cfg); }).catch(function() {});
+    fetch('site-config.json?v=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(cfg) {
+        buildSearchIndex(cfg);
+        var s = cfg && cfg._site;
+        if (!s) return;
+        if (s.serviceArea) { var sa = document.getElementById('util-service-area'); if (sa) sa.innerHTML = s.serviceArea; }
+        if (s.phoneFmt) {
+          var digits = s.phone || s.phoneFmt.replace(/\D/g,'');
+          var up = document.getElementById('util-phone');    if (up) { up.href = 'tel:' + digits; up.textContent = '☎ ' + s.phoneFmt; }
+          var cp = document.getElementById('contact-phone'); if (cp) { cp.href = 'tel:' + digits; cp.textContent = s.phoneFmt; }
+          var fp = document.getElementById('footer-phone');  if (fp) { fp.href = 'tel:' + digits; fp.textContent = s.phoneFmt; }
+        }
+        if (s.email) {
+          var ue = document.getElementById('util-email');   if (ue) { ue.href = 'mailto:' + s.email; ue.textContent = '✉ ' + s.email; }
+          var ce = document.getElementById('contact-email'); if (ce) { ce.href = 'mailto:' + s.email; ce.textContent = s.email; }
+          var fe = document.getElementById('footer-email'); if (fe) { fe.href = 'mailto:' + s.email; fe.textContent = s.email; }
+        }
+      })
+      .catch(function() {});
     var ICONS = {
       page:    '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
       project: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>',
