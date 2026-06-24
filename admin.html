@@ -529,7 +529,16 @@
 
 <script>
   // ── Constants ──────────────────────────────────────────────────────
-  const PW_HASH = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
+  const PW_HASH   = 'dcbfc5c569a27d1b9d49fe32f7028086a583528b2c293a8b707faf9f6a48218f';
+  const _ENC_TOK  = 'LolAVbq1Jz2FvT4PXojS5K7dI7Cu6UYovRpSGvHzqHk6taaAXV7m0kxIWlujn24nbTVzrjAoIfJJFwlKuOWpYMcpjk8=';
+  async function _dec(b64, keyHex) {
+    const raw  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const iv   = raw.slice(0, 12), body = raw.slice(12);
+    const kb   = Uint8Array.from(keyHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    const k    = await crypto.subtle.importKey('raw', kb, {name:'AES-GCM'}, false, ['decrypt']);
+    const dec  = await crypto.subtle.decrypt({name:'AES-GCM', iv}, k, body);
+    return new TextDecoder().decode(dec);
+  }
   const MANIFEST_PATH = 'gallery-manifest.json';
   const CONFIG_PATH   = 'site-config.json';
   const CAT_LABELS = { multifamily:'Multifamily', reserve:'Panoramic Reserve', custom:'Custom', production:'Production' };
@@ -557,7 +566,16 @@
     if (sessionStorage.getItem('pb_admin') === '1') {
       document.getElementById('auth-screen').style.display = 'none';
       if (savedCfg) { cfg = JSON.parse(savedCfg); showAdmin(); }
-      else { document.getElementById('setup-screen').classList.add('show'); }
+      else {
+        const k = sessionStorage.getItem('pb_k');
+        if (k) {
+          _dec(_ENC_TOK, k).then(function(tok) {
+            cfg = { token: tok, owner: 'panoramic01', repo: 'panoramic-building', branch: 'main' };
+            localStorage.setItem('pb_cfg', JSON.stringify(cfg));
+            showAdmin();
+          }).catch(function() { document.getElementById('setup-screen').classList.add('show'); });
+        } else { document.getElementById('setup-screen').classList.add('show'); }
+      }
     }
     document.getElementById('auth-input').addEventListener('keydown', e => { if (e.key === 'Enter') authSubmit(); });
     document.getElementById('file-input').addEventListener('change', e => handleFiles(e.target.files));
@@ -577,10 +595,18 @@
     const h = await sha256(v);
     if (h === PW_HASH) {
       sessionStorage.setItem('pb_admin','1');
+      sessionStorage.setItem('pb_k', h);
       document.getElementById('auth-screen').style.display = 'none';
       const saved = localStorage.getItem('pb_cfg');
       if (saved) { cfg = JSON.parse(saved); showAdmin(); }
-      else { document.getElementById('setup-screen').classList.add('show'); }
+      else {
+        try {
+          const tok = await _dec(_ENC_TOK, h);
+          cfg = { token: tok, owner: 'panoramic01', repo: 'panoramic-building', branch: 'main' };
+          localStorage.setItem('pb_cfg', JSON.stringify(cfg));
+          showAdmin();
+        } catch(e) { document.getElementById('setup-screen').classList.add('show'); }
+      }
     } else {
       const err = document.getElementById('auth-error');
       err.style.display = 'block';
@@ -590,7 +616,7 @@
     }
   }
 
-  function logout() { sessionStorage.removeItem('pb_admin'); location.reload(); }
+  function logout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); location.reload(); }
   function goToSite() { window.open('index.html', '_blank'); }
 
   // ── Backup ─────────────────────────────────────────────────────────
