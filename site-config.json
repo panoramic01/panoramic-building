@@ -199,9 +199,11 @@
     },
     "rees": {
       "name": "Rees",
-      "location": "Paris Idaho",
+      "location": "Paris, ID",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
     },
     "hogan": {
       "name": "Hogan",
