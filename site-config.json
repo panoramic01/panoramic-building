@@ -160,6 +160,13 @@
       "materials": [],
       "featured": false
     },
+    "baker": {
+      "name": "Baker",
+      "location": "Laketown, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
     "lowell": {
       "name": "Lowell",
       "location": "Fish Haven, ID",
@@ -180,13 +187,6 @@
     "roberts": {
       "name": "Roberts",
       "location": "St Charles, ID",
-      "description": "",
-      "materials": [],
-      "featured": false
-    },
-    "baker": {
-      "name": "Baker",
-      "location": "Laketown, UT",
       "description": "",
       "materials": [],
       "featured": false
