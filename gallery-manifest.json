@@ -316,17 +316,8 @@
     "location": ""
   },
   "reserve/rees": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407212/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_260.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407203/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_251.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407204/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_250.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407206/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_252.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407208/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_253.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407210/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_258.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407212/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_260.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407213/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_256.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407215/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_257.jpg"
-    ],
+    "cover": null,
+    "photos": [],
     "location": "Paris Idaho"
   },
   "multifamily/building-c": {
