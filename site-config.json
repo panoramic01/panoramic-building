@@ -185,6 +185,12 @@
       "materials": [],
       "featured": false,
       "needsPhotos": true
+    },
+    "rees": {
+      "name": "Rees",
+      "location": "Paris Idaho",
+      "description": "",
+      "materials": []
     }
   },
   "custom": {
