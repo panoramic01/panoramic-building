@@ -205,9 +205,11 @@
     },
     "hogan": {
       "name": "Hogan",
-      "location": "Marysville Ut",
+      "location": "Marysville, UT",
       "description": "",
-      "materials": []
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
     }
   },
   "custom": {
