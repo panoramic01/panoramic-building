@@ -361,5 +361,10 @@
       "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407438/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_575.jpg"
     ],
     "location": "Bountiful Utah"
+  },
+  "reserve/hogan": {
+    "cover": null,
+    "photos": [],
+    "location": "Marysville Ut"
   }
 }
