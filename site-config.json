@@ -212,6 +212,14 @@
       "materials": [],
       "featured": false,
       "needsPhotos": true
+    },
+    "job-name-2": {
+      "name": "Lockhart",
+      "location": "Mendon, UT",
+      "description": "",
+      "materials": [],
+      "featured": false,
+      "needsPhotos": false
     }
   },
   "custom": {
@@ -231,13 +239,6 @@
     "job-name-1": {
       "name": "Spencer",
       "location": "Smithfield, UT",
-      "description": "",
-      "materials": [],
-      "featured": false
-    },
-    "job-name-2": {
-      "name": "Lockhart",
-      "location": "Mendon, UT",
       "description": "",
       "materials": [],
       "featured": false
