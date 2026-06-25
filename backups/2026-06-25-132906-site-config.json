@@ -1,0 +1,309 @@
+{
+  "_site": {
+    "phone": "3852895872",
+    "phoneFmt": "385-289-5872",
+    "email": "info@panoramicbuildingllc.com",
+    "serviceArea": "Serving Northern Utah &nbsp;&#183;&nbsp; Southern Idaho &nbsp;&#183;&nbsp; Wasatch Front",
+    "hero": {
+      "eyebrow": "New Construction Specialists &nbsp;&#183;&nbsp; Logan, Utah",
+      "h1": "Turn-Key Exteriors<br>Built for Builders",
+      "sub": "Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package including siding, masonry, stucco, soffit, fascia, paint and gutters all under one contract, on your schedule."
+    },
+    "seo": {
+      "index": {
+        "title": "Panoramic Building LLC | New Construction Exterior Specialists | Logan, Utah",
+        "desc": "Panoramic Building LLC specializes in new construction exterior finishing &mdash; siding, gutters, trim, soffit, and fascia. Serving Northern Utah, Southern Idaho, and the Wasatch Front. Based in Logan, UT."
+      },
+      "multifamily": {
+        "title": "Multifamily Exterior Contractor | Panoramic Building LLC | Utah & Idaho",
+        "desc": "Panoramic Building LLC delivers complete turn-key exterior packages for multifamily apartment and condo projects &mdash; siding, masonry, stucco, soffit, fascia, gutters & paint. Northern Utah & Southern Idaho."
+      },
+      "reserve": {
+        "title": "Panoramic Reserve Homes | Premium Exterior Specialist",
+        "desc": "For homes that call for something different. We work with specialty materials most crews never touch &mdash; natural wood, Sgiper, Chm Clad, full-bed stone &mdash; installed correctly from day one."
+      },
+      "custom": {
+        "title": "Custom Home Exteriors | Panoramic Building LLC",
+        "desc": "Custom exterior finishing for one-of-a-kind homes. Precision craftsmanship for every material, from hardboard to natural wood."
+      },
+      "production": {
+        "title": "Production Home Exteriors | Panoramic Building LLC",
+        "desc": "Turn-key siding, trim, gutters, and exterior packages for production home builders in Northern Utah and Southern Idaho."
+      }
+    }
+  },
+  "multifamily": {
+    "orchard-grove": {
+      "name": "Orchard Grove",
+      "location": "Idaho Falls, ID",
+      "description": "",
+      "stats": {
+        "units": 55,
+        "sqft": 25677,
+        "buildings": 1
+      },
+      "materials": [
+        "LP 8\" Lap Expert Finish",
+        "LP Panel B&B Expert Finish",
+        "Dryvit Stucco",
+        "Harristone Slate Lueders"
+      ]
+    },
+    "parkway": {
+      "name": "Parkway Apartments",
+      "location": "Idaho Falls, ID",
+      "description": "",
+      "stats": {
+        "units": 336,
+        "sqft": 276060,
+        "buildings": 17
+      },
+      "materials": [
+        "LP 8\" Lap Expert Finish",
+        "LP Panel B&B Expert Finish",
+        "LP SmartSide 8\" Lap",
+        "Dutch Quality Weather Ledge Winter Point",
+        "Mastic Dark Bronze Soffit",
+        "Mastic Dark Bronze Fascia"
+      ],
+      "year": 2026,
+      "featured": false
+    },
+    "altura": {
+      "name": "Altura Apartments",
+      "location": "Logan, UT",
+      "description": "",
+      "stats": {
+        "units": 168,
+        "sqft": 141369,
+        "buildings": 8
+      },
+      "materials": [
+        "LP Panel B&B Expert Finish",
+        "LP 8\" Lap Expert Finish",
+        "LP SmartSide 8\" Lap",
+        "Eldorado Loire Valley Rough Cut",
+        "Dryvit Stucco"
+      ],
+      "featured": false
+    },
+    "the-crossing": {
+      "name": "The Crossing",
+      "location": "Woods Cross, UT",
+      "description": "",
+      "stats": {
+        "units": 22,
+        "sqft": 34120,
+        "buildings": 5
+      },
+      "materials": [
+        "LP SmartSide 8\" Lap",
+        "LP NickelGap",
+        "Interstate Smokey Mountain Mod",
+        "Interstate Coal King",
+        "Smooth Hardie Panel"
+      ],
+      "featured": false,
+      "needsPhotos": true
+    },
+    "4th-main": {
+      "name": "4th + Main",
+      "location": "Bountiful, UT",
+      "description": "",
+      "stats": {
+        "units": 24,
+        "sqft": 19530,
+        "buildings": 2
+      },
+      "materials": []
+    },
+    "hyde-park-gateway": {
+      "name": "Hyde Park Gateway",
+      "location": "Hyde Park, UT",
+      "description": "",
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "building-c": {
+      "name": "4th + Main Building C",
+      "location": "Bountiful, UT",
+      "description": "",
+      "materials": [],
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      },
+      "featured": false,
+      "needsPhotos": true
+    }
+  },
+  "reserve": {
+    "lowell": {
+      "name": "Lowell",
+      "location": "Fish Haven, ID",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "blacktail": {
+      "name": "Blacktail",
+      "location": "Garden City, UT",
+      "description": "",
+      "materials": [
+        "Tresselwood"
+      ],
+      "year": 2025,
+      "featured": false
+    },
+    "watson": {
+      "name": "Watson",
+      "location": "",
+      "description": "",
+      "stats": {
+        "sqft": 0,
+        "buildings": 0
+      },
+      "materials": []
+    },
+    "goble": {
+      "name": "Goble",
+      "location": "North Logan, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "roberts": {
+      "name": "Roberts",
+      "location": "St Charles, ID",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "baker": {
+      "name": "Baker",
+      "location": "Laketown, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "lasswell": {
+      "name": "Lasswell",
+      "location": "Ovid, ID",
+      "description": "",
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
+    },
+    "rees": {
+      "name": "Rees",
+      "location": "Paris, ID",
+      "description": "",
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
+    },
+    "hogan": {
+      "name": "Hogan",
+      "location": "Marysville, UT",
+      "description": "",
+      "materials": [],
+      "featured": false,
+      "needsPhotos": true
+    },
+    "job-name-2": {
+      "name": "Lockhart",
+      "location": "Mendon, UT",
+      "description": "",
+      "materials": [],
+      "featured": false,
+      "needsPhotos": false
+    }
+  },
+  "custom": {
+    "job-name-10": {
+      "name": "Anderson",
+      "location": "Hyrum, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "pena-lloyd": {
+      "name": "Pena Lloyd",
+      "location": "Logan, UT",
+      "description": "",
+      "materials": []
+    },
+    "job-name-1": {
+      "name": "Spencer",
+      "location": "Smithfield, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-3": {
+      "name": "The Boat House",
+      "location": "Petersboro, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-4": {
+      "name": "Smith",
+      "location": "Mendon, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-5": {
+      "name": "HC08",
+      "location": "",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-6": {
+      "name": "Williams",
+      "location": "Providence, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-7": {
+      "name": "Twitchell",
+      "location": "Cove, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-8": {
+      "name": "Anderson",
+      "location": "Providence, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-9": {
+      "name": "Heath",
+      "location": "Smithfield, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
+    "job-name-11": {
+      "name": "ME42",
+      "location": "North Logan, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    }
+  },
+  "production": {
+    "description": "",
+    "materials": []
+  }
+}
