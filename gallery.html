@@ -64,6 +64,9 @@
     .nav-links a:hover, .nav-links a.active { color: #fff; }
     .nav-links .btn-nav { background: #1F3971; color: #fff; padding: 9px 22px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: background 0.2s; }
     .nav-links .btn-nav:hover { background: #163060; color: #fff; }
+    .nav-admin-btn { background: none; border: none; cursor: pointer; padding: 6px; color: rgba(255,255,255,0.45); transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .nav-admin-btn:hover { color: #fff; }
+    .nav-admin-btn svg { width: 20px; height: 20px; }
     .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
     .nav-toggle span { display: block; width: 24px; height: 2px; background: rgba(255,255,255,0.8); transition: all 0.3s; }
     .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -453,6 +456,11 @@
       </li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html" class="btn-nav">Get a Bid</a></li>
+      <li>
+        <a href="admin.html" class="nav-admin-btn" title="Admin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </a>
+      </li>
     </ul>
   </nav>
 
@@ -1159,13 +1167,4 @@
       var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
       var hash = Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
       if (hash === _APH) { sessionStorage.setItem('pb_admin','1'); sessionStorage.setItem('pb_k', hash); renderAdminDropdown(); }
-      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(); }
-    }
-    function adminLogout() { sessionStorage.removeItem('pb_admin'); sessionStorage.removeItem('pb_k'); sessionStorage.removeItem('pb_links'); document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    document.addEventListener('click', function(e) {
-      var w = document.getElementById('nav-admin-wrap');
-      if (w && !w.contains(e.target)) { document.getElementById('admin-dropdown').style.display='none'; document.getElementById('nav-admin-btn').classList.remove('active'); }
-    });
-  </script>
-</body>
-</html>
+      else { document.getElementById('admin-pw-error').style.display='block'; document.getElementById('admin-pw-input').value=''; document.getElementById('admin-pw-input').focus(
