@@ -28,50 +28,6 @@
       "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221880/panoramic-building/production/aidan-81-2.jpg"
     ]
   },
-  "reserve/lowell": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221881/panoramic-building/reserve/lowell/aidan-low.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221881/panoramic-building/reserve/lowell/aidan-low.jpg"
-    ]
-  },
-  "reserve/blacktail": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg"
-    ]
-  },
-  "reserve/watson": {
-    "cover": null,
-    "photos": []
-  },
-  "reserve/goble": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235090/panoramic-building/aidan_GOB.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235090/panoramic-building/aidan_GOB.jpg"
-    ]
-  },
-  "reserve/roberts": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221893/panoramic-building/reserve/roberts/aidan-rob.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221882/panoramic-building/reserve/roberts/aidan-rob-11.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221883/panoramic-building/reserve/roberts/aidan-rob-10.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221884/panoramic-building/reserve/roberts/aidan-rob-9.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221885/panoramic-building/reserve/roberts/aidan-rob-5.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221886/panoramic-building/reserve/roberts/aidan-rob-8.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221887/panoramic-building/reserve/roberts/aidan-rob-6.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221889/panoramic-building/reserve/roberts/aidan-rob-7.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221891/panoramic-building/reserve/roberts/aidan-rob-4.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221892/panoramic-building/reserve/roberts/aidan-rob-3.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221893/panoramic-building/reserve/roberts/aidan-rob.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221894/panoramic-building/reserve/roberts/aidan-rob-2.jpg"
-    ]
-  },
-  "reserve/baker": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg"
-    ]
-  },
   "multifamily/orchard-grove": {
     "cover": "assets/multifamily/orchard-grove/cover.jpg",
     "photos": [
@@ -158,13 +114,6 @@
   "multifamily/the-crossing": {
     "cover": null,
     "photos": []
-  },
-  "reserve/lasswell": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782251599/panoramic-building/9758.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782251599/panoramic-building/9758.jpg"
-    ],
-    "location": "Ovid, ID"
   },
   "custom/job-name-10": {
     "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782247048/panoramic-building/aidan_BAK-3-3.jpg",
@@ -315,6 +264,67 @@
     ],
     "location": ""
   },
+  "multifamily/building-c": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407430/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_573.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407430/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_573.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407434/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_574.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407436/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_576.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407438/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_575.jpg"
+    ],
+    "location": "Bountiful Utah"
+  },
+  "reserve/blacktail": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235868/panoramic-building/aidan_BLA.jpg"
+    ]
+  },
+  "reserve/lowell": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221881/panoramic-building/reserve/lowell/aidan-low.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221881/panoramic-building/reserve/lowell/aidan-low.jpg"
+    ]
+  },
+  "reserve/watson": {
+    "cover": null,
+    "photos": []
+  },
+  "reserve/goble": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235090/panoramic-building/aidan_GOB.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782235090/panoramic-building/aidan_GOB.jpg"
+    ]
+  },
+  "reserve/roberts": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221893/panoramic-building/reserve/roberts/aidan-rob.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221882/panoramic-building/reserve/roberts/aidan-rob-11.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221883/panoramic-building/reserve/roberts/aidan-rob-10.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221884/panoramic-building/reserve/roberts/aidan-rob-9.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221885/panoramic-building/reserve/roberts/aidan-rob-5.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221886/panoramic-building/reserve/roberts/aidan-rob-8.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221887/panoramic-building/reserve/roberts/aidan-rob-6.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221889/panoramic-building/reserve/roberts/aidan-rob-7.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221891/panoramic-building/reserve/roberts/aidan-rob-4.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221892/panoramic-building/reserve/roberts/aidan-rob-3.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221893/panoramic-building/reserve/roberts/aidan-rob.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782221894/panoramic-building/reserve/roberts/aidan-rob-2.jpg"
+    ]
+  },
+  "reserve/baker": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782236429/panoramic-building/aidan_BAK.jpg"
+    ]
+  },
+  "reserve/lasswell": {
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782251599/panoramic-building/9758.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782251599/panoramic-building/9758.jpg"
+    ],
+    "location": "Ovid, ID"
+  },
   "reserve/rees": {
     "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417808/panoramic-building/aidan_REES.jpg",
     "photos": [
@@ -328,16 +338,6 @@
       "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417816/panoramic-building/aidan_REES-2.jpg"
     ],
     "location": "Paris Idaho"
-  },
-  "multifamily/building-c": {
-    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407430/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_573.jpg",
-    "photos": [
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407430/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_573.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407434/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_574.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407436/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_576.jpg",
-      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782407438/panoramic-building/9bd1d88f-0e7b-4f5b-aaa7-982d2e4a88f7-1_all_575.jpg"
-    ],
-    "location": "Bountiful Utah"
   },
   "reserve/hogan": {
     "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782408017/panoramic-building/PXL_20251208_205926214.jpg",
