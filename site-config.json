@@ -203,9 +203,12 @@
       "name": "Rees",
       "location": "Paris, ID",
       "description": "",
-      "materials": [],
+      "materials": [
+        "Hardboard B&B",
+        "Merrilstone Cotswold"
+      ],
       "featured": false,
-      "needsPhotos": true
+      "needsPhotos": false
     },
     "hogan": {
       "name": "Hogan",
