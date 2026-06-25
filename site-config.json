@@ -153,6 +153,13 @@
       "year": 2025,
       "featured": false
     },
+    "goble": {
+      "name": "Goble",
+      "location": "North Logan, UT",
+      "description": "",
+      "materials": [],
+      "featured": false
+    },
     "lowell": {
       "name": "Lowell",
       "location": "Fish Haven, ID",
@@ -169,13 +176,6 @@
         "buildings": 0
       },
       "materials": []
-    },
-    "goble": {
-      "name": "Goble",
-      "location": "North Logan, UT",
-      "description": "",
-      "materials": [],
-      "featured": false
     },
     "roberts": {
       "name": "Roberts",
