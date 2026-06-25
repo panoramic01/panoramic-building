@@ -143,13 +143,6 @@
     }
   },
   "reserve": {
-    "lowell": {
-      "name": "Lowell",
-      "location": "Fish Haven, ID",
-      "description": "",
-      "materials": [],
-      "featured": false
-    },
     "blacktail": {
       "name": "Blacktail",
       "location": "Garden City, UT",
@@ -158,6 +151,13 @@
         "Tresselwood"
       ],
       "year": 2025,
+      "featured": false
+    },
+    "lowell": {
+      "name": "Lowell",
+      "location": "Fish Haven, ID",
+      "description": "",
+      "materials": [],
       "featured": false
     },
     "watson": {
