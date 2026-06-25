@@ -487,7 +487,16 @@
       <div class="sidebar-sec">
         <div class="sidebar-sec-label">Workflow</div>
         <div class="sidebar-item" id="nav-photo-queue" onclick="showPhotoQueue()">
-          <span>Photo Queue</span><span class="sidebar-badge" id="cnt-photo-queue" style="background:#e74c3c;color:#fff;"></span>
+          <span>Photo Queue</span><span class="sidebar-badge" id="cnt-photo-queue" style="background:#e74c3c;color:#fff;display:none;"></span>
+        </div>
+        <div class="sidebar-item" id="nav-leads" onclick="showLeads()">
+          <span>Leads</span><span class="sidebar-badge" id="cnt-leads" style="background:#e74c3c;color:#fff;display:none;"></span>
+        </div>
+        <div class="sidebar-item" id="nav-needs-materials" onclick="showNeedsMaterials()">
+          <span>Needs Materials</span><span class="sidebar-badge" id="cnt-needs-materials" style="background:#e67e22;color:#fff;display:none;"></span>
+        </div>
+        <div class="sidebar-item" id="nav-mf-stats" onclick="showMFStats()">
+          <span>MF Stats</span><span class="sidebar-badge" id="cnt-mf-stats" style="background:#e67e22;color:#fff;display:none;"></span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -930,14 +939,41 @@
       document.getElementById('cnt-'+c).textContent = slugs.filter(s=>catOf(s)===c).length;
     });
 
-    // Photo queue badge — count projects with needsPhotos: true
+    // Photo queue badge
     const photoQueueCount = slugs.filter(s => {
       const [cat, id] = s.split('/');
       const proj = siteConfig[cat] && siteConfig[cat][id];
       return proj && proj.needsPhotos;
     }).length;
-    const badge = document.getElementById('cnt-photo-queue');
-    if (badge) { badge.textContent = photoQueueCount || ''; badge.style.display = photoQueueCount ? '' : 'none'; }
+    const pqBadge = document.getElementById('cnt-photo-queue');
+    if (pqBadge) { pqBadge.textContent = photoQueueCount || ''; pqBadge.style.display = photoQueueCount ? '' : 'none'; }
+
+    // Leads badge — new (un-contacted) leads
+    const leads = (siteConfig._contacts) || [];
+    const newLeadsCount = leads.filter(l => l.status === 'new').length;
+    const ldBadge = document.getElementById('cnt-leads');
+    if (ldBadge) { ldBadge.textContent = newLeadsCount || ''; ldBadge.style.display = newLeadsCount ? '' : 'none'; }
+
+    // Needs materials badge — projects missing materials list
+    const needsMatsCount = slugs.filter(s => {
+      const [cat, id] = s.split('/');
+      const proj = cat === 'production' ? siteConfig.production : (siteConfig[cat] && siteConfig[cat][id]);
+      if (!proj) return false;
+      const mats = proj.materials;
+      return !mats || !Array.isArray(mats) || mats.length === 0;
+    }).length;
+    const nmBadge = document.getElementById('cnt-needs-materials');
+    if (nmBadge) { nmBadge.textContent = needsMatsCount || ''; nmBadge.style.display = needsMatsCount ? '' : 'none'; }
+
+    // MF stats badge — multifamily projects missing stats
+    const mfProjects = Object.entries((siteConfig.multifamily) || {});
+    const mfStatsMissing = mfProjects.filter(([id, p]) => {
+      if (!p || typeof p !== 'object') return false;
+      const st = p.stats || {};
+      return !st.units && !st.sqft && !st.buildings;
+    }).length;
+    const mfBadge = document.getElementById('cnt-mf-stats');
+    if (mfBadge) { mfBadge.textContent = mfStatsMissing || ''; mfBadge.style.display = mfStatsMissing ? '' : 'none'; }
 
     const filtered = currentCat === 'all' ? slugs : slugs.filter(s=>catOf(s)===currentCat);
     const label = currentCat === 'all' ? 'All Projects' : CAT_LABELS[currentCat];
@@ -2038,7 +2074,7 @@
             ${projects.map(function(p) {
               const photoCount = (manifest[p.slug] && manifest[p.slug].photos && manifest[p.slug].photos.length) || 0;
               const coverUrl   = manifest[p.slug] && manifest[p.slug].cover;
-              return `<div onclick="openProject('${escH(p.cat)}','${escH(p.id)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;padding:14px 18px;margin-bottom:8px;cursor:pointer;border-left:3px solid #e67e22;transition:background 0.15s;" onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background='#fff'">
+              return `<div onclick="openProject('${escH(p.slug)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;padding:14px 18px;margin-bottom:8px;cursor:pointer;border-left:3px solid #e67e22;transition:background 0.15s;" onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background='#fff'">
                 <div style="width:52px;height:52px;background:#f0efe9;flex-shrink:0;overflow:hidden;">
                   ${coverUrl ? `<img src="${escH(coverUrl)}" style="width:100%;height:100%;object-fit:cover;" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#D1D0CB;font-size:11px;letter-spacing:1px;">NO PHOTO</div>'}
                 </div>
@@ -2069,411 +2105,273 @@
       ${groupsHtml}`;
   }
 
+  // ── Leads ─────────────────────────────────────────────────────────────────
+
+  var _leadsFilter = 'new';
+
+  function showLeads(filter) {
+    if (filter !== undefined) _leadsFilter = filter;
+    setSidebarActive('nav-leads');
+    const leads = Array.isArray(siteConfig._contacts) ? siteConfig._contacts : [];
+    leads.sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''));
+
+    const STATUS_LABELS = { new: 'New', contacted: 'Contacted', quoted: 'Quoted', won: 'Won', lost: 'Lost' };
+    const STATUS_COLORS = { new: '#e74c3c', contacted: '#1F3971', quoted: '#8e44ad', won: '#27ae60', lost: '#95a5a6' };
+
+    const counts = {};
+    Object.keys(STATUS_LABELS).forEach(s => { counts[s] = leads.filter(l => l.status === s).length; });
+    counts.all = leads.length;
+
+    const tabs = ['all','new','contacted','quoted','won','lost'].map(s => {
+      const active = _leadsFilter === s;
+      const c = s === 'all' ? leads.length : counts[s];
+      return `<button onclick="showLeads('${s}')" style="padding:6px 14px;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;border:1px solid ${active?'#1F3971':'#e8e7e3'};background:${active?'#1F3971':'#fff'};color:${active?'#fff':'#6B6960'};cursor:pointer;border-radius:3px;">${s==='all'?'All':STATUS_LABELS[s]}${c?' ('+c+')':''}</button>`;
+    }).join('');
+
+    const filtered = _leadsFilter === 'all' ? leads : leads.filter(l => l.status === _leadsFilter);
+
+    let listHtml = '';
+    if (filtered.length === 0) {
+      listHtml = `<div style="text-align:center;padding:60px 20px;color:#A2A092;">
+        <div style="font-size:14px;font-weight:600;color:#2E2E2E;margin-bottom:6px;">${_leadsFilter === 'new' ? 'No new leads' : 'Nothing here'}</div>
+        <div style="font-size:12px;">${_leadsFilter === 'new' ? 'Add a lead when a bid request comes in.' : 'No leads with this status.'}</div>
+      </div>`;
+    } else {
+      listHtml = filtered.map(l => {
+        const col = STATUS_COLORS[l.status] || '#8A887E';
+        const lbl = STATUS_LABELS[l.status] || l.status;
+        const date = l.dateAdded ? new Date(l.dateAdded).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+        return `<div onclick="openLeadModal('${escH(l.id)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;border-left:3px solid ${col};padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f2'" onmouseout="this.style.background='#fff'">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:#2E2E2E;">${escH(l.name)}${l.company?' <span style="font-weight:400;color:#8A887E;">— '+escH(l.company)+'</span>':''}</div>
+            <div style="font-size:11px;color:#A2A092;margin-top:3px;">${escH(l.projectType||'')}${l.location?' · '+escH(l.location):''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:${col};text-transform:uppercase;">${lbl}</div>
+            <div style="font-size:10px;color:#A2A092;margin-top:3px;">${date}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="ch">
+        <div class="ch-left"><h2>Leads</h2><p>${leads.length} total · ${counts.new} new</p></div>
+        <button class="btn-primary" onclick="openLeadModal(null)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M12 5v14M5 12h14"/></svg>
+          Add Lead
+        </button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">${tabs}</div>
+      ${listHtml}`;
+  }
+
+  function openLeadModal(id) {
+    const leads = Array.isArray(siteConfig._contacts) ? siteConfig._contacts : [];
+    const existing = id ? leads.find(l => l.id === id) : null;
+    const STATUS_OPTS = ['new','contacted','quoted','won','lost'];
+    const STATUS_LABELS = { new:'New', contacted:'Contacted', quoted:'Quoted', won:'Won', lost:'Lost' };
+
+    const sel = s => STATUS_OPTS.map(o => `<option value="${o}"${(existing&&existing.status===o||(!existing&&o==='new'))?'selected':''}>${STATUS_LABELS[o]}</option>`).join('');
+
+    document.getElementById('admin-main').insertAdjacentHTML('beforeend', `
+      <div class="modal-wrap" id="lead-modal" onclick="if(event.target===this)closeLeadModal()" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center;">
+        <div class="modal" style="background:#fff;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:28px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="font-size:16px;font-weight:700;">${existing ? 'Edit Lead' : 'Add Lead'}</h3>
+            <button onclick="closeLeadModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#A2A092;">×</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label class="form-lbl">Full Name *</label><input class="form-input" id="ld-name" value="${escH(existing&&existing.name||'')}" placeholder="John Smith" /></div>
+            <div><label class="form-lbl">Company</label><input class="form-input" id="ld-company" value="${escH(existing&&existing.company||'')}" placeholder="Smith Dev LLC" /></div>
+            <div><label class="form-lbl">Phone</label><input class="form-input" id="ld-phone" value="${escH(existing&&existing.phone||'')}" placeholder="(801) 555-0100" /></div>
+            <div><label class="form-lbl">Email</label><input class="form-input" id="ld-email" value="${escH(existing&&existing.email||'')}" placeholder="john@company.com" /></div>
+            <div><label class="form-lbl">Project Type</label>
+              <select class="form-select" id="ld-type">
+                <option value="">-- Select --</option>
+                ${['Multifamily Development','Custom Home','Production Home','Panoramic Reserve','Commercial','Other'].map(t=>`<option${(existing&&existing.projectType===t)?' selected':''}>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div><label class="form-lbl">Location</label><input class="form-input" id="ld-location" value="${escH(existing&&existing.location||'')}" placeholder="City, State" /></div>
+          </div>
+          <div style="margin-top:12px;"><label class="form-lbl">Status</label>
+            <select class="form-select" id="ld-status">${sel()}</select>
+          </div>
+          <div style="margin-top:12px;"><label class="form-lbl">Notes</label>
+            <textarea class="form-input" id="ld-notes" rows="3" style="resize:vertical;">${escH(existing&&existing.notes||'')}</textarea>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+            ${existing ? `<button onclick="deleteLead('${escH(id)}')" style="padding:8px 14px;background:none;border:1px solid #e74c3c;color:#e74c3c;font-size:12px;cursor:pointer;border-radius:2px;">Delete</button>` : ''}
+            <button onclick="closeLeadModal()" style="padding:8px 18px;background:none;border:1px solid #e8e7e3;font-size:12px;cursor:pointer;border-radius:2px;">Cancel</button>
+            <button class="btn-primary" onclick="saveLead('${escH(id||'')}')">Save</button>
+          </div>
+        </div>
+      </div>`);
+    document.getElementById('ld-name').focus();
+  }
+
+  function closeLeadModal() {
+    const m = document.getElementById('lead-modal');
+    if (m) m.remove();
+  }
+
+  async function saveLead(id) {
+    const name = (document.getElementById('ld-name').value || '').trim();
+    if (!name) { alert('Name is required.'); return; }
+    if (!Array.isArray(siteConfig._contacts)) siteConfig._contacts = [];
+    const now = new Date().toISOString();
+    const lead = {
+      id:          id || ('lead-' + Date.now()),
+      name,
+      company:     document.getElementById('ld-company').value.trim(),
+      phone:       document.getElementById('ld-phone').value.trim(),
+      email:       document.getElementById('ld-email').value.trim(),
+      projectType: document.getElementById('ld-type').value,
+      location:    document.getElementById('ld-location').value.trim(),
+      status:      document.getElementById('ld-status').value,
+      notes:       document.getElementById('ld-notes').value.trim(),
+      dateAdded:   id ? (siteConfig._contacts.find(l=>l.id===id)||{}).dateAdded || now : now,
+      dateUpdated: now
+    };
+    const idx = siteConfig._contacts.findIndex(l => l.id === lead.id);
+    if (idx >= 0) siteConfig._contacts[idx] = lead; else siteConfig._contacts.push(lead);
+    try {
+      await saveSiteConfig(id ? `Update lead: ${name}` : `Add lead: ${name}`);
+      closeLeadModal();
+      showLeads();
+      renderProjects(); // refresh badges
+      toast('Lead saved', 'success');
+    } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+  }
+
+  async function deleteLead(id) {
+    if (!confirm('Delete this lead?')) return;
+    if (!Array.isArray(siteConfig._contacts)) return;
+    siteConfig._contacts = siteConfig._contacts.filter(l => l.id !== id);
+    try {
+      await saveSiteConfig('Delete lead');
+      closeLeadModal();
+      showLeads();
+      renderProjects();
+      toast('Lead deleted', 'success');
+    } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
+  }
+
+  // ── Needs Materials ────────────────────────────────────────────────────────
+
+  function showNeedsMaterials() {
+    setSidebarActive('nav-needs-materials');
+    const CAT_ORDER  = ['multifamily','reserve','custom','production'];
+    const CAT_LABELS_LOCAL = { multifamily:'Multifamily', reserve:'Panoramic Reserve', custom:'Custom Homes', production:'Production' };
+
+    const missing = [];
+    const slugs = Object.keys(manifest);
+    slugs.forEach(s => {
+      const [cat, id] = s.split('/');
+      const proj = cat === 'production' ? siteConfig.production : (siteConfig[cat] && siteConfig[cat][id]);
+      if (!proj) return;
+      const mats = proj.materials;
+      if (!mats || !Array.isArray(mats) || mats.length === 0) {
+        missing.push({ cat, id, slug: s, name: proj.name || (cat === 'production' ? 'Production' : id), location: proj.location || '' });
+      }
+    });
+
+    const byCategory = {};
+    missing.forEach(p => { if (!byCategory[p.cat]) byCategory[p.cat] = []; byCategory[p.cat].push(p); });
+
+    let groupsHtml = '';
+    if (missing.length === 0) {
+      groupsHtml = `<div style="text-align:center;padding:60px 20px;color:#A2A092;">
+        <div style="font-size:14px;font-weight:600;color:#2E2E2E;margin-bottom:6px;">All caught up</div>
+        <div style="font-size:12px;">Every project has materials listed.</div>
+      </div>`;
+    } else {
+      CAT_ORDER.forEach(cat => {
+        const projects = byCategory[cat];
+        if (!projects || !projects.length) return;
+        groupsHtml += `
+          <div style="margin-bottom:28px;">
+            <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#A2A092;margin-bottom:10px;">${CAT_LABELS_LOCAL[cat]}</div>
+            ${projects.map(p => `
+              <div onclick="openProject('${escH(p.slug)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;border-left:3px solid #e67e22;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background='#fff'">
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:#2E2E2E;">${escH(p.name)}</div>
+                  <div style="font-size:11px;color:#A2A092;margin-top:2px;">${escH(p.location)}</div>
+                </div>
+                <div style="font-size:9px;color:#e67e22;letter-spacing:1px;text-transform:uppercase;font-weight:600;">No Materials</div>
+              </div>`).join('')}
+          </div>`;
+      });
+    }
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="ch">
+        <div class="ch-left"><h2>Needs Materials</h2><p>${missing.length} project${missing.length !== 1 ? 's' : ''} missing a materials list</p></div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #f0d080;padding:12px 16px;margin-bottom:24px;font-size:12px;color:#a07800;line-height:1.6;">
+        <strong>How it works:</strong> Open any project → Content tab → add materials. Once a project has at least one material it disappears from this list.
+      </div>
+      ${groupsHtml}`;
+  }
+
+  // ── MF Stats ───────────────────────────────────────────────────────────────
+
+  function showMFStats() {
+    setSidebarActive('nav-mf-stats');
+    const mfProjects = Object.entries((siteConfig.multifamily) || {});
+
+    const missing = mfProjects.filter(([id, p]) => {
+      if (!p || typeof p !== 'object') return false;
+      const st = p.stats || {};
+      return !st.units && !st.sqft && !st.buildings;
+    }).map(([id, p]) => ({ id, name: p.name || id, location: p.location || '', stats: p.stats || {} }));
+
+    const complete = mfProjects.filter(([id, p]) => {
+      if (!p || typeof p !== 'object') return false;
+      const st = p.stats || {};
+      return st.units || st.sqft || st.buildings;
+    }).map(([id, p]) => ({ id, name: p.name || id, location: p.location || '', stats: p.stats || {} }));
+
+    const missingHtml = missing.length === 0
+      ? `<div style="text-align:center;padding:40px 20px;color:#A2A092;font-size:12px;">All multifamily projects have stats.</div>`
+      : missing.map(p => `
+          <div onclick="openProject('multifamily/${escH(p.id)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;border-left:3px solid #e67e22;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background='#fff'">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:#2E2E2E;">${escH(p.name)}</div>
+              <div style="font-size:11px;color:#A2A092;margin-top:2px;">${escH(p.location)}</div>
+            </div>
+            <div style="font-size:9px;color:#e67e22;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Missing Stats</div>
+          </div>`).join('');
+
+    const completeHtml = complete.length === 0 ? '' : `
+      <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#A2A092;margin:24px 0 10px;">Complete</div>
+      ${complete.map(p => `
+        <div onclick="openProject('multifamily/${escH(p.id)}')" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e8e7e3;border-left:3px solid #27ae60;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f7f6f2'" onmouseout="this.style.background='#fff'">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:#2E2E2E;">${escH(p.name)}</div>
+            <div style="font-size:11px;color:#A2A092;margin-top:2px;">${escH(p.location)}</div>
+          </div>
+          <div style="text-align:right;font-size:11px;color:#8A887E;">
+            ${p.stats.units ? `<span>${p.stats.units} units</span>` : ''}
+            ${p.stats.sqft  ? ` · <span>${Number(p.stats.sqft).toLocaleString()} sqft</span>` : ''}
+            ${p.stats.buildings ? ` · <span>${p.stats.buildings} bldg${p.stats.buildings!==1?'s':''}</span>` : ''}
+          </div>
+        </div>`).join('')}`;
+
+    document.getElementById('admin-main').innerHTML = `
+      <div class="ch">
+        <div class="ch-left"><h2>MF Stats</h2><p>${missing.length} of ${mfProjects.length} multifamily project${mfProjects.length!==1?'s':''} missing stats</p></div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #f0d080;padding:12px 16px;margin-bottom:24px;font-size:12px;color:#a07800;line-height:1.6;">
+        <strong>Stats needed:</strong> Units, square footage, and building count for the project detail overlay. Open a project → Content tab to add them.
+      </div>
+      ${missing.length > 0 ? `<div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#A2A092;margin-bottom:10px;">Missing Stats</div>` : ''}
+      ${missingHtml}
+      ${completeHtml}`;
+  }
+
   // Pages read from this key at load time — no HTML editing needed.
   function showSiteSettings(section) {
     document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
     const el = document.getElementById('ss-' + section);
-    if (el) el.classList.add('active');
-    currentSlug = null;
-
-    const site = siteConfig._site || {};
-
-    if (section === 'company') {
-      const phone    = site.phone    || '3852895872';
-      const phoneFmt = site.phoneFmt || '385-289-5872';
-      const email    = site.email    || 'info@panoramicbuildingllc.com';
-      const area     = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
-
-      document.getElementById('admin-main').innerHTML = `
-        <div class="ch"><div class="ch-left">
-          <h2>Company Info</h2>
-          <p>Updates phone, email &amp; service area across all site pages instantly</p>
-        </div></div>
-        <div class="ss-form">
-          <div class="form-grp">
-            <div class="ce-form-row">
-              <div>
-                <label class="form-lbl">Phone (digits only)</label>
-                <input class="form-input" id="ss-phone" type="text" value="${escH(phone)}" placeholder="e.g. 3852895872" />
-              </div>
-              <div>
-                <label class="form-lbl">Phone (display)</label>
-                <input class="form-input" id="ss-phonefmt" type="text" value="${escH(phoneFmt)}" placeholder="e.g. 385-289-5872" />
-              </div>
-            </div>
-          </div>
-          <div class="form-grp">
-            <label class="form-lbl">Email Address</label>
-            <input class="form-input" id="ss-email" type="text" value="${escH(email)}" />
-          </div>
-          <div class="form-grp">
-            <label class="form-lbl">Service Area Tagline (HTML allowed)</label>
-            <input class="form-input" id="ss-area" type="text" value="${escH(area)}" />
-            <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
-              <button type="button" onclick="insertDot('ss-area')" style="font-size:10px;padding:3px 10px;background:#eef2fb;border:1px solid #d5e0f7;color:#1F3971;cursor:pointer;letter-spacing:0.5px;font-family:inherit;">&#183; Insert Dot Separator</button>
-              <span style="font-size:11px;color:#A2A092;">Click to insert &amp;nbsp;&#183;&amp;nbsp; at cursor</span>
-            </div>
-          </div>
-          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
-            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('company')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save
-            </button>
-          </div>
-        </div>`;
-
-    } else if (section === 'hero') {
-      const hero = site.hero || {};
-      const eyebrow = hero.eyebrow || '';
-      const h1      = hero.h1      || '';
-      const sub     = hero.sub     || '';
-
-      document.getElementById('admin-main').innerHTML = `
-        <div class="ch"><div class="ch-left">
-          <h2>Homepage Hero</h2>
-          <p>Edit the hero headline on the home page</p>
-        </div></div>
-        <div class="ss-form">
-          <div class="form-grp">
-            <label class="form-lbl">Eyebrow Text</label>
-            <input class="form-input" id="ss-eyebrow" type="text" value="${escH(eyebrow)}" />
-            <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
-              <button type="button" onclick="insertDot('ss-eyebrow')" style="font-size:10px;padding:3px 10px;background:#eef2fb;border:1px solid #d5e0f7;color:#1F3971;cursor:pointer;letter-spacing:0.5px;font-family:inherit;">&#183; Insert Dot Separator</button>
-              <span style="font-size:11px;color:#A2A092;">Click to insert &amp;nbsp;&#183;&amp;nbsp; at cursor</span>
-            </div>
-          </div>
-          <div class="form-grp">
-            <label class="form-lbl">Heading (&lt;br&gt; for line break)</label>
-            <input class="form-input" id="ss-h1" type="text" value="${escH(h1)}" />
-          </div>
-          <div class="form-grp">
-            <label class="form-lbl">Sub-headline</label>
-            <textarea class="ce-textarea" id="ss-sub">${escH(sub)}</textarea>
-          </div>
-          <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e8e7e3;">
-            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('hero')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save Hero
-            </button>
-          </div>
-        </div>`;
-
-    } else if (section === 'seo') {
-      const seo   = site.seo || {};
-      const pages = ['index','multifamily','reserve','custom','production'];
-      const fields = pages.map(pg => {
-        const s = seo[pg] || {};
-        return `
-          <div style="margin-bottom:28px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1F3971;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0efe9;">${pg}.html</div>
-            <div class="form-grp">
-              <label class="form-lbl">Page Title</label>
-              <input class="form-input" id="seo-title-${pg}" type="text" value="${escH(s.title || '')}" />
-            </div>
-            <div class="form-grp" style="margin-bottom:0;">
-              <label class="form-lbl">Meta Description</label>
-              <textarea class="ce-textarea" id="seo-desc-${pg}" style="min-height:52px;">${escH(s.desc || '')}</textarea>
-            </div>
-          </div>`;
-      }).join('');
-
-      document.getElementById('admin-main').innerHTML = `
-        <div class="ch"><div class="ch-left">
-          <h2>SEO / Meta</h2>
-          <p>Page titles and meta descriptions, applied dynamically on every page load</p>
-        </div></div>
-        <div class="ss-form">
-          ${fields}
-          <div style="display:flex;gap:12px;padding-top:20px;border-top:1px solid #e8e7e3;">
-            <button class="btn-primary" id="ss-save-btn" onclick="saveSiteSettings('seo')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save All
-            </button>
-          </div>
-        </div>`;
-    }
-  }
-
-  async function saveSiteSettings(section) {
-    const btn = document.getElementById('ss-save-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-
-    try {
-      if (!siteConfig._site) siteConfig._site = {};
-
-      if (section === 'company') {
-        siteConfig._site.phone      = document.getElementById('ss-phone').value.trim();
-        siteConfig._site.phoneFmt   = document.getElementById('ss-phonefmt').value.trim();
-        siteConfig._site.email      = document.getElementById('ss-email').value.trim();
-        siteConfig._site.serviceArea = document.getElementById('ss-area').value.trim();
-        await saveSiteConfig('Update company info');
-        toast('Company info saved. Changes go live on all pages.', 'success');
-
-      } else if (section === 'hero') {
-        if (!siteConfig._site.hero) siteConfig._site.hero = {};
-        siteConfig._site.hero.eyebrow = document.getElementById('ss-eyebrow').value;
-        siteConfig._site.hero.h1      = document.getElementById('ss-h1').value;
-        siteConfig._site.hero.sub     = document.getElementById('ss-sub').value;
-        await saveSiteConfig('Update homepage hero');
-        toast('Hero saved', 'success');
-
-      } else if (section === 'seo') {
-        if (!siteConfig._site.seo) siteConfig._site.seo = {};
-        ['index','multifamily','reserve','custom','production'].forEach(pg => {
-          siteConfig._site.seo[pg] = {
-            title: (document.getElementById('seo-title-' + pg) || {}).value || '',
-            desc:  (document.getElementById('seo-desc-'  + pg) || {}).value || ''
-          };
-        });
-        await saveSiteConfig('Update SEO meta');
-        toast('SEO saved', 'success');
-      }
-
-      if (btn) {
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
-        setTimeout(() => {
-          if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save'; }
-        }, 2500);
-      }
-    } catch(err) {
-      toast('Save failed: ' + err.message, 'error');
-      if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
-    }
-  }
-
-  // ── Materials library ──────────────────────────────────────────────
-  function getAllMaterials() {
-    const seen = new Set();
-    const mats = [];
-    function scan(obj) {
-      if (!obj || typeof obj !== 'object') return;
-      if (Array.isArray(obj.materials)) {
-        obj.materials.forEach(m => { if (m && !seen.has(m)) { seen.add(m); mats.push(m); } });
-      }
-      Object.values(obj).forEach(v => { if (v && typeof v === 'object' && !Array.isArray(v)) scan(v); });
-    }
-    if (siteConfig) scan(siteConfig);
-    return mats.sort((a, b) => a.localeCompare(b));
-  }
-
-  let matDropdownFocusIdx = -1;
-
-  function setupMatInput() {
-    const input = document.getElementById('mat-add-input');
-    const drop  = document.getElementById('mat-dropdown');
-    if (!input || !drop) return;
-
-    input.addEventListener('keydown', e => {
-      const items = drop.querySelectorAll('.mat-dropdown-item');
-      if (e.key === 'Enter')  { e.preventDefault(); if (matDropdownFocusIdx >= 0 && items[matDropdownFocusIdx]) { pickMaterial(items[matDropdownFocusIdx].dataset.val); } else { addMaterial(); } return; }
-      if (e.key === 'Escape') { hideMatDropdown(); return; }
-      if (e.key === 'ArrowDown')  { e.preventDefault(); matDropdownFocusIdx = Math.min(matDropdownFocusIdx + 1, items.length - 1); highlightDropItem(items); return; }
-      if (e.key === 'ArrowUp')    { e.preventDefault(); matDropdownFocusIdx = Math.max(matDropdownFocusIdx - 1, -1); highlightDropItem(items); return; }
-    });
-
-    input.addEventListener('input', () => { matDropdownFocusIdx = -1; renderMatDropdown(input.value.trim()); });
-    input.addEventListener('focus', () => { matDropdownFocusIdx = -1; renderMatDropdown(input.value.trim()); });
-    input.addEventListener('blur',  () => { setTimeout(hideMatDropdown, 150); });
-  }
-
-  function highlightDropItem(items) {
-    items.forEach((el, i) => el.classList.toggle('focused', i === matDropdownFocusIdx));
-    if (matDropdownFocusIdx >= 0 && items[matDropdownFocusIdx]) items[matDropdownFocusIdx].scrollIntoView({ block: 'nearest' });
-  }
-
-  function renderMatDropdown(query) {
-    const drop = document.getElementById('mat-dropdown');
-    if (!drop) return;
-    const all = getAllMaterials().filter(m => !contentMaterials.includes(m));
-    const filtered = query ? all.filter(m => m.toLowerCase().includes(query.toLowerCase())) : all;
-
-    if (!filtered.length) {
-      drop.innerHTML = all.length
-        ? `<div class="mat-dropdown-empty">No match. Press Add to create "${escH(query)}"</div>`
-        : `<div class="mat-dropdown-empty">No materials used yet. Type one and press Add.</div>`;
-    } else {
-      const hintHtml = `<div class="mat-dropdown-hint">Previously used</div>`;
-      const itemsHtml = filtered.map(m =>
-        `<div class="mat-dropdown-item" data-val="${escH(m)}" onmousedown="pickMaterial('${escH(m.replace(/'/g,"\\'"))}')">
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 8 6 12 14 4"/></svg>
-          ${escH(m)}
-        </div>`
-      ).join('');
-      drop.innerHTML = hintHtml + itemsHtml;
-    }
-    drop.classList.add('open');
-  }
-
-  function hideMatDropdown() {
-    const drop = document.getElementById('mat-dropdown');
-    if (drop) { drop.classList.remove('open'); drop.innerHTML = ''; }
-    matDropdownFocusIdx = -1;
-  }
-
-  function pickMaterial(val) {
-    if (!val || contentMaterials.includes(val)) return;
-    contentMaterials.push(val);
-    const input = document.getElementById('mat-add-input');
-    if (input) { input.value = ''; input.focus(); }
-    hideMatDropdown();
-    refreshChips();
-  }
-
-  function addMaterial() {
-    const input = document.getElementById('mat-add-input');
-    if (!input) return;
-    const val = input.value.trim();
-    if (!val || contentMaterials.includes(val)) { if (!val) return; input.value = ''; return; }
-    contentMaterials.push(val);
-    input.value = '';
-    hideMatDropdown();
-    refreshChips();
-    input.focus();
-  }
-
-  function removeMaterial(idx) {
-    contentMaterials.splice(idx, 1);
-    refreshChips();
-  }
-
-  function refreshChips() {
-    const el = document.getElementById('mat-chips');
-    if (!el) return;
-    el.innerHTML = contentMaterials.map((m, i) =>
-      `<div class="mat-chip">${escH(m)}<button class="mat-chip-del" onclick="removeMaterial(${i})" title="Remove">×</button></div>`
-    ).join('');
-  }
-
-  async function deleteProject() {
-    const slug = currentSlug;
-    if (!slug) return;
-    const name = (manifest[slug] && manifest[slug].name) ||
-                 (siteConfig[contentCat] && siteConfig[contentCat][contentSlug] && siteConfig[contentCat][contentSlug].name) ||
-                 slug;
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-
-    // Remove from in-memory data
-    const manifestBackup    = JSON.parse(JSON.stringify(manifest));
-    const siteConfigBackup  = JSON.parse(JSON.stringify(siteConfig));
-    delete manifest[slug];
-    if (siteConfig[contentCat] && siteConfig[contentCat][contentSlug]) {
-      delete siteConfig[contentCat][contentSlug];
-    }
-
-    try {
-      await Promise.all([
-        saveManifest(`Delete project: ${slug}`),
-        saveSiteConfig(`Delete project: ${slug}`)
-      ]);
-      toast(`"${name}" deleted`, 'success');
-      currentSlug = null;
-      contentCat  = null;
-      contentSlug = null;
-      renderProjects();
-    } catch(e) {
-      // Restore on failure
-      Object.assign(manifest, manifestBackup);
-      Object.assign(siteConfig, siteConfigBackup);
-      toast('Delete failed: ' + e.message, 'error');
-    }
-  }
-
-  async function saveContentProject() {
-    const btn = document.getElementById('ce-save-btn');
-    if (!btn) return;
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
-
-    const oldCat       = contentCat;
-    const isProduction = oldCat === 'production';
-    const id           = contentSlug;
-
-    try {
-      if (isProduction) {
-        if (!siteConfig.production) siteConfig.production = {};
-        const descEl = document.getElementById('ce-description');
-        siteConfig.production.description = descEl ? descEl.value.trim() : '';
-        siteConfig.production.materials   = [...contentMaterials];
-        await saveSiteConfig('Update production content');
-
-      } else {
-        const catEl      = document.getElementById('ce-category');
-        const nameEl     = document.getElementById('ce-name');
-        const locationEl = document.getElementById('ce-location');
-        const descEl     = document.getElementById('ce-description');
-        const newCat     = catEl ? catEl.value : oldCat;
-
-        const proj = Object.assign({}, (siteConfig[oldCat] || {})[id] || {});
-        if (nameEl)     proj.name        = nameEl.value.trim();
-        if (locationEl) proj.location    = locationEl.value.trim();
-        if (descEl)     proj.description = descEl.value.trim();
-        proj.materials = [...contentMaterials];
-
-        const yearEl       = document.getElementById('ce-year');
-        const featuredEl   = document.getElementById('ce-featured');
-        const needsPhotosEl = document.getElementById('ce-needs-photos');
-        const yearVal      = yearEl ? parseInt(yearEl.value) : 0;
-        if (yearVal >= 2000 && yearVal <= 2099) proj.year = yearVal;
-        else delete proj.year;
-        proj.featured     = featuredEl    ? featuredEl.checked    : false;
-        proj.needsPhotos  = needsPhotosEl ? needsPhotosEl.checked : false;
-
-        if (newCat === 'multifamily') {
-          const unitsEl     = document.getElementById('ce-units');
-          const sqftEl      = document.getElementById('ce-sqft');
-          const buildingsEl = document.getElementById('ce-buildings');
-          proj.stats = {
-            units:     parseInt(unitsEl     ? unitsEl.value     : 0) || 0,
-            sqft:      parseInt(sqftEl      ? sqftEl.value      : 0) || 0,
-            buildings: parseInt(buildingsEl ? buildingsEl.value : 0) || 0
-          };
-        } else {
-          delete proj.stats;
-        }
-
-        const catChanged = newCat !== oldCat;
-
-        if (catChanged) {
-          if (siteConfig[oldCat]) delete siteConfig[oldCat][id];
-          if (!siteConfig[newCat]) siteConfig[newCat] = {};
-          siteConfig[newCat][id] = proj;
-
-          const oldManifestKey = oldCat + '/' + id;
-          const newManifestKey = newCat + '/' + id;
-          if (manifest[oldManifestKey] !== undefined) {
-            manifest[newManifestKey] = manifest[oldManifestKey];
-            delete manifest[oldManifestKey];
-          }
-
-          await Promise.all([
-            saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`),
-            saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
-          ]);
-
-          contentCat  = newCat;
-          currentSlug = newManifestKey;
-
-        } else {
-          if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
-          siteConfig[oldCat][id] = proj;
-          await saveSiteConfig(`Update content: ${oldCat}/${id}`);
-        }
-      }
-
-      toast('Saved', 'success');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
-      setTimeout(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
-        }
-      }, 2500);
-    } catch(e) {
-      toast('Save failed: ' + e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = 'Save Changes';
-    }
-  }
-</script>
-</body>
-</html>
+    if (el) el.classL
