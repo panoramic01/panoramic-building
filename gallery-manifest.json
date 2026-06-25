@@ -316,8 +316,17 @@
     "location": ""
   },
   "reserve/rees": {
-    "cover": null,
-    "photos": [],
+    "cover": "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417808/panoramic-building/aidan_REES.jpg",
+    "photos": [
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417808/panoramic-building/aidan_REES.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417809/panoramic-building/aidan_REES-6.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417810/panoramic-building/aidan_REES-7.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417811/panoramic-building/aidan_REES-8.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417812/panoramic-building/aidan_REES-3.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417813/panoramic-building/aidan_REES-5.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417815/panoramic-building/aidan_REES-4.jpg",
+      "https://res.cloudinary.com/ddbkmw2g0/image/upload/v1782417816/panoramic-building/aidan_REES-2.jpg"
+    ],
     "location": "Paris Idaho"
   },
   "multifamily/building-c": {
