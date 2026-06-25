@@ -127,6 +127,17 @@
         "buildings": 0
       },
       "materials": []
+    },
+    "building-c": {
+      "name": "Building C",
+      "location": "Bountiful Utah",
+      "description": "",
+      "materials": [],
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      }
     }
   },
   "reserve": {
