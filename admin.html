@@ -72,6 +72,18 @@
     .sidebar-link svg { flex-shrink: 0; }
     .sidebar-bottom { margin-top: auto; padding-bottom: 12px; }
 
+    /* ── Activity feed ─────────────────────────────────────────────── */
+    .activity-feed { display: flex; flex-direction: column; }
+    .activity-item { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid #f0efe9; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-desc { font-size: 13px; color: #2E2E2E; line-height: 1.45; }
+    .activity-ts { font-size: 11px; color: #A2A092; margin-top: 3px; }
+    .activity-empty { text-align: center; padding: 70px 0; color: #A2A092; font-size: 13px; }
+    .activity-clear-btn { background: none; border: 1px solid #D1D0CB; color: #8A887E; padding: 6px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; transition: all 0.18s; }
+    .activity-clear-btn:hover { border-color: #c0392b; color: #c0392b; }
+
     /* ── Main ─────────────────────────────────────────────────────── */
     .admin-main { flex: 1; overflow-y: auto; padding: 32px 36px; }
 
@@ -501,6 +513,9 @@
         </div>
         <div class="sidebar-item" id="nav-mf-stats" onclick="showMFStats()">
           <span>MF Stats</span><span class="sidebar-badge" id="cnt-mf-stats" style="background:#e67e22;color:#fff;display:none;"></span>
+        </div>
+        <div class="sidebar-item" id="nav-activity" onclick="showActivity()">
+          <span>Activity</span>
         </div>
       </div>
       <div class="sidebar-divider"></div>
@@ -1124,6 +1139,7 @@
 
     try {
       toast('Saving order…');
+      logActivity('order', `Reordered ${cat} projects`);
       await Promise.all([saveManifest('Reorder projects'), saveSiteConfig('Reorder projects')]);
       toast('Order saved!');
     } catch(e) {
@@ -1416,6 +1432,7 @@
       uploaded.forEach(p => { if (!entry.photos.includes(p)) entry.photos.push(p); });
       if (!entry.cover) entry.cover = uploaded[0];
       try {
+        logActivity('photo', `Uploaded ${uploaded.length} photo${uploaded.length>1?'s':''} to ${currentSlug}`);
         await saveManifest(`Add ${uploaded.length} photo(s) to ${currentSlug}`);
         toast(`${uploaded.length} photo${uploaded.length>1?'s':''} uploaded`, 'success');
         renderDetail();
@@ -1444,6 +1461,7 @@
     if (!currentSlug) return;
     manifest[currentSlug].cover = path;
     try {
+      logActivity('photo', `Set cover for ${currentSlug}`);
       await saveManifest(`Set cover for ${currentSlug}`);
       toast('Cover updated', 'success');
       renderDetail();
@@ -1471,6 +1489,7 @@
         entry.photos = (entry.photos||[]).filter(p => p !== path);
         if (entry.cover === path) entry.cover = entry.photos[0] || null;
       }
+      logActivity('photo', `Deleted photo from ${currentSlug}`);
       await saveManifest(`Remove photo from ${currentSlug}`);
       toast('Photo deleted', 'success');
       renderDetail();
@@ -1499,6 +1518,7 @@
     if (si < 0 || di < 0) return;
     photos.splice(si, 1);
     photos.splice(di, 0, srcPath);
+    logActivity('photo', `Reordered photos in ${currentSlug}`);
     saveManifest(`Reorder photos in ${currentSlug}`)
       .then(() => { toast('Order saved', 'success'); renderDetail('photos'); })
       .catch(err => toast('Reorder failed: ' + err.message, 'error'));
@@ -2313,6 +2333,7 @@
     const idx = siteConfig._contacts.findIndex(l => l.id === lead.id);
     if (idx >= 0) siteConfig._contacts[idx] = lead; else siteConfig._contacts.push(lead);
     try {
+      logActivity('lead', id ? `Updated lead: ${name}` : `Added lead: ${name}`);
       await saveSiteConfig(id ? `Update lead: ${name}` : `Add lead: ${name}`);
       closeLeadModal();
       showLeads();
@@ -2326,12 +2347,76 @@
     if (!Array.isArray(siteConfig._contacts)) return;
     siteConfig._contacts = siteConfig._contacts.filter(l => l.id !== id);
     try {
+      logActivity('lead', 'Deleted lead');
       await saveSiteConfig('Delete lead');
       closeLeadModal();
       showLeads();
       renderProjects();
       toast('Lead deleted', 'success');
     } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
+  }
+
+  // ── Activity Log ──────────────────────────────────────────────────────────
+
+  const ACTIVITY_COLORS = {
+    photo:    '#1F3971',
+    project:  '#27ae60',
+    lead:     '#e74c3c',
+    settings: '#8A887E',
+    order:    '#9b59b6',
+  };
+
+  function logActivity(type, desc) {
+    if (!siteConfig) return;
+    if (!Array.isArray(siteConfig._activity)) siteConfig._activity = [];
+    siteConfig._activity.unshift({ ts: new Date().toISOString(), type: type || 'project', desc });
+    if (siteConfig._activity.length > 200) siteConfig._activity.length = 200;
+  }
+
+  function relativeTime(isoStr) {
+    const diff = Math.floor((Date.now() - new Date(isoStr)) / 1000);
+    if (diff < 60)   return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + ' days ago';
+    return new Date(isoStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  function showActivity() {
+    setSidebarActive('nav-activity');
+    const log = (siteConfig && siteConfig._activity) || [];
+    const main = document.getElementById('admin-main');
+    main.innerHTML = `
+      <div class="ch">
+        <div class="ch-left">
+          <h2>Activity</h2>
+          <p>${log.length} change${log.length !== 1 ? 's' : ''} recorded</p>
+        </div>
+        ${log.length ? `<button class="activity-clear-btn" onclick="clearActivity()">Clear All</button>` : ''}
+      </div>
+      <div style="background:#fff;border:1px solid #e8e7e3;padding:0 24px;">
+        ${log.length ? `
+          <div class="activity-feed">
+            ${log.map(e => `
+              <div class="activity-item">
+                <div class="activity-dot" style="background:${ACTIVITY_COLORS[e.type] || '#A2A092'};"></div>
+                <div class="activity-body">
+                  <div class="activity-desc">${escH(e.desc || '')}</div>
+                  <div class="activity-ts">${relativeTime(e.ts)}</div>
+                </div>
+              </div>`).join('')}
+          </div>` : `<div class="activity-empty">No activity recorded yet.<br>Changes you make will appear here.</div>`}
+      </div>`;
+  }
+
+  async function clearActivity() {
+    if (!confirm('Clear all activity history?')) return;
+    siteConfig._activity = [];
+    try {
+      await saveSiteConfig('Clear activity log');
+      showActivity();
+      toast('Activity cleared', 'success');
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
   }
 
   // ── Needs Materials ────────────────────────────────────────────────────────
@@ -2578,6 +2663,7 @@
         siteConfig._site.phoneFmt   = document.getElementById('ss-phonefmt').value.trim();
         siteConfig._site.email      = document.getElementById('ss-email').value.trim();
         siteConfig._site.serviceArea = document.getElementById('ss-area').value.trim();
+        logActivity('settings', 'Updated company info');
         await saveSiteConfig('Update company info');
         toast('Company info saved. Changes go live on all pages.', 'success');
 
@@ -2586,6 +2672,7 @@
         siteConfig._site.hero.eyebrow = document.getElementById('ss-eyebrow').value;
         siteConfig._site.hero.h1      = document.getElementById('ss-h1').value;
         siteConfig._site.hero.sub     = document.getElementById('ss-sub').value;
+        logActivity('settings', 'Updated homepage hero');
         await saveSiteConfig('Update homepage hero');
         toast('Hero saved', 'success');
 
@@ -2597,6 +2684,7 @@
             desc:  (document.getElementById('seo-desc-'  + pg) || {}).value || ''
           };
         });
+        logActivity('settings', 'Updated SEO meta');
         await saveSiteConfig('Update SEO meta');
         toast('SEO saved', 'success');
       }
@@ -2733,6 +2821,7 @@
     }
 
     try {
+      logActivity('project', `Deleted project: ${name}`);
       await Promise.all([
         saveManifest(`Delete project: ${slug}`),
         saveSiteConfig(`Delete project: ${slug}`)
@@ -2766,6 +2855,7 @@
         const descEl = document.getElementById('ce-description');
         siteConfig.production.description = descEl ? descEl.value.trim() : '';
         siteConfig.production.materials   = [...contentMaterials];
+        logActivity('project', 'Updated production content');
         await saveSiteConfig('Update production content');
 
       } else {
@@ -2818,7 +2908,7 @@
           }
 
           await Promise.all([
-            saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`),
+            (logActivity('project', `Moved ${proj.name || id} from ${oldCat} to ${newCat}`), saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`)),
             saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
           ]);
 
@@ -2828,6 +2918,7 @@
         } else {
           if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
           siteConfig[oldCat][id] = proj;
+          logActivity('project', `Updated ${proj.name || id} (${oldCat})`);
           await saveSiteConfig(`Update content: ${oldCat}/${id}`);
         }
       }
