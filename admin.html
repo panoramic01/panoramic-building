@@ -2872,4 +2872,71 @@
         proj.materials = [...contentMaterials];
 
         const yearEl       = document.getElementById('ce-year');
-        const featuredEl   = document.getElementById('ce
+        const featuredEl   = document.getElementById('ce-featured');
+        const needsPhotosEl = document.getElementById('ce-needs-photos');
+        const yearVal      = yearEl ? parseInt(yearEl.value) : 0;
+        if (yearVal >= 2000 && yearVal <= 2099) proj.year = yearVal;
+        else delete proj.year;
+        proj.featured     = featuredEl    ? featuredEl.checked    : false;
+        proj.needsPhotos  = needsPhotosEl ? needsPhotosEl.checked : false;
+
+        if (newCat === 'multifamily') {
+          const unitsEl     = document.getElementById('ce-units');
+          const sqftEl      = document.getElementById('ce-sqft');
+          const buildingsEl = document.getElementById('ce-buildings');
+          proj.stats = {
+            units:     parseInt(unitsEl     ? unitsEl.value     : 0) || 0,
+            sqft:      parseInt(sqftEl      ? sqftEl.value      : 0) || 0,
+            buildings: parseInt(buildingsEl ? buildingsEl.value : 0) || 0
+          };
+        } else {
+          delete proj.stats;
+        }
+
+        const catChanged = newCat !== oldCat;
+
+        if (catChanged) {
+          if (siteConfig[oldCat]) delete siteConfig[oldCat][id];
+          if (!siteConfig[newCat]) siteConfig[newCat] = {};
+          siteConfig[newCat][id] = proj;
+
+          const oldManifestKey = oldCat + '/' + id;
+          const newManifestKey = newCat + '/' + id;
+          if (manifest[oldManifestKey] !== undefined) {
+            manifest[newManifestKey] = manifest[oldManifestKey];
+            delete manifest[oldManifestKey];
+          }
+
+          await Promise.all([
+            (logActivity('project', `Moved ${proj.name || id} from ${oldCat} to ${newCat}`), saveSiteConfig(`Move ${id} from ${oldCat} to ${newCat}`)),
+            saveManifest(`Move ${id} from ${oldCat} to ${newCat}`)
+          ]);
+
+          contentCat  = newCat;
+          currentSlug = newManifestKey;
+
+        } else {
+          if (!siteConfig[oldCat]) siteConfig[oldCat] = {};
+          siteConfig[oldCat][id] = proj;
+          logActivity('project', `Updated ${proj.name || id} (${oldCat})`);
+          await saveSiteConfig(`Update content: ${oldCat}/${id}`);
+        }
+      }
+
+      toast('Saved', 'success');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg> Saved';
+      setTimeout(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes';
+        }
+      }, 2500);
+    } catch(e) {
+      toast('Save failed: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Save Changes';
+    }
+  }
+</script>
+</body>
+</html>
