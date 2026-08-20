@@ -140,6 +140,17 @@
       },
       "featured": false,
       "needsPhotos": true
+    },
+    "cache-valley-market-place": {
+      "name": "Cache Valley Market Place",
+      "location": "Logan, UT",
+      "description": "",
+      "materials": [],
+      "stats": {
+        "units": 0,
+        "sqft": 0,
+        "buildings": 0
+      }
     }
   },
   "reserve": {
