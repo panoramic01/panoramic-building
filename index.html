@@ -709,7 +709,7 @@
   <!-- Utility Bar -->
   <div class="util-bar">
     <span id="util-service-area">Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
-    <span class="util-right"><a href="tel:3852895872" id="util-phone">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com" id="util-email">&#9993; info@panoramicbuildingllc.com</a></span>
+    <span class="util-right"><span id="util-phone-wrap" style="display:none"><a id="util-phone"></a> &nbsp;&nbsp; </span><a href="mailto:info@panoramicbuildingllc.com" id="util-email">&#9993; info@panoramicbuildingllc.com</a></span>
   </div>
 
   <!-- Navigation -->
@@ -761,7 +761,7 @@
         <h1 class="hero-h1" id="hero-h1">Turn-Key Exteriors<br>Built for Builders.</h1>
         <p class="hero-sub" id="hero-sub">Stop coordinating multiple trades for one exterior. We deliver a complete turn-key package: siding, gutters, trim, soffit, and fascia under one contract, on your schedule.</p>
         <a href="contact.html" class="btn-primary">Request a Bid</a>
-        <p class="hero-phone">Or call &nbsp;<a href="tel:3852895872">385-289-5872</a></p>
+        <p class="hero-phone" id="hero-phone" style="display:none">Or call &nbsp;<a id="hero-phone-link"></a></p>
       </div>
     </div>
   </section>
@@ -922,7 +922,7 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a id="footer-phone" style="display:none"></a>
       <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
@@ -1090,8 +1090,12 @@
         // Util bar
         if (s.serviceArea) { var sa = document.getElementById('util-service-area'); if (sa) sa.innerHTML = s.serviceArea; }
         if (s.phoneFmt) {
+          var phoneDigits = s.phone || s.phoneFmt.replace(/\D/g,'');
           var up = document.getElementById('util-phone');
-          if (up) { up.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); up.textContent = '☎ ' + s.phoneFmt; }
+          if (up) { up.href = 'tel:' + phoneDigits; up.textContent = '☎ ' + s.phoneFmt; }
+          var upw = document.getElementById('util-phone-wrap'); if (upw) upw.style.display = '';
+          var hp = document.getElementById('hero-phone'), hpl = document.getElementById('hero-phone-link');
+          if (hp && hpl) { hpl.href = 'tel:' + phoneDigits; hpl.textContent = s.phoneFmt; hp.style.display = ''; }
         }
         if (s.email) {
           var ue = document.getElementById('util-email');
@@ -1100,7 +1104,7 @@
         // Footer
         if (s.phoneFmt) {
           var fp = document.getElementById('footer-phone');
-          if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; }
+          if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; fp.style.display = ''; }
         }
         if (s.email) {
           var fe = document.getElementById('footer-email');

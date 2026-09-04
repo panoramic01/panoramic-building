@@ -425,8 +425,6 @@
   <div class="util-bar">
     <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
     <span class="util-right">
-      <a href="tel:3852895872">&#9990; 385-289-5872</a>
-      &nbsp;&nbsp;
       <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a>
     </span>
   </div>
@@ -759,7 +757,7 @@
     <div>
       <p class="footer-col-title">Contact</p>
       <ul class="footer-links">
-        <li><a href="tel:3852895872" id="footer-phone">385-289-5872</a></li>
+        <li id="footer-phone-li" style="display:none"><a id="footer-phone"></a></li>
         <li><a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a></li>
         <li>Logan, Utah 84321</li>
       </ul>
@@ -928,19 +926,18 @@
       var site = cfg._site || {};
       var bar  = document.querySelector('.util-bar');
       if (bar && site) {
-        var p  = site.phone    || '3852895872';
+        var p  = site.phone    || '';
         var pf = site.phoneFmt || p;
         var e  = site.email    || 'info@panoramicbuildingllc.com';
         var a  = site.serviceArea || 'Serving Northern Utah &nbsp;&#183;&nbsp; Southern Idaho &nbsp;&#183;&nbsp; Wasatch Front';
         bar.innerHTML =
           '<span>' + a + '</span>' +
           '<span class="util-right">' +
-            '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
-            ' &nbsp;&nbsp; ' +
+            (pf ? '<a href="tel:' + (p || pf.replace(/\D/g,'')) + '">&#9990; ' + pf + '</a> &nbsp;&nbsp; ' : '') +
             '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
           '</span>';
       }
-      if (site.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (site.phone || site.phoneFmt.replace(/\D/g,'')); fp.textContent = site.phoneFmt; } }
+      if (site.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (site.phone || site.phoneFmt.replace(/\D/g,'')); fp.textContent = site.phoneFmt; var fpl = document.getElementById('footer-phone-li'); if (fpl) fpl.style.display = ''; } }
       if (site.email)    { var fe = document.getElementById('footer-email');  if (fe) { fe.href = 'mailto:' + site.email; fe.textContent = site.email; } }
     }).catch(function(e) { console.warn('Could not load gallery manifest', e); });
 

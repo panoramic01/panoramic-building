@@ -279,7 +279,6 @@
       "provider": {
         "@type": "LocalBusiness",
         "name": "Panoramic Building LLC",
-        "telephone": "+13852895872",
         "url": "https://www.panoramicbuildingllc.com"
       },
       "areaServed": ["Utah", "Idaho"],
@@ -292,7 +291,7 @@
   <div class="accent-top"></div>
   <div class="util-bar">
     <span>Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front</span>
-    <span class="util-right"><a href="tel:3852895872">&#9990; 385-289-5872</a> &nbsp;&nbsp; <a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></span>
+    <span class="util-right"><a href="mailto:info@panoramicbuildingllc.com">&#9993; info@panoramicbuildingllc.com</a></span>
   </div>
   <nav class="nav" role="navigation">
     <a class="nav-logo" href="index.html" aria-label="Panoramic Building LLC home">
@@ -404,7 +403,7 @@
       <img src="assets/logo.png" alt="Panoramic Building LLC" onerror="this.style.display='none'" />
     </div>
     <div class="footer-contact-info">
-      <a href="tel:3852895872" id="footer-phone">385-289-5872</a>
+      <a id="footer-phone" style="display:none"></a>
       <a href="mailto:info@panoramicbuildingllc.com" id="footer-email">info@panoramicbuildingllc.com</a>
       <a href="contact.html" class="footer-bid">Get a Bid</a>
     </div>
@@ -453,15 +452,14 @@
     function applyUtilBar(site) {
       var bar = document.querySelector('.util-bar');
       if (!bar || !site) return;
-      var p  = site.phone       || '3852895872';
+      var p  = site.phone       || '';
       var pf = site.phoneFmt    || p;
       var e  = site.email       || 'info@panoramicbuildingllc.com';
       var a  = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
       bar.innerHTML =
         '<span>' + a + '</span>' +
         '<span class="util-right">' +
-          '<a href="tel:' + p + '">&#9990; ' + pf + '</a>' +
-          ' &nbsp;&nbsp; ' +
+          (pf ? '<a href="tel:' + (p || pf.replace(/\D/g,'')) + '">&#9990; ' + pf + '</a> &nbsp;&nbsp; ' : '') +
           '<a href="mailto:' + e + '">&#9993; ' + e + '</a>' +
         '</span>';
     }
@@ -589,7 +587,7 @@
       applyConfig(cfg);
       applyUtilBar(cfg._site || {});
       var s = cfg._site || {};
-      if (s && s.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; } }
+      if (s && s.phoneFmt) { var fp = document.getElementById('footer-phone'); if (fp) { fp.href = 'tel:' + (s.phone || s.phoneFmt.replace(/\D/g,'')); fp.textContent = s.phoneFmt; fp.style.display = ''; } }
       if (s && s.email)    { var fe = document.getElementById('footer-email');  if (fe) { fe.href = 'mailto:' + s.email; fe.textContent = s.email; } }
       // Auto-open project from URL hash (e.g. multifamily.html#orchard-grove)
       var hash = window.location.hash.replace('#', '');

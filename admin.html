@@ -2536,8 +2536,8 @@
     const site = siteConfig._site || {};
 
     if (section === 'company') {
-      const phone    = site.phone    || '3852895872';
-      const phoneFmt = site.phoneFmt || '385-289-5872';
+      const phone    = site.phone    || '';
+      const phoneFmt = site.phoneFmt || '';
       const email    = site.email    || 'info@panoramicbuildingllc.com';
       const area     = site.serviceArea || 'Serving Northern Utah &nbsp;·&nbsp; Southern Idaho &nbsp;·&nbsp; Wasatch Front';
 
@@ -2551,11 +2551,11 @@
             <div class="ce-form-row">
               <div>
                 <label class="form-lbl">Phone (digits only)</label>
-                <input class="form-input" id="ss-phone" type="text" value="${escH(phone)}" placeholder="e.g. 3852895872" />
+                <input class="form-input" id="ss-phone" type="text" value="${escH(phone)}" placeholder="e.g. 8015550100" />
               </div>
               <div>
                 <label class="form-lbl">Phone (display)</label>
-                <input class="form-input" id="ss-phonefmt" type="text" value="${escH(phoneFmt)}" placeholder="e.g. 385-289-5872" />
+                <input class="form-input" id="ss-phonefmt" type="text" value="${escH(phoneFmt)}" placeholder="e.g. 801-555-0100" />
               </div>
             </div>
           </div>
