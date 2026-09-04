@@ -1,7 +1,7 @@
 {
   "_site": {
-    "phone": "3852895872",
-    "phoneFmt": "385-289-5872",
+    "phone": "",
+    "phoneFmt": "",
     "email": "info@panoramicbuildingllc.com",
     "serviceArea": "Serving Northern Utah &nbsp;&#183;&nbsp; Southern Idaho &nbsp;&#183;&nbsp; Wasatch Front",
     "hero": {
@@ -319,5 +319,12 @@
   "production": {
     "description": "",
     "materials": []
-  }
+  },
+  "_activity": [
+    {
+      "ts": "2026-09-04T21:51:21.915Z",
+      "type": "settings",
+      "desc": "Updated company info"
+    }
+  ]
 }
